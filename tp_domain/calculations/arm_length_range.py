@@ -180,7 +180,11 @@ def calculate_arm_length_range(
     elif level == DefensibilityLevel.MODERATE:
         conclusion = f"This transfer price is MODERATE. Rate {transaction.rate_percent}% is outside P25-P75 but within reasonable range. Requires additional documentation."
     else:
-        conclusion = f"This transfer price is RISKY. Rate {transaction.rate_percent}% significantly exceeds benchmark ({p75}%). High audit probability."
+        # Distinguish between exceeds and below
+        if transaction.rate_percent > p75:
+            conclusion = f"This transfer price is RISKY. Rate {transaction.rate_percent}% significantly EXCEEDS benchmark ({p75}%). High audit probability."
+        else:
+            conclusion = f"This transfer price is RISKY. Rate {transaction.rate_percent}% significantly BELOW benchmark ({p25}%). High audit probability."
 
     return AnalysisResult(
         transaction_id=transaction.id or "unknown",
