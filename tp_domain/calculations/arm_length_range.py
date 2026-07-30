@@ -20,7 +20,9 @@ def load_comparables() -> List[Comparable]:
     path = Path(__file__).parent.parent / "comparables.json"
     with open(path, encoding="utf-8") as f:
         data = json.load(f)
-    return [Comparable(**item) for item in data]
+    # Skip metadata if present
+    comparables_list = data.get("comparables", data) if isinstance(data, dict) and "comparables" in data else data
+    return [Comparable(**item) for item in comparables_list]
 
 
 def filter_comparables(
@@ -65,9 +67,9 @@ def calculate_percentiles(values: List[float]) -> dict:
     sorted_vals = sorted(values)
 
     return {
-        "p25": float(np.percentile(sorted_vals, 25)),
-        "p50": float(np.percentile(sorted_vals, 50)),
-        "p75": float(np.percentile(sorted_vals, 75)),
+        "p25": round(float(np.percentile(sorted_vals, 25)), 2),  # REDONDEAR
+        "p50": round(float(np.percentile(sorted_vals, 50)), 2),  # REDONDEAR
+        "p75": round(float(np.percentile(sorted_vals, 75)), 2),  # REDONDEAR
         "count": len(sorted_vals)
     }
 
