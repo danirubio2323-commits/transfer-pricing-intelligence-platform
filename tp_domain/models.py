@@ -88,6 +88,7 @@ class Transaction(BaseModel):
 
     # Tipo de transacción
     transaction_type: TransactionType = Field(..., description="Tipo: royalty, dividend, etc.")
+    industry: str = Field(..., description="Industry: pharmaceutical, software, manufacturing")
 
     # Datos económicos
     amount_eur: float = Field(..., gt=0, description="Monto en EUR")
@@ -104,6 +105,7 @@ class Transaction(BaseModel):
                 "from_country": "ES",
                 "to_country": "LU",
                 "transaction_type": "royalty",
+                "industry": "software",
                 "amount_eur": 1000000,
                 "rate_percent": 12.0,
                 "effective_date": "2024-01-01"
@@ -118,9 +120,11 @@ class Transaction(BaseModel):
 class BenchmarkRange(BaseModel):
     """El rango de precios arm's length según comparables"""
 
-    percentile_25: float
-    percentile_50: float  # mediana
-    percentile_75: float
+    # Optional: son None cuando no se encuentran comparables para la transacción.
+    # La UI comprueba `percentile_25 is None` para mostrar el caso "sin datos".
+    percentile_25: Optional[float] = None
+    percentile_50: Optional[float] = None  # mediana
+    percentile_75: Optional[float] = None
     count_comparables: int
 
     class Config:
@@ -141,7 +145,8 @@ class AnalysisResult(BaseModel):
     method_recommended: TPMethod
     benchmark_range: BenchmarkRange
     proposed_rate: float
-    defensibility_score: int = Field(..., ge=1, le=10, description="1-10, donde 10 es muy defensible")
+    # Optional: es None cuando no hay comparables suficientes para puntuar.
+    defensibility_score: Optional[int] = Field(None, ge=1, le=10, description="1-10, donde 10 es muy defensible")
     defensibility_level: DefensibilityLevel
     comparables_used: List[Comparable]
     risk_factors: List[str] = Field(default_factory=list)

@@ -11,6 +11,7 @@ from tp_domain.models import (
     Transaction, TransactionType, TPMethod,
     BenchmarkRange, AnalysisResult, DefensibilityLevel, Comparable
 )
+from tp_domain.calculations.arm_length_range import calculate_arm_length_range
 
 # ============================================================================
 # PAGE CONFIG
@@ -54,6 +55,13 @@ with st.sidebar.form("transaction_form"):
         [t.value for t in TransactionType]
     )
 
+    # Industry selector
+    industry = st.selectbox(
+        "Industry",
+        ["pharmaceutical", "software", "manufacturing"],
+        help="Select the industry to find relevant comparables"
+    )
+
     # Datos económicos
     col1, col2 = st.columns(2)
     with col1:
@@ -88,54 +96,20 @@ if submitted:
             from_country=from_country.upper(),
             to_country=to_country.upper(),
             transaction_type=transaction_type,
+            industry=industry,
             amount_eur=amount_eur,
             rate_percent=rate_percent,
             effective_date=effective_date,
             method_hint=None if method_hint == "Auto-detect" else method_hint
         )
 
-        # MOCK RESULT (for now, hardcoded)
-        # Later this will call real analysis logic
+        # REAL CALCULATION: call domain logic
+        result = calculate_arm_length_range(transaction)
 
-        comparable_1 = Comparable(
-            id="comp_001",
-            company_name="Pharma Corp AG",
-            country="CH",
-            industry="pharmaceutical",
-            royalty_rate=5.2,
-            data_year=2024,
-            source="OECD TP Database"
-        )
-
-        comparable_2 = Comparable(
-            id="comp_002",
-            company_name="BioTech Ltd",
-            country="DE",
-            industry="pharmaceutical",
-            royalty_rate=6.8,
-            data_year=2024,
-            source="OECD TP Database"
-        )
-
-        result = AnalysisResult(
-            transaction_id="tx_001",
-            method_recommended=TPMethod.CUP,
-            benchmark_range=BenchmarkRange(
-                percentile_25=4.5,
-                percentile_50=6.1,
-                percentile_75=8.2,
-                count_comparables=23
-            ),
-            proposed_rate=rate_percent,
-            defensibility_score=4,
-            defensibility_level=DefensibilityLevel.WEAK,
-            comparables_used=[comparable_1, comparable_2],
-            risk_factors=[
-                f"Rate {rate_percent}% exceeds 90th percentile (8.2%)",
-                "Only 2 recent comparables found for this industry"
-            ],
-            conclusion="This transfer price is RISKY. High probability of audit challenge. Consider adjusting rate to 6-8% range."
-        )
+        # Handle no-data case
+        if result.benchmark_range.percentile_25 is None:
+            st.error(result.conclusion)
+            st.stop()
 
         # Display results in columns
         col1, col2, col3, col4 = st.columns(4)
