@@ -6,11 +6,6 @@ Simple web interface to analyze transfer pricing transactions.
 
 import streamlit as st
 from datetime import datetime
-import sys
-from pathlib import Path
-
-# Add project root to path for imports
-sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from tp_domain.models import (
     Transaction, TransactionType, TPMethod,
