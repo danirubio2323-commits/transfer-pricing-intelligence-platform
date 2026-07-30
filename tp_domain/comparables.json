@@ -32,7 +32,7 @@
       "gross_margin": 73.9,
       "operating_margin": 26.0,
       "data_year": 2024,
-      "source": "OECD TP Database"
+      "source": "OECD TP Database (synthetic)"
     },
     {
       "id": "comp_002",
@@ -43,7 +43,7 @@
       "gross_margin": 70.9,
       "operating_margin": 22.1,
       "data_year": 2024,
-      "source": "OECD TP Database"
+      "source": "OECD TP Database (synthetic)"
     },
     {
       "id": "comp_003",
@@ -54,7 +54,7 @@
       "gross_margin": 74.9,
       "operating_margin": 30.0,
       "data_year": 2025,
-      "source": "OECD TP Database"
+      "source": "OECD TP Database (synthetic)"
     },
     {
       "id": "comp_004",
@@ -65,7 +65,7 @@
       "gross_margin": 82.0,
       "operating_margin": 24.4,
       "data_year": 2025,
-      "source": "OECD TP Database"
+      "source": "OECD TP Database (synthetic)"
     },
     {
       "id": "comp_005",
@@ -76,7 +76,7 @@
       "gross_margin": 71.2,
       "operating_margin": 21.2,
       "data_year": 2024,
-      "source": "OECD TP Database"
+      "source": "OECD TP Database (synthetic)"
     },
     {
       "id": "comp_006",
@@ -87,7 +87,7 @@
       "gross_margin": 81.6,
       "operating_margin": 24.3,
       "data_year": 2025,
-      "source": "OECD TP Database"
+      "source": "OECD TP Database (synthetic)"
     },
     {
       "id": "comp_007",
@@ -98,7 +98,7 @@
       "gross_margin": 76.9,
       "operating_margin": 18.7,
       "data_year": 2024,
-      "source": "OECD TP Database"
+      "source": "OECD TP Database (synthetic)"
     },
     {
       "id": "comp_008",
@@ -109,7 +109,7 @@
       "gross_margin": 72.8,
       "operating_margin": 26.1,
       "data_year": 2025,
-      "source": "OECD TP Database"
+      "source": "OECD TP Database (synthetic)"
     },
     {
       "id": "comp_009",
@@ -120,7 +120,7 @@
       "gross_margin": 72.8,
       "operating_margin": 18.7,
       "data_year": 2025,
-      "source": "OECD TP Database"
+      "source": "OECD TP Database (synthetic)"
     },
     {
       "id": "comp_010",
@@ -131,7 +131,7 @@
       "gross_margin": 84.4,
       "operating_margin": 30.1,
       "data_year": 2024,
-      "source": "OECD TP Database"
+      "source": "OECD TP Database (synthetic)"
     },
     {
       "id": "comp_011",
@@ -142,7 +142,7 @@
       "gross_margin": 72.2,
       "operating_margin": 26.9,
       "data_year": 2024,
-      "source": "OECD TP Database"
+      "source": "OECD TP Database (synthetic)"
     },
     {
       "id": "comp_012",
@@ -153,7 +153,7 @@
       "gross_margin": 79.9,
       "operating_margin": 20.9,
       "data_year": 2024,
-      "source": "OECD TP Database"
+      "source": "OECD TP Database (synthetic)"
     },
     {
       "id": "comp_013",
@@ -164,7 +164,7 @@
       "gross_margin": 74.8,
       "operating_margin": 18.2,
       "data_year": 2025,
-      "source": "OECD TP Database"
+      "source": "OECD TP Database (synthetic)"
     },
     {
       "id": "comp_014",
@@ -175,7 +175,7 @@
       "gross_margin": 76.4,
       "operating_margin": 33.7,
       "data_year": 2025,
-      "source": "OECD TP Database"
+      "source": "OECD TP Database (synthetic)"
     },
     {
       "id": "comp_015",
@@ -186,7 +186,7 @@
       "gross_margin": 74.1,
       "operating_margin": 20.4,
       "data_year": 2025,
-      "source": "OECD TP Database"
+      "source": "OECD TP Database (synthetic)"
     },
     {
       "id": "comp_016",
@@ -197,7 +197,7 @@
       "gross_margin": 83.3,
       "operating_margin": 19.5,
       "data_year": 2025,
-      "source": "OECD TP Database"
+      "source": "OECD TP Database (synthetic)"
     },
     {
       "id": "comp_017",
@@ -208,7 +208,7 @@
       "gross_margin": 80.8,
       "operating_margin": 18.8,
       "data_year": 2025,
-      "source": "OECD TP Database"
+      "source": "OECD TP Database (synthetic)"
     },
     {
       "id": "comp_018",
@@ -219,7 +219,7 @@
       "gross_margin": 82.9,
       "operating_margin": 30.7,
       "data_year": 2025,
-      "source": "OECD TP Database"
+      "source": "OECD TP Database (synthetic)"
     },
     {
       "id": "comp_019",
@@ -230,7 +230,7 @@
       "gross_margin": 89.7,
       "operating_margin": 28.3,
       "data_year": 2025,
-      "source": "OECD TP Database"
+      "source": "OECD TP Database (synthetic)"
     },
     {
       "id": "comp_020",
@@ -241,7 +241,7 @@
       "gross_margin": 79.6,
       "operating_margin": 17.4,
       "data_year": 2025,
-      "source": "OECD TP Database"
+      "source": "OECD TP Database (synthetic)"
     },
     {
       "id": "comp_021",
@@ -252,7 +252,7 @@
       "gross_margin": 92.7,
       "operating_margin": 31.7,
       "data_year": 2024,
-      "source": "OECD TP Database"
+      "source": "OECD TP Database (synthetic)"
     },
     {
       "id": "comp_022",
@@ -263,7 +263,7 @@
       "gross_margin": 86.8,
       "operating_margin": 12.8,
       "data_year": 2024,
-      "source": "OECD TP Database"
+      "source": "OECD TP Database (synthetic)"
     },
     {
       "id": "comp_023",
@@ -274,7 +274,7 @@
       "gross_margin": 82.9,
       "operating_margin": 24.8,
       "data_year": 2024,
-      "source": "OECD TP Database"
+      "source": "OECD TP Database (synthetic)"
     },
     {
       "id": "comp_024",
@@ -285,7 +285,7 @@
       "gross_margin": 81.6,
       "operating_margin": 25.3,
       "data_year": 2024,
-      "source": "OECD TP Database"
+      "source": "OECD TP Database (synthetic)"
     },
     {
       "id": "comp_025",
@@ -296,7 +296,7 @@
       "gross_margin": 92.7,
       "operating_margin": 15.5,
       "data_year": 2024,
-      "source": "OECD TP Database"
+      "source": "OECD TP Database (synthetic)"
     },
     {
       "id": "comp_026",
@@ -307,7 +307,7 @@
       "gross_margin": 82.0,
       "operating_margin": 28.3,
       "data_year": 2024,
-      "source": "OECD TP Database"
+      "source": "OECD TP Database (synthetic)"
     },
     {
       "id": "comp_027",
@@ -318,7 +318,7 @@
       "gross_margin": 79.0,
       "operating_margin": 23.3,
       "data_year": 2024,
-      "source": "OECD TP Database"
+      "source": "OECD TP Database (synthetic)"
     },
     {
       "id": "comp_028",
@@ -329,7 +329,7 @@
       "gross_margin": 88.6,
       "operating_margin": 29.5,
       "data_year": 2024,
-      "source": "OECD TP Database"
+      "source": "OECD TP Database (synthetic)"
     },
     {
       "id": "comp_029",
@@ -340,7 +340,7 @@
       "gross_margin": 86.1,
       "operating_margin": 14.2,
       "data_year": 2024,
-      "source": "OECD TP Database"
+      "source": "OECD TP Database (synthetic)"
     },
     {
       "id": "comp_030",
@@ -351,7 +351,7 @@
       "gross_margin": 88.5,
       "operating_margin": 30.2,
       "data_year": 2024,
-      "source": "OECD TP Database"
+      "source": "OECD TP Database (synthetic)"
     },
     {
       "id": "comp_031",
@@ -362,7 +362,7 @@
       "gross_margin": 86.6,
       "operating_margin": 16.9,
       "data_year": 2024,
-      "source": "OECD TP Database"
+      "source": "OECD TP Database (synthetic)"
     },
     {
       "id": "comp_032",
@@ -373,7 +373,7 @@
       "gross_margin": 79.1,
       "operating_margin": 29.2,
       "data_year": 2025,
-      "source": "OECD TP Database"
+      "source": "OECD TP Database (synthetic)"
     },
     {
       "id": "comp_033",
@@ -384,7 +384,7 @@
       "gross_margin": 86.1,
       "operating_margin": 32.8,
       "data_year": 2025,
-      "source": "OECD TP Database"
+      "source": "OECD TP Database (synthetic)"
     },
     {
       "id": "comp_034",
@@ -395,7 +395,7 @@
       "gross_margin": 74.9,
       "operating_margin": 12.8,
       "data_year": 2024,
-      "source": "OECD TP Database"
+      "source": "OECD TP Database (synthetic)"
     },
     {
       "id": "comp_035",
@@ -406,7 +406,7 @@
       "gross_margin": 86.6,
       "operating_margin": 25.7,
       "data_year": 2024,
-      "source": "OECD TP Database"
+      "source": "OECD TP Database (synthetic)"
     },
     {
       "id": "comp_036",
@@ -417,7 +417,7 @@
       "gross_margin": 91.4,
       "operating_margin": 26.4,
       "data_year": 2024,
-      "source": "OECD TP Database"
+      "source": "OECD TP Database (synthetic)"
     },
     {
       "id": "comp_037",
@@ -428,7 +428,7 @@
       "gross_margin": 87.9,
       "operating_margin": 12.1,
       "data_year": 2024,
-      "source": "OECD TP Database"
+      "source": "OECD TP Database (synthetic)"
     },
     {
       "id": "comp_038",
@@ -439,7 +439,7 @@
       "gross_margin": 30.6,
       "operating_margin": 11.4,
       "data_year": 2024,
-      "source": "OECD TP Database"
+      "source": "OECD TP Database (synthetic)"
     },
     {
       "id": "comp_039",
@@ -450,7 +450,7 @@
       "gross_margin": 45.9,
       "operating_margin": 8.7,
       "data_year": 2024,
-      "source": "OECD TP Database"
+      "source": "OECD TP Database (synthetic)"
     },
     {
       "id": "comp_040",
@@ -461,7 +461,7 @@
       "gross_margin": 29.7,
       "operating_margin": 13.8,
       "data_year": 2024,
-      "source": "OECD TP Database"
+      "source": "OECD TP Database (synthetic)"
     },
     {
       "id": "comp_041",
@@ -472,7 +472,7 @@
       "gross_margin": 29.4,
       "operating_margin": 10.1,
       "data_year": 2024,
-      "source": "OECD TP Database"
+      "source": "OECD TP Database (synthetic)"
     },
     {
       "id": "comp_042",
@@ -483,7 +483,7 @@
       "gross_margin": 36.7,
       "operating_margin": 6.6,
       "data_year": 2025,
-      "source": "OECD TP Database"
+      "source": "OECD TP Database (synthetic)"
     },
     {
       "id": "comp_043",
@@ -494,7 +494,7 @@
       "gross_margin": 31.7,
       "operating_margin": 10.1,
       "data_year": 2025,
-      "source": "OECD TP Database"
+      "source": "OECD TP Database (synthetic)"
     },
     {
       "id": "comp_044",
@@ -505,7 +505,7 @@
       "gross_margin": 36.8,
       "operating_margin": 7.2,
       "data_year": 2024,
-      "source": "OECD TP Database"
+      "source": "OECD TP Database (synthetic)"
     },
     {
       "id": "comp_045",
@@ -516,7 +516,7 @@
       "gross_margin": 29.1,
       "operating_margin": 4.6,
       "data_year": 2025,
-      "source": "OECD TP Database"
+      "source": "OECD TP Database (synthetic)"
     },
     {
       "id": "comp_046",
@@ -527,7 +527,7 @@
       "gross_margin": 36.5,
       "operating_margin": 10.8,
       "data_year": 2024,
-      "source": "OECD TP Database"
+      "source": "OECD TP Database (synthetic)"
     },
     {
       "id": "comp_047",
@@ -538,7 +538,7 @@
       "gross_margin": 34.7,
       "operating_margin": 10.1,
       "data_year": 2024,
-      "source": "OECD TP Database"
+      "source": "OECD TP Database (synthetic)"
     },
     {
       "id": "comp_048",
@@ -549,7 +549,7 @@
       "gross_margin": 32.7,
       "operating_margin": 5.9,
       "data_year": 2024,
-      "source": "OECD TP Database"
+      "source": "OECD TP Database (synthetic)"
     },
     {
       "id": "comp_049",
@@ -560,7 +560,7 @@
       "gross_margin": 44.9,
       "operating_margin": 8.5,
       "data_year": 2025,
-      "source": "OECD TP Database"
+      "source": "OECD TP Database (synthetic)"
     },
     {
       "id": "comp_050",
@@ -571,7 +571,7 @@
       "gross_margin": 40.5,
       "operating_margin": 6.5,
       "data_year": 2025,
-      "source": "OECD TP Database"
+      "source": "OECD TP Database (synthetic)"
     },
     {
       "id": "comp_051",
@@ -582,7 +582,7 @@
       "gross_margin": 44.2,
       "operating_margin": 4.8,
       "data_year": 2025,
-      "source": "OECD TP Database"
+      "source": "OECD TP Database (synthetic)"
     },
     {
       "id": "comp_052",
@@ -593,7 +593,7 @@
       "gross_margin": 27.0,
       "operating_margin": 8.9,
       "data_year": 2024,
-      "source": "OECD TP Database"
+      "source": "OECD TP Database (synthetic)"
     },
     {
       "id": "comp_053",
@@ -604,7 +604,7 @@
       "gross_margin": 42.0,
       "operating_margin": 13.6,
       "data_year": 2025,
-      "source": "OECD TP Database"
+      "source": "OECD TP Database (synthetic)"
     },
     {
       "id": "comp_054",
@@ -615,7 +615,7 @@
       "gross_margin": 32.5,
       "operating_margin": 7.4,
       "data_year": 2024,
-      "source": "OECD TP Database"
+      "source": "OECD TP Database (synthetic)"
     },
     {
       "id": "comp_055",
@@ -626,7 +626,7 @@
       "gross_margin": 43.0,
       "operating_margin": 13.4,
       "data_year": 2024,
-      "source": "OECD TP Database"
+      "source": "OECD TP Database (synthetic)"
     }
   ]
 }

@@ -1,4 +1,6 @@
-# transfer-pricing-intelligence-platform
+# Transfer Pricing Intelligence Platform (TPIP)
+
+![Tests](https://github.com/danirubio2323-commits/transfer-pricing-intelligence-platform/actions/workflows/tests.yml/badge.svg)
 
 TP analysis platform for transfer pricing validation
 
