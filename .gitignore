@@ -221,3 +221,6 @@ __marimo__/
 .agents/
 .claude/
 TPIP.bat.txt
+
+# Local execution script (machine-specific paths)
+TPIP.bat
