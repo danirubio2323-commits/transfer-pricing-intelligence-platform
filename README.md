@@ -24,4 +24,4 @@ The app opens in your browser at `http://localhost:8501`
 ### Important
 
 - Always run `pip install -e .` first (makes `tp_domain` importable)
-- The project requires Python 3.9+
+- The project requires Python 3.10+

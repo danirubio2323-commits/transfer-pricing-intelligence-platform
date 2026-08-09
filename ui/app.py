@@ -1,217 +1,224 @@
 """
-Streamlit UI for TPIP (Transfer Pricing Intelligence Platform)
+Interfaz Streamlit de TPIP.
 
-Simple web interface to analyze transfer pricing transactions.
+Esta capa no calcula nada: construye una `Transaction`, llama al dominio y
+presenta el `AnalysisResult`. Cualquier cálculo que aparezca aquí es un bug.
+
+El acabado visual (jerarquía, gráfico de rango, tipografía) se aborda en el
+pase de presentación al cierre de la Fase 1.
 """
 
+import datetime as dt
+from decimal import Decimal
+
 import streamlit as st
-from datetime import datetime
 
-from tp_domain.models import (
-    Transaction, TransactionType, TPMethod,
-    BenchmarkRange, AnalysisResult, DefensibilityLevel, Comparable
-)
 from tp_domain.calculations.arm_length_range import calculate_arm_length_range
-
-# ============================================================================
-# PAGE CONFIG
-# ============================================================================
+from tp_domain.models import (
+    SUPPORTED_TRANSACTION_TYPES,
+    DefensibilityLevel,
+    Industry,
+    RangeRule,
+    Severity,
+    Transaction,
+)
 
 st.set_page_config(
-    page_title="TPIP - Transfer Pricing Analyzer",
-    page_icon="📊",
-    layout="wide"
+    page_title="TPIP — Transfer Pricing Analyzer",
+    layout="wide",
 )
 
-st.title("🔍 Transfer Pricing Intelligence Platform")
-st.markdown("**Validate if your transfer prices are arm's length defensible**")
+# Caso de referencia de la demo: canon de software España -> Alemania.
+# Alemania importa porque el §1.3a AStG impone ajuste a la mediana y España no
+# tiene regla estadística: la misma operación, dos consecuencias.
+DEMO_CASE = {
+    "description": "Canon por licencia de tecnología",
+    "payer_country": "ES",
+    "recipient_country": "DE",
+    "industry": Industry.SOFTWARE,
+    "amount_eur": 1_000_000,
+    "rate_percent": 12.0,
+}
 
-# ============================================================================
-# SIDEBAR: Input form
-# ============================================================================
+st.title("Transfer Pricing Intelligence Platform")
+st.caption(
+    "Evalúa si un canon intragrupo resiste el principio de plena competencia, "
+    "y qué consecuencia tiene en cada jurisdicción implicada."
+)
 
-st.sidebar.header("Transaction Details")
+if "case" not in st.session_state:
+    st.session_state.case = dict(DEMO_CASE)
 
-with st.sidebar.form("transaction_form"):
-    st.write("### Enter Transaction")
+with st.sidebar:
+    st.header("Operación")
+    if st.button("Cargar caso de ejemplo", use_container_width=True):
+        st.session_state.case = dict(DEMO_CASE)
 
-    # Identificación
-    description = st.text_input(
-        "Transaction Description",
-        value="Royalty payment for patent license",
-        help="Brief description of what this transaction is"
-    )
+    case = st.session_state.case
 
-    # Países
-    col1, col2 = st.columns(2)
-    with col1:
-        from_country = st.text_input("From Country", value="ES", max_chars=2)
-    with col2:
-        to_country = st.text_input("To Country", value="LU", max_chars=2)
+    with st.form("transaction_form"):
+        description = st.text_input("Descripción", value=case["description"])
 
-    # Tipo de transacción
-    transaction_type = st.selectbox(
-        "Transaction Type",
-        [t.value for t in TransactionType]
-    )
+        col1, col2 = st.columns(2)
+        with col1:
+            payer_country = st.text_input(
+                "País pagador", value=case["payer_country"], max_chars=2,
+                help="Quién paga el canon y deduce el gasto",
+            )
+        with col2:
+            recipient_country = st.text_input(
+                "País perceptor", value=case["recipient_country"], max_chars=2,
+            )
 
-    # Industry selector
-    industry = st.selectbox(
-        "Industry",
-        ["pharmaceutical", "software", "manufacturing"],
-        help="Select the industry to find relevant comparables"
-    )
-
-    # Datos económicos
-    col1, col2 = st.columns(2)
-    with col1:
-        amount_eur = st.number_input("Amount (EUR)", value=1000000, min_value=1, step=100000)
-    with col2:
-        rate_percent = st.number_input("Proposed Rate (%)", value=12.0, min_value=0.0, max_value=100.0, step=0.5)
-
-    # Fecha
-    effective_date = st.date_input("Effective Date", value=datetime.now())
-
-    # TP Method hint
-    method_hint = st.selectbox(
-        "Suggested TP Method (optional)",
-        ["Auto-detect"] + [m.value for m in TPMethod]
-    )
-
-    # Submit button
-    submitted = st.form_submit_button("📊 Analyze Transaction")
-
-# ============================================================================
-# MAIN CONTENT: Results
-# ============================================================================
-
-if submitted:
-    st.divider()
-    st.header("📈 Analysis Results")
-
-    # Create transaction object
-    try:
-        transaction = Transaction(
-            description=description,
-            from_country=from_country.upper(),
-            to_country=to_country.upper(),
-            transaction_type=transaction_type,
-            industry=industry,
-            amount_eur=amount_eur,
-            rate_percent=rate_percent,
-            effective_date=effective_date,
-            method_hint=None if method_hint == "Auto-detect" else method_hint
+        st.selectbox(
+            "Tipo de operación",
+            [t.value for t in sorted(SUPPORTED_TRANSACTION_TYPES, key=lambda t: t.value)],
+            help="Fase 1 cubre únicamente cánones sobre intangibles",
         )
 
-        # REAL CALCULATION: call domain logic
-        result = calculate_arm_length_range(transaction)
+        industry = st.selectbox(
+            "Industria",
+            [i.value for i in Industry],
+            index=[i.value for i in Industry].index(case["industry"].value),
+        )
 
-        # Handle no-data case
-        if result.benchmark_range.percentile_25 is None:
-            st.error(result.conclusion)
-            st.stop()
-
-        # Display results in columns
-        col1, col2, col3, col4 = st.columns(4)
-
+        col1, col2 = st.columns(2)
         with col1:
-            st.metric(
-                "Defensibility Score",
-                f"{result.defensibility_score}/10",
-                delta=None
+            amount_eur = st.number_input(
+                "Importe (EUR)", value=case["amount_eur"], min_value=1, step=100_000
             )
-
         with col2:
-            st.metric(
-                "Your Rate",
-                f"{result.proposed_rate}%",
-                delta=None
+            rate_percent = st.number_input(
+                "Tipo propuesto (%)", value=case["rate_percent"],
+                min_value=0.0, max_value=100.0, step=0.5,
             )
 
-        with col3:
-            st.metric(
-                "Median Rate",
-                f"{result.benchmark_range.percentile_50}%",
-                delta=None
-            )
+        effective_date = st.date_input("Fecha de efecto", value=dt.date(2026, 1, 1))
+        submitted = st.form_submit_button("Analizar", use_container_width=True)
 
-        with col4:
-            st.metric(
-                "Comparables",
-                f"{result.benchmark_range.count_comparables}",
-                delta=None
-            )
+    st.divider()
+    st.caption(
+        "Los comparables son sintéticos. La herramienta demuestra el motor de "
+        "análisis; no produce estudios oponibles ante una administración."
+    )
 
-        st.divider()
+if not submitted:
+    st.info("Introduce una operación o carga el caso de ejemplo para empezar.")
+    st.stop()
 
-        # Benchmark range visualization
-        st.subheader("Benchmark Range (Arm's Length)")
+try:
+    transaction = Transaction(
+        description=description,
+        payer_country=payer_country,
+        recipient_country=recipient_country,
+        transaction_type="royalty",
+        industry=industry,
+        amount_eur=Decimal(str(amount_eur)),
+        rate_percent=Decimal(str(rate_percent)),
+        effective_date=effective_date,
+    )
+except ValueError as exc:
+    st.error(f"Operación no válida: {exc}")
+    st.stop()
 
-        col1, col2 = st.columns([2, 1])
+result = calculate_arm_length_range(transaction)
+benchmark = result.benchmark
 
-        with col1:
-            # Create a simple bar representation
-            benchmark = result.benchmark_range
-            your_rate = result.proposed_rate
+if benchmark.count_accepted == 0:
+    st.error(result.conclusion)
+    st.stop()
 
-            st.write(f"""
-            **Percentile 25:** {benchmark.percentile_25}%
-            **Percentile 50 (Median):** {benchmark.percentile_50}%
-            **Percentile 75:** {benchmark.percentile_75}%
+# --- Rango de mercado -------------------------------------------------------
+st.subheader("Rango de plena competencia")
+st.caption(
+    f"Método: {result.method_applied.value.upper()} · "
+    f"{benchmark.count_accepted} comparables aceptados · "
+    f"percentiles por {benchmark.percentile_method}"
+)
 
-            **Your Proposed Rate:** {your_rate}%
-            """)
+cols = st.columns(5)
+for col, label, value in zip(
+    cols,
+    ["P10", "P25", "Mediana", "P75", "P90"],
+    [benchmark.percentile_10, benchmark.percentile_25, benchmark.percentile_50,
+     benchmark.percentile_75, benchmark.percentile_90],
+):
+    col.metric(label, f"{value}%")
 
-        with col2:
-            if result.defensibility_level == DefensibilityLevel.STRONG:
-                st.success("✅ STRONG", icon="✅")
-            elif result.defensibility_level == DefensibilityLevel.MODERATE:
-                st.warning("⚠️ MODERATE", icon="⚠️")
-            else:
-                st.error("❌ WEAK", icon="❌")
+st.metric("Tipo propuesto", f"{float(transaction.rate_percent)}%")
 
-        st.divider()
+st.divider()
 
-        # Risk factors
-        st.subheader("⚠️ Risk Factors")
-        for risk in result.risk_factors:
-            st.warning(risk)
+# --- Veredicto por jurisdicción ---------------------------------------------
+st.subheader("Tratamiento por jurisdicción")
 
-        st.divider()
+for col, assessment in zip(st.columns(len(result.assessments)), result.assessments):
+    with col:
+        st.markdown(f"### {assessment.country}")
+        st.caption(assessment.role.value)
 
-        # Conclusion
-        st.subheader("📋 Conclusion")
-        st.info(result.conclusion)
+        if assessment.defensibility_level is DefensibilityLevel.STRONG:
+            st.success(f"Defendible — {assessment.defensibility_score}/10")
+        elif assessment.defensibility_level is DefensibilityLevel.MODERATE:
+            st.warning(f"Moderado — {assessment.defensibility_score}/10")
+        else:
+            st.error(f"Riesgo alto — {assessment.defensibility_score}/10")
 
-        # Comparables used
-        st.subheader("📊 Comparables Used")
-        for comp in result.comparables_used:
-            col1, col2, col3 = st.columns(3)
-            with col1:
-                st.write(f"**{comp.company_name}**")
-            with col2:
-                st.write(f"{comp.country} | {comp.industry}")
-            with col3:
-                st.write(f"Rate: {comp.royalty_rate}%")
+        if assessment.adjusted_rate is not None:
+            st.metric("Ajuste de oficio", f"{assessment.adjusted_rate}%")
+        elif assessment.range_rule is RangeRule.NO_STATUTORY_RULE:
+            st.metric("Ajuste de oficio", "No automático")
 
-    except ValueError as e:
-        st.error(f"Error: {e}")
+        st.write(assessment.consequence)
 
-# ============================================================================
-# SIDEBAR: Instructions
-# ============================================================================
+st.divider()
 
-st.sidebar.divider()
-st.sidebar.markdown("""
-### 📚 How It Works
+# --- Riesgos ----------------------------------------------------------------
+st.subheader("Factores de riesgo")
+for factor in result.risk_factors:
+    if factor.severity is Severity.CRITICAL:
+        st.error(factor.message)
+    elif factor.severity is Severity.WARNING:
+        st.warning(factor.message)
+    else:
+        st.info(factor.message)
 
-1. **Fill in transaction details** on the left
-2. **Click "Analyze"** to validate
-3. **See benchmark comparison** and risk score
-4. **Export report** when ready
+st.subheader("Conclusión")
+st.write(result.conclusion)
 
-### About Defensibility Score
-- **8-10: STRONG** — Defensible in audit
-- **5-7: MODERATE** — Requires documentation
-- **1-4: WEAK** — High audit risk
-""")
+# --- Anexos -----------------------------------------------------------------
+with st.expander(f"Comparables aceptados ({len(result.comparables_accepted)})"):
+    st.dataframe(
+        [
+            {
+                "ID": c.id, "Compañía": c.company_name, "País": c.country,
+                "Industria": c.industry.value, "Canon %": c.royalty_rate,
+                "Ejercicio": c.data_year,
+            }
+            for c in result.comparables_accepted
+        ],
+        use_container_width=True, hide_index=True,
+    )
+
+with st.expander(f"Comparables rechazados ({len(result.comparables_rejected)})"):
+    st.dataframe(
+        [
+            {"ID": r.comparable_id, "Compañía": r.company_name,
+             "Motivo": r.reason.value, "Detalle": r.detail}
+            for r in result.comparables_rejected
+        ],
+        use_container_width=True, hide_index=True,
+    )
+
+with st.expander(f"Fuentes citadas ({len(result.sources)})"):
+    for src in result.sources:
+        st.markdown(f"**{src.citation}**" + (f" — {src.pinpoint}" if src.pinpoint else ""))
+        if src.official_ref:
+            st.caption(src.official_ref)
+        if src.disclaimer:
+            st.caption(src.disclaimer)
+
+st.caption(
+    f"Análisis {result.analysis_id} · motor {result.engine_version} · "
+    f"dataset {result.dataset_version} · {result.created_at:%Y-%m-%d %H:%M}"
+)

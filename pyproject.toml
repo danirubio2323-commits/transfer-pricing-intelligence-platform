@@ -7,7 +7,7 @@ name = "tpip"
 version = "0.1.0"
 description = "Transfer Pricing Intelligence Platform"
 authors = [{name = "Daru", email = "danirubio2323@gmail.com"}]
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = [
     "fastapi>=0.104.1",
     "uvicorn>=0.24.0",
@@ -28,4 +28,12 @@ dev = [
 ]
 
 [tool.setuptools]
-packages = ["tp_domain", "api", "ui", "ai", "tests", "infrastructure"]
+packages = [
+    "tp_domain",
+    "tp_domain.calculations",
+    "tp_domain.rules",
+    "api",
+    "ui",
+    "ai",
+    "infrastructure",
+]
