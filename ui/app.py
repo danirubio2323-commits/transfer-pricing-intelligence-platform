@@ -13,6 +13,7 @@ from decimal import Decimal
 
 import streamlit as st
 
+from infrastructure.report.pdf_report import render_report_bytes
 from tp_domain.calculations.arm_length_range import calculate_arm_length_range
 from tp_domain.models import (
     SUPPORTED_TRANSACTION_TYPES,
@@ -127,6 +128,15 @@ benchmark = result.benchmark
 if benchmark.count_accepted == 0:
     st.error(result.conclusion)
     st.stop()
+
+# --- Entregable -------------------------------------------------------------
+st.download_button(
+    "Descargar informe (PDF)",
+    data=render_report_bytes(result),
+    file_name=f"{result.analysis_id}.pdf",
+    mime="application/pdf",
+    help="Informe completo: benchmark, fundamento por jurisdicción y anexo de comparables",
+)
 
 # --- Rango de mercado -------------------------------------------------------
 st.subheader("Rango de plena competencia")
