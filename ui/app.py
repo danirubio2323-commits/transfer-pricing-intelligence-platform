@@ -13,6 +13,7 @@ from decimal import Decimal
 
 import streamlit as st
 
+from ai.claude_client import explain_analysis, resolve_api_key
 from infrastructure.report.pdf_report import render_report_bytes
 from tp_domain.calculations.arm_length_range import calculate_arm_length_range
 from tp_domain.models import (
@@ -128,6 +129,27 @@ benchmark = result.benchmark
 if benchmark.count_accepted == 0:
     st.error(result.conclusion)
     st.stop()
+
+# --- Explicación asistida (opcional) ----------------------------------------
+# El motor ya ha terminado. La IA solo redacta sobre este resultado y su
+# ausencia no degrada nada: el informe se genera igual.
+if resolve_api_key():
+    if st.checkbox("Añadir explicación redactada con IA al informe"):
+        with st.spinner("Redactando explicación sobre el análisis calculado…"):
+            explanation = explain_analysis(result)
+        if explanation is None:
+            st.warning(
+                "La explicación no ha superado la validación automática y se ha "
+                "descartado. El informe se genera sin esa sección."
+            )
+        else:
+            result = result.model_copy(update={"ai_explanation": explanation})
+            st.success(f"Explicación validada · modelo {explanation.model}")
+else:
+    st.caption(
+        "Sin ANTHROPIC_API_KEY configurada: el informe se generará sin sección "
+        "de IA. Copia `.env.example` a `.env` para activarla."
+    )
 
 # --- Entregable -------------------------------------------------------------
 st.download_button(
