@@ -224,3 +224,20 @@ TPIP.bat.txt
 
 # Local execution script (machine-specific paths)
 TPIP.bat
+
+# ---------------------------------------------------------------------------
+# Corpus fiscal — vive fuera del repositorio (proyecto Cerebros_Fiscales).
+# TPIP consume material DERIVADO (documentation/tax-research/), nunca fuentes
+# de terceros. No reintroducir PDFs de OCDE, notas de firma ni doctrina.
+# ---------------------------------------------------------------------------
+tp_domain/knowledge/
+knowledge/
+**/.obsidian/
+
+# Documentos fuente: no se versionan en este repo.
+# Para un PDF legítimo (informe de demo), usar `git add -f` de forma deliberada.
+*.pdf
+*.epub
+
+# Catálogo de entorno personal — no forma parte del producto
+Catalogo_Herramientas_IA_Daru.md
