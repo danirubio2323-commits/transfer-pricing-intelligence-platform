@@ -9,17 +9,12 @@ description = "Transfer Pricing Intelligence Platform"
 authors = [{name = "Daru", email = "danirubio2323@gmail.com"}]
 requires-python = ">=3.10"
 dependencies = [
-    "fastapi>=0.104.1",
-    "uvicorn>=0.24.0",
-    "pydantic>=2.5.0",
-    "sqlalchemy>=2.0.23",
-    "alembic>=1.12.1",
-    "streamlit>=1.28.1",
-    "anthropic>=0.39.0",
-    "pandas>=2.1.3",
-    "numpy>=1.26.2",
-    "python-dotenv>=1.0.0",
+    "pydantic>=2.9",
+    "streamlit>=1.36",
+    "numpy>=1.26",
     "reportlab>=4.0",
+    "anthropic>=0.40",
+    "python-dotenv>=1.0.0",
 ]
 
 [project.optional-dependencies]

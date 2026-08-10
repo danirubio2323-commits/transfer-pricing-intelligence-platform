@@ -43,14 +43,17 @@ from reportlab.platypus import (
     TableStyle,
 )
 
-from tp_domain.models import (
-    AnalysisResult,
-    DefensibilityLevel,
-    RangePosition,
-    RangeRule,
-    RejectionReason,
-    Severity,
+from infrastructure.theme import (
+    COLORS,
+    LEVEL_LABEL,
+    POSITION_LABEL,
+    REJECTION_LABEL,
+    ROLE_LABEL,
+    RULE_LABEL,
+    SEVERITY_LABEL,
+    range_geometry,
 )
+from tp_domain.models import AnalysisResult
 
 # ---------------------------------------------------------------------------
 # Paleta y tipografía
@@ -60,43 +63,21 @@ from tp_domain.models import (
 # la estructura fiscal del documento.
 # ---------------------------------------------------------------------------
 
-INK = colors.HexColor("#1A1A1A")
-MUTED = colors.HexColor("#5A5A5A")
-RULE = colors.HexColor("#C8C8C8")
-BAND_OUTER = colors.HexColor("#DCE3EC")   # P10-P90
-BAND_INNER = colors.HexColor("#9FB3C8")   # P25-P75 (rango intercuartílico)
-MEDIAN = colors.HexColor("#334E68")
-ACCENT_OK = colors.HexColor("#2E6B4F")
-ACCENT_WARN = colors.HexColor("#8A6D1F")
-ACCENT_RISK = colors.HexColor("#8C2F2F")
+INK = colors.HexColor(COLORS["ink"])
+MUTED = colors.HexColor(COLORS["muted"])
+RULE = colors.HexColor(COLORS["rule"])
+BAND_OUTER = colors.HexColor(COLORS["band_outer"])
+BAND_INNER = colors.HexColor(COLORS["band_inner"])
+MEDIAN = colors.HexColor(COLORS["median"])
+ACCENT_OK = colors.HexColor(COLORS["ok"])
+ACCENT_WARN = colors.HexColor(COLORS["warn"])
+ACCENT_RISK = colors.HexColor(COLORS["risk"])
 
-_LEVEL_COLOR = {
-    DefensibilityLevel.STRONG: ACCENT_OK,
-    DefensibilityLevel.MODERATE: ACCENT_WARN,
-    DefensibilityLevel.WEAK: ACCENT_RISK,
-}
-_LEVEL_LABEL = {
-    DefensibilityLevel.STRONG: "Defendible",
-    DefensibilityLevel.MODERATE: "Moderado",
-    DefensibilityLevel.WEAK: "Riesgo alto",
-}
-_SEVERITY_LABEL = {
-    Severity.INFO: "Información",
-    Severity.WARNING: "Advertencia",
-    Severity.CRITICAL: "Crítico",
-}
-_REJECTION_LABEL = {
-    RejectionReason.INDUSTRY_MISMATCH: "Sector no coincidente",
-    RejectionReason.STALE_YEAR: "Ejercicio fuera de ventana",
-    RejectionReason.NO_RATE_DATA: "Sin dato de canon",
-}
-_POSITION_LABEL = {
-    RangePosition.BELOW_P10: "Por debajo del P10",
-    RangePosition.P10_TO_P25: "Entre P10 y P25",
-    RangePosition.WITHIN_IQR: "Dentro del rango intercuartílico",
-    RangePosition.P75_TO_P90: "Entre P75 y P90",
-    RangePosition.ABOVE_P90: "Por encima del P90",
-}
+_LEVEL_LABEL = LEVEL_LABEL
+_SEVERITY_LABEL = SEVERITY_LABEL
+_REJECTION_LABEL = REJECTION_LABEL
+_POSITION_LABEL = POSITION_LABEL
+
 
 def _safe(text: str) -> str:
     """
@@ -176,20 +157,19 @@ def _range_chart(result: AnalysisResult, width: float = 460, height: float = 120
     left, right = 46.0, width - 26.0
     axis_y, band_h = 42.0, 26.0
 
-    lo, hi = min(p10, rate), max(p90, rate)
-    pad = max((hi - lo) * 0.12, 0.4)
-    lo, hi = lo - pad, hi + pad
-    span = hi - lo or 1.0
+    # Misma geometría que el gráfico de la interfaz: ambos parten de las
+    # fracciones normalizadas del tema y solo cambian el sistema de coordenadas.
+    geometry = range_geometry(b, rate)
 
-    def x(value: float) -> float:
-        return left + (value - lo) / span * (right - left)
+    def x(key: str) -> float:
+        return left + geometry[key] * (right - left)
 
     # Bandas
-    drawing.add(Rect(x(p10), axis_y, x(p90) - x(p10), band_h,
+    drawing.add(Rect(x("p10"), axis_y, x("p90") - x("p10"), band_h,
                      fillColor=BAND_OUTER, strokeColor=None))
-    drawing.add(Rect(x(p25), axis_y, x(p75) - x(p25), band_h,
+    drawing.add(Rect(x("p25"), axis_y, x("p75") - x("p25"), band_h,
                      fillColor=BAND_INNER, strokeColor=None))
-    drawing.add(Line(x(p50), axis_y - 3, x(p50), axis_y + band_h + 3,
+    drawing.add(Line(x("p50"), axis_y - 3, x("p50"), axis_y + band_h + 3,
                      strokeColor=MEDIAN, strokeWidth=1.6))
 
     # Eje
@@ -197,19 +177,20 @@ def _range_chart(result: AnalysisResult, width: float = 460, height: float = 120
                      strokeColor=RULE, strokeWidth=0.7))
 
     # Marcas de percentil
-    for value, label in ((p10, "P10"), (p25, "P25"), (p50, "Mediana"),
-                         (p75, "P75"), (p90, "P90")):
-        drawing.add(Line(x(value), axis_y - 9, x(value), axis_y - 6,
+    for key, value, label in (("p10", p10, "P10"), ("p25", p25, "P25"),
+                              ("p50", p50, "Mediana"), ("p75", p75, "P75"),
+                              ("p90", p90, "P90")):
+        drawing.add(Line(x(key), axis_y - 9, x(key), axis_y - 6,
                          strokeColor=RULE, strokeWidth=0.7))
-        drawing.add(String(x(value), axis_y - 20, label,
+        drawing.add(String(x(key), axis_y - 20, label,
                            fontName="Helvetica", fontSize=6.5,
                            fillColor=MUTED, textAnchor="middle"))
-        drawing.add(String(x(value), axis_y - 29, f"{value}%",
+        drawing.add(String(x(key), axis_y - 29, f"{value}%",
                            fontName="Helvetica-Bold", fontSize=7,
                            fillColor=INK, textAnchor="middle"))
 
     # Tipo analizado
-    marker_x, top = x(rate), axis_y + band_h
+    marker_x, top = x("rate"), axis_y + band_h
     inside = p25 <= rate <= p75
     marker_color = ACCENT_OK if inside else ACCENT_RISK
     drawing.add(Polygon(
@@ -355,7 +336,7 @@ def _executive_summary(result: AnalysisResult, st) -> list:
         for a in result.assessments:
             rows.append([
                 a.country,
-                "Pagadora" if a.role.value == "payer" else "Perceptora",
+                ROLE_LABEL[a.role],
                 _LEVEL_LABEL[a.defensibility_level],
                 f"{a.defensibility_score}/10" if a.defensibility_score else "-",
                 f"{a.adjusted_rate}%" if a.adjusted_rate is not None else "No automático",
@@ -414,12 +395,7 @@ def _basis_section(result: AnalysisResult, st) -> list:
     ]
 
     for a in result.assessments:
-        rule_label = {
-            RangeRule.NO_STATUTORY_RULE: "Sin regla estadística legal",
-            RangeRule.INTERQUARTILE_MEDIAN_ADJUSTMENT:
-                "Rango intercuartílico con ajuste obligatorio a la mediana",
-            RangeRule.NOT_MODELLED: "Jurisdicción no modelada en esta versión",
-        }[a.range_rule]
+        rule_label = RULE_LABEL[a.range_rule]
 
         cited = [s for s in result.sources if s.id in a.source_ids]
         story += [

@@ -1,11 +1,20 @@
 """
-Interfaz Streamlit de TPIP.
+Interfaz de TPIP.
 
 Esta capa no calcula nada: construye una `Transaction`, llama al dominio y
-presenta el `AnalysisResult`. Cualquier cálculo que aparezca aquí es un bug.
+presenta el `AnalysisResult`. Cualquier aritmética que aparezca aquí es un bug.
 
-El acabado visual (jerarquía, gráfico de rango, tipografía) se aborda en el
-pase de presentación al cierre de la Fase 1.
+Jerarquía de lectura, en este orden y por este motivo:
+
+    1. Veredicto en una frase — qué ha pasado
+    2. Rango con el tipo situado — por qué, en dos segundos
+    3. Comparación por jurisdicción — la asimetría, que es el argumento
+    4. Riesgos, fuentes y anexos — el soporte
+    5. Entregable — el informe
+
+El índice de defensibilidad va deliberadamente subordinado a la posición
+estadística: es una etiqueta derivada de dónde cae el tipo, no una puntuación
+propia.
 """
 
 import datetime as dt
@@ -14,47 +23,124 @@ from decimal import Decimal
 import streamlit as st
 
 from ai.claude_client import explain_analysis, resolve_api_key
+from infrastructure.charts import benchmark_range_svg
 from infrastructure.report.pdf_report import render_report_bytes
-from tp_domain.calculations.arm_length_range import calculate_arm_length_range
-from tp_domain.models import (
-    SUPPORTED_TRANSACTION_TYPES,
-    DefensibilityLevel,
-    Industry,
-    RangeRule,
-    Severity,
-    Transaction,
+from infrastructure.theme import (
+    COLORS,
+    LEVEL_COLOR,
+    LEVEL_LABEL,
+    POSITION_LABEL,
+    REJECTION_LABEL,
+    ROLE_LABEL,
+    RULE_LABEL_SHORT,
+    SEVERITY_LABEL,
 )
+from tp_domain.calculations.arm_length_range import calculate_arm_length_range
+from tp_domain.models import Industry, RangeRule, Severity, Transaction
 
 st.set_page_config(
-    page_title="TPIP — Transfer Pricing Analyzer",
+    page_title="TPIP · Análisis de plena competencia",
     layout="wide",
 )
 
-# Caso de referencia de la demo: canon de software España -> Alemania.
-# Alemania importa porque el §1.3a AStG impone ajuste a la mediana y España no
-# tiene regla estadística: la misma operación, dos consecuencias.
+#: Caso de referencia. Alemania importa: el §1.3a AStG impone ajuste a la
+#: mediana y España no tiene regla estadística, así que la misma operación
+#: recibe dos tratamientos distintos.
 DEMO_CASE = {
-    "description": "Canon por licencia de tecnología",
+    "description": "Canon por licencia de tecnología de software",
     "payer_country": "ES",
     "recipient_country": "DE",
     "industry": Industry.SOFTWARE,
     "amount_eur": 1_000_000,
     "rate_percent": 12.0,
+    "effective_date": dt.date(2026, 1, 1),
 }
 
-st.title("Transfer Pricing Intelligence Platform")
-st.caption(
-    "Evalúa si un canon intragrupo resiste el principio de plena competencia, "
-    "y qué consecuencia tiene en cada jurisdicción implicada."
+st.markdown(
+    f"""
+    <style>
+      .tpip-eyebrow {{
+        font-size: 0.72rem; letter-spacing: .13em; text-transform: uppercase;
+        color: {COLORS["muted"]}; margin-bottom: .1rem;
+      }}
+      .tpip-title {{
+        font-size: 1.85rem; font-weight: 700; color: {COLORS["ink"]};
+        line-height: 1.15; margin: 0 0 .2rem 0;
+      }}
+      .tpip-verdict {{
+        font-size: 1.28rem; line-height: 1.45; color: {COLORS["ink"]};
+        margin: .1rem 0 .35rem 0;
+      }}
+      .tpip-notice {{
+        border-left: 3px solid {COLORS["risk"]};
+        background: {COLORS["surface"]};
+        padding: .7rem .95rem; margin: .4rem 0 1.1rem 0;
+        font-size: .82rem; color: {COLORS["ink"]};
+      }}
+      .tpip-card {{
+        border: 1px solid {COLORS["rule"]}; border-top: 4px solid var(--accent);
+        background: #FFFFFF; padding: 1rem 1.15rem 1.15rem 1.15rem;
+        height: 100%;
+      }}
+      .tpip-card h3 {{
+        font-size: 1.35rem; margin: 0; color: {COLORS["ink"]}; font-weight: 700;
+      }}
+      .tpip-card .role {{
+        font-size: .72rem; text-transform: uppercase; letter-spacing: .1em;
+        color: {COLORS["muted"]};
+      }}
+      .tpip-rule {{
+        font-size: .85rem; font-weight: 600; color: var(--accent);
+        margin: .55rem 0 .1rem 0;
+      }}
+      .tpip-outcome {{
+        font-size: 1.5rem; font-weight: 700; color: {COLORS["ink"]};
+        margin: .45rem 0 .05rem 0;
+      }}
+      .tpip-outcome small {{
+        display: block; font-size: .74rem; font-weight: 400;
+        color: {COLORS["muted"]}; letter-spacing: .04em; text-transform: uppercase;
+      }}
+      .tpip-consequence {{
+        font-size: .84rem; line-height: 1.5; color: {COLORS["ink"]};
+        margin-top: .7rem;
+      }}
+      .tpip-index {{
+        font-size: .74rem; color: {COLORS["muted"]}; margin-top: .8rem;
+        border-top: 1px solid {COLORS["rule"]}; padding-top: .5rem;
+      }}
+      .tpip-meta {{
+        font-size: .72rem; color: {COLORS["muted"]}; margin-top: 1.6rem;
+        border-top: 1px solid {COLORS["rule"]}; padding-top: .6rem;
+      }}
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+st.markdown(
+    '<div class="tpip-eyebrow">Transfer Pricing Intelligence Platform</div>'
+    '<div class="tpip-title">Análisis de plena competencia</div>',
+    unsafe_allow_html=True,
 )
 
 if "case" not in st.session_state:
     st.session_state.case = dict(DEMO_CASE)
+if "run" not in st.session_state:
+    st.session_state.run = False
+
+
+# ---------------------------------------------------------------------------
+# Entrada
+# ---------------------------------------------------------------------------
 
 with st.sidebar:
-    st.header("Operación")
-    if st.button("Cargar caso de ejemplo", use_container_width=True):
+    st.markdown("**Operación vinculada**")
+
+    if st.button("Cargar caso de referencia (ES → DE, canon 12%)",
+                 use_container_width=True):
         st.session_state.case = dict(DEMO_CASE)
+        st.session_state.run = True
 
     case = st.session_state.case
 
@@ -64,30 +150,34 @@ with st.sidebar:
         col1, col2 = st.columns(2)
         with col1:
             payer_country = st.text_input(
-                "País pagador", value=case["payer_country"], max_chars=2,
-                help="Quién paga el canon y deduce el gasto",
+                "Jurisdicción pagadora", value=case["payer_country"], max_chars=2,
+                help="Satisface el canon y deduce el gasto",
             )
         with col2:
             recipient_country = st.text_input(
-                "País perceptor", value=case["recipient_country"], max_chars=2,
+                "Jurisdicción perceptora", value=case["recipient_country"],
+                max_chars=2,
             )
 
-        st.selectbox(
-            "Tipo de operación",
-            [t.value for t in sorted(SUPPORTED_TRANSACTION_TYPES, key=lambda t: t.value)],
-            help="Fase 1 cubre únicamente cánones sobre intangibles",
+        # Un desplegable con una sola opción es un control muerto: informa mejor
+        # como texto, y deja claro el alcance de esta versión.
+        st.text_input(
+            "Tipo de operación", value="Canon sobre intangibles",
+            disabled=True,
+            help="Esta versión cubre exclusivamente cánones. Los servicios "
+                 "intragrupo requieren su propia rama de cálculo.",
         )
 
         industry = st.selectbox(
-            "Industria",
-            [i.value for i in Industry],
+            "Sector", [i.value for i in Industry],
             index=[i.value for i in Industry].index(case["industry"].value),
         )
 
         col1, col2 = st.columns(2)
         with col1:
             amount_eur = st.number_input(
-                "Importe (EUR)", value=case["amount_eur"], min_value=1, step=100_000
+                "Importe (EUR)", value=case["amount_eur"], min_value=1,
+                step=100_000,
             )
         with col2:
             rate_percent = st.number_input(
@@ -95,17 +185,18 @@ with st.sidebar:
                 min_value=0.0, max_value=100.0, step=0.5,
             )
 
-        effective_date = st.date_input("Fecha de efecto", value=dt.date(2026, 1, 1))
-        submitted = st.form_submit_button("Analizar", use_container_width=True)
+        effective_date = st.date_input(
+            "Fecha de efecto", value=case["effective_date"]
+        )
+        if st.form_submit_button("Analizar", use_container_width=True):
+            st.session_state.run = True
 
-    st.divider()
-    st.caption(
-        "Los comparables son sintéticos. La herramienta demuestra el motor de "
-        "análisis; no produce estudios oponibles ante una administración."
+if not st.session_state.run:
+    st.markdown(
+        '<div class="tpip-verdict">Introduzca una operación vinculada o cargue '
+        "el caso de referencia para iniciar el análisis.</div>",
+        unsafe_allow_html=True,
     )
-
-if not submitted:
-    st.info("Introduce una operación o carga el caso de ejemplo para empezar.")
     st.stop()
 
 try:
@@ -120,7 +211,7 @@ try:
         effective_date=effective_date,
     )
 except ValueError as exc:
-    st.error(f"Operación no válida: {exc}")
+    st.error(f"La operación no supera la validación del dominio: {exc}")
     st.stop()
 
 result = calculate_arm_length_range(transaction)
@@ -130,101 +221,121 @@ if benchmark.count_accepted == 0:
     st.error(result.conclusion)
     st.stop()
 
-# --- Explicación asistida (opcional) ----------------------------------------
-# El motor ya ha terminado. La IA solo redacta sobre este resultado y su
-# ausencia no degrada nada: el informe se genera igual.
-if resolve_api_key():
-    if st.checkbox("Añadir explicación redactada con IA al informe"):
-        with st.spinner("Redactando explicación sobre el análisis calculado…"):
-            explanation = explain_analysis(result)
-        if explanation is None:
-            st.warning(
-                "La explicación no ha superado la validación automática y se ha "
-                "descartado. El informe se genera sin esa sección."
-            )
-        else:
-            result = result.model_copy(update={"ai_explanation": explanation})
-            st.success(f"Explicación validada · modelo {explanation.model}")
-else:
-    st.caption(
-        "Sin ANTHROPIC_API_KEY configurada: el informe se generará sin sección "
-        "de IA. Copia `.env.example` a `.env` para activarla."
-    )
+position = result.assessments[0].position
+rate = float(transaction.rate_percent)
 
-# --- Entregable -------------------------------------------------------------
-st.download_button(
-    "Descargar informe (PDF)",
-    data=render_report_bytes(result),
-    file_name=f"{result.analysis_id}.pdf",
-    mime="application/pdf",
-    help="Informe completo: benchmark, fundamento por jurisdicción y anexo de comparables",
+
+# ---------------------------------------------------------------------------
+# 1. Veredicto
+# ---------------------------------------------------------------------------
+
+st.markdown(
+    f'<div class="tpip-verdict">El canon propuesto del <strong>{rate}%</strong> '
+    f"({transaction.industry.value}, {transaction.payer_country} → "
+    f"{transaction.recipient_country}) se sitúa "
+    f"<strong>{POSITION_LABEL[position].lower()}</strong> del rango de "
+    f"comparables.</div>",
+    unsafe_allow_html=True,
 )
 
-# --- Rango de mercado -------------------------------------------------------
-st.subheader("Rango de plena competencia")
+dataset_source = next((s for s in result.sources if s.id == "tpip-dataset-v1"), None)
+if dataset_source and dataset_source.disclaimer:
+    st.markdown(
+        f'<div class="tpip-notice">{dataset_source.disclaimer}</div>',
+        unsafe_allow_html=True,
+    )
+
+
+# ---------------------------------------------------------------------------
+# 2. Rango
+# ---------------------------------------------------------------------------
+
+chart = benchmark_range_svg(result)
+if chart:
+    st.markdown(chart, unsafe_allow_html=True)
+
 st.caption(
-    f"Método: {result.method_applied.value.upper()} · "
-    f"{benchmark.count_accepted} comparables aceptados · "
+    f"Método {result.method_applied.value.upper()} · "
+    f"{benchmark.count_accepted} comparables aceptados y "
+    f"{len(result.comparables_rejected)} rechazados · "
     f"percentiles por {benchmark.percentile_method}"
 )
 
-cols = st.columns(5)
-for col, label, value in zip(
-    cols,
-    ["P10", "P25", "Mediana", "P75", "P90"],
-    [benchmark.percentile_10, benchmark.percentile_25, benchmark.percentile_50,
-     benchmark.percentile_75, benchmark.percentile_90],
-):
-    col.metric(label, f"{value}%")
-
-st.metric("Tipo propuesto", f"{float(transaction.rate_percent)}%")
-
 st.divider()
 
-# --- Veredicto por jurisdicción ---------------------------------------------
-st.subheader("Tratamiento por jurisdicción")
 
-for col, assessment in zip(st.columns(len(result.assessments)), result.assessments):
-    with col:
-        st.markdown(f"### {assessment.country}")
-        st.caption(assessment.role.value)
+# ---------------------------------------------------------------------------
+# 3. Comparación por jurisdicción — el argumento de la herramienta
+# ---------------------------------------------------------------------------
 
-        if assessment.defensibility_level is DefensibilityLevel.STRONG:
-            st.success(f"Defendible — {assessment.defensibility_score}/10")
-        elif assessment.defensibility_level is DefensibilityLevel.MODERATE:
-            st.warning(f"Moderado — {assessment.defensibility_score}/10")
-        else:
-            st.error(f"Riesgo alto — {assessment.defensibility_score}/10")
+st.markdown("#### Tratamiento por jurisdicción")
+st.caption(
+    "Mismo tipo, mismos comparables, mismo rango. La consecuencia la fija "
+    "cada ordenamiento."
+)
 
-        if assessment.adjusted_rate is not None:
-            st.metric("Ajuste de oficio", f"{assessment.adjusted_rate}%")
-        elif assessment.range_rule is RangeRule.NO_STATUTORY_RULE:
-            st.metric("Ajuste de oficio", "No automático")
+for column, assessment in zip(st.columns(len(result.assessments)), result.assessments):
+    accent = LEVEL_COLOR[assessment.defensibility_level]
 
-        st.write(assessment.consequence)
-
-st.divider()
-
-# --- Riesgos ----------------------------------------------------------------
-st.subheader("Factores de riesgo")
-for factor in result.risk_factors:
-    if factor.severity is Severity.CRITICAL:
-        st.error(factor.message)
-    elif factor.severity is Severity.WARNING:
-        st.warning(factor.message)
+    if assessment.adjusted_rate is not None:
+        outcome = f"{assessment.adjusted_rate}%"
+        outcome_label = "Ajuste de oficio a la mediana"
+    elif assessment.range_rule is RangeRule.NO_STATUTORY_RULE:
+        outcome = "No automático"
+        outcome_label = "Ajuste · valoración caso por caso"
     else:
-        st.info(factor.message)
+        outcome = "No evaluado"
+        outcome_label = "Regla no modelada en esta versión"
 
-st.subheader("Conclusión")
-st.write(result.conclusion)
+    with column:
+        st.markdown(
+            f'<div class="tpip-card" style="--accent:{accent}">'
+            f'<h3>{assessment.country}</h3>'
+            f'<div class="role">{ROLE_LABEL[assessment.role]}</div>'
+            f'<div class="tpip-rule">{RULE_LABEL_SHORT[assessment.range_rule]}</div>'
+            f'<div class="tpip-outcome">{outcome}'
+            f"<small>{outcome_label}</small></div>"
+            f'<div class="tpip-consequence">{assessment.consequence}</div>'
+            f'<div class="tpip-index">Posición: {POSITION_LABEL[assessment.position]}'
+            f" · índice de defensibilidad "
+            f"{assessment.defensibility_score}/10 "
+            f"({LEVEL_LABEL[assessment.defensibility_level].lower()})</div>"
+            "</div>",
+            unsafe_allow_html=True,
+        )
 
-# --- Anexos -----------------------------------------------------------------
+st.divider()
+
+
+# ---------------------------------------------------------------------------
+# 4. Soporte
+# ---------------------------------------------------------------------------
+
+st.markdown("#### Factores de riesgo")
+for factor in result.risk_factors:
+    label = SEVERITY_LABEL[factor.severity]
+    if factor.severity is Severity.CRITICAL:
+        st.error(f"**{label}** · {factor.message}")
+    elif factor.severity is Severity.WARNING:
+        st.warning(f"**{label}** · {factor.message}")
+    else:
+        st.info(f"**{label}** · {factor.message}")
+
+with st.expander(f"Fuentes citadas ({len(result.sources)})"):
+    for source in result.sources:
+        pinpoint = f" — {source.pinpoint}" if source.pinpoint else ""
+        st.markdown(f"**{source.citation}**{pinpoint}")
+        if source.official_ref:
+            st.caption(source.official_ref)
+        if source.disclaimer:
+            st.caption(source.disclaimer)
+
 with st.expander(f"Comparables aceptados ({len(result.comparables_accepted)})"):
     st.dataframe(
         [
             {
-                "ID": c.id, "Compañía": c.company_name, "País": c.country,
-                "Industria": c.industry.value, "Canon %": c.royalty_rate,
+                "Referencia": c.id, "Compañía": c.company_name, "País": c.country,
+                "Sector": c.industry.value, "Canon": f"{c.royalty_rate}%",
                 "Ejercicio": c.data_year,
             }
             for c in result.comparables_accepted
@@ -235,22 +346,58 @@ with st.expander(f"Comparables aceptados ({len(result.comparables_accepted)})"):
 with st.expander(f"Comparables rechazados ({len(result.comparables_rejected)})"):
     st.dataframe(
         [
-            {"ID": r.comparable_id, "Compañía": r.company_name,
-             "Motivo": r.reason.value, "Detalle": r.detail}
+            {
+                "Referencia": r.comparable_id, "Compañía": r.company_name,
+                "Motivo": REJECTION_LABEL[r.reason], "Detalle": r.detail,
+            }
             for r in result.comparables_rejected
         ],
         use_container_width=True, hide_index=True,
     )
 
-with st.expander(f"Fuentes citadas ({len(result.sources)})"):
-    for src in result.sources:
-        st.markdown(f"**{src.citation}**" + (f" — {src.pinpoint}" if src.pinpoint else ""))
-        if src.official_ref:
-            st.caption(src.official_ref)
-        if src.disclaimer:
-            st.caption(src.disclaimer)
+st.divider()
 
-st.caption(
-    f"Análisis {result.analysis_id} · motor {result.engine_version} · "
-    f"dataset {result.dataset_version} · {result.created_at:%Y-%m-%d %H:%M}"
+
+# ---------------------------------------------------------------------------
+# 5. Entregable
+# ---------------------------------------------------------------------------
+
+st.markdown("#### Informe")
+
+if resolve_api_key():
+    if st.checkbox(
+        "Incorporar explicación redactada con asistencia de IA",
+        help="La explicación se redacta sobre el análisis ya calculado y se "
+             "valida contra las fuentes emitidas por el motor antes de "
+             "incorporarse al informe.",
+    ):
+        with st.spinner("Redactando explicación sobre el análisis calculado"):
+            explanation = explain_analysis(result)
+        if explanation is None:
+            st.warning(
+                "La explicación no ha superado la validación automática y se ha "
+                "descartado. El informe se emite sin esa sección."
+            )
+        else:
+            result = result.model_copy(update={"ai_explanation": explanation})
+            st.caption(f"Explicación validada · modelo {explanation.model}")
+else:
+    st.caption(
+        "Sin ANTHROPIC_API_KEY configurada. El informe se emite sin sección de "
+        "IA; su ausencia no afecta al análisis."
+    )
+
+st.download_button(
+    "Descargar informe (PDF)",
+    data=render_report_bytes(result),
+    file_name=f"{result.analysis_id}.pdf",
+    mime="application/pdf",
+    type="primary",
+)
+
+st.markdown(
+    f'<div class="tpip-meta">Análisis {result.analysis_id} · motor '
+    f"{result.engine_version} · dataset {result.dataset_version} · "
+    f"{result.created_at:%d/%m/%Y %H:%M}</div>",
+    unsafe_allow_html=True,
 )
