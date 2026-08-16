@@ -1,3 +1,11 @@
+---
+titulo: "Safe harbours y HTVI — las reglas numéricas de la OCDE"
+fecha_creacion: 2026-07-30
+origen: "Cerebros_Fiscales/wiki/sub_tp/ocde-vs-onu-divergencias-precios-transferencia.md"
+fuente_primaria: "OECD TPG 2022, Cap. VI D.4 y Cap. VII D; ONU, Manual Práctico 2013 (ST/ESA/347)"
+usar_en: "tp_domain/rules/safe_harbours.py (Fase 2B)"
+---
+
 # Safe harbours y HTVI — las reglas numéricas de la OCDE
 
 **Origen:** `Cerebros_Fiscales/wiki/sub_tp/ocde-vs-onu-divergencias-precios-transferencia.md`

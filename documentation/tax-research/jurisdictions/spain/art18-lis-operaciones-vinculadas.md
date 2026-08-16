@@ -1,3 +1,13 @@
+---
+titulo: "España — Art. 18 LIS: operaciones vinculadas"
+fecha_creacion: 2026-07-30
+origen: "Cerebros_Fiscales/wiki/sub_tp/lis-art18-operaciones-vinculadas-precios-transferencia.md"
+fuente_primaria: "Ley 27/2014, del Impuesto sobre Sociedades, Art. 18"
+tipo: "Normativa estatal, ficha de cabecera de la Capa España"
+usar_en: "tp_domain/rules/spanish_rules.py (Fase 2A)"
+enlaces: ["sub_is/ris-rd634-2015-reglamento-impuesto-sociedades", "sub_tp/ocde-directrices-precios-transferencia-2022", "sub_tp/beps-acciones-8-10-precios-transferencia", "sub_is/establecimiento-permanente"]
+---
+
 # España — Art. 18 LIS: operaciones vinculadas
 
 **Origen:** `Cerebros_Fiscales/wiki/sub_tp/lis-art18-operaciones-vinculadas-precios-transferencia.md`

@@ -1,3 +1,12 @@
+---
+titulo: "OCDE — Directrices de Precios de Transferencia 2022: los tres marcos"
+fecha_creacion: 2026-07-30
+origen: "Cerebros_Fiscales/wiki/sub_tp/ocde-directrices-precios-transferencia-2022.md"
+fuente_primaria: "OECD Transfer Pricing Guidelines 2022, Cap. I, VI y VII"
+usar_en: "tp_domain/rules/comparable_selection.py, cuestionario de la UI (Fase 2B)"
+enlaces: ["sub_tp/beps-acciones-8-10-precios-transferencia", "sub_tp/lis-art18-operaciones-vinculadas-precios-transferencia", "sub_tp/teac-rg-7833-2023-servicios-intragrupo-doble-vinculacion"]
+---
+
 # OCDE — Directrices de Precios de Transferencia 2022: los tres marcos
 
 **Origen:** `Cerebros_Fiscales/wiki/sub_tp/ocde-directrices-precios-transferencia-2022.md`

@@ -1,3 +1,12 @@
+---
+titulo: "Doctrina TEAC aplicable a operaciones vinculadas"
+fecha_creacion: 2026-07-30
+origen: "Cerebros_Fiscales/wiki/sub_tp/teac-rg-*.md (3 fichas)"
+tipo: "criterio administrativo español"
+usar_en: "factores de riesgo cualitativos (Fase 2A), informe generado"
+enlaces: ["sub_tp/lis-art18-operaciones-vinculadas-precios-transferencia", "sub_tp/ocde-directrices-precios-transferencia-2022"]
+---
+
 # Doctrina TEAC aplicable a operaciones vinculadas
 
 **Origen:** `Cerebros_Fiscales/wiki/sub_tp/teac-rg-*.md` (3 fichas)

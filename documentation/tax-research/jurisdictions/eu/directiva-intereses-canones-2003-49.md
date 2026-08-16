@@ -1,3 +1,12 @@
+---
+titulo: "UE — Directiva Intereses-Cánones 2003/49/CE"
+fecha_creacion: 2026-07-30
+origen: "Cerebros_Fiscales/wiki/matriz/ue-directiva-intereses-canones-2003-49-ce.md"
+tipo: "Normativa UE vigente"
+usar_en: "Tax Impact Modeler (Fase 2), cálculo de retención en fuente"
+enlaces: ["matriz/ue-directiva-matriz-filial", "matriz/boe-cdi-espana-luxemburgo-1986"]
+---
+
 # UE — Directiva Intereses-Cánones 2003/49/CE
 
 **Origen:** `Cerebros_Fiscales/wiki/matriz/ue-directiva-intereses-canones-2003-49-ce.md`

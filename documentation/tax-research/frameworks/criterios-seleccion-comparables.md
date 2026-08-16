@@ -1,3 +1,11 @@
+---
+titulo: "Criterios de selección de comparables"
+fecha_creacion: 2026-07-30
+origen: "síntesis de sub_tp/ocde-directrices-precios-transferencia-2022.md, matriz/de-astg-transparencia-precios.md, sub_is/ris-rd634-2015-reglamento-impuesto-sociedades.md"
+tipo: "taxonomía derivada, no ficha directa del corpus"
+usar_en: "tp_domain/calculations/comparable_scoring.py (Fase 2B)"
+---
+
 # Criterios de selección de comparables
 
 **Origen:** síntesis de `sub_tp/ocde-directrices-precios-transferencia-2022.md`, `matriz/de-astg-transparencia-precios.md`, `sub_is/ris-rd634-2015-reglamento-impuesto-sociedades.md`

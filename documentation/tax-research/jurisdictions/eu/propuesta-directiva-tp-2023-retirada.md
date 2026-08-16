@@ -1,3 +1,13 @@
+---
+titulo: "UE — Propuesta de Directiva sobre Precios de Transferencia COM(2023) 529 (RETIRADA)"
+fecha_creacion: 2026-07-30
+origen: "Cerebros_Fiscales/wiki/sub_tp/ue-propuesta-directiva-precios-transferencia-2023-retirada.md"
+estado: "Retirada por la Comisión el 21 de octubre de 2025. Sin vigencia."
+tipo: "Derecho comparado / contrafáctico"
+usar_en: "contexto del comparador, NUNCA como regla aplicable"
+enlaces: ["sub_tp/lis-art18-operaciones-vinculadas-precios-transferencia", "matriz/de-astg-transparencia-precios"]
+---
+
 # UE — Propuesta de Directiva sobre Precios de Transferencia COM(2023) 529 (RETIRADA)
 
 **Origen:** `Cerebros_Fiscales/wiki/sub_tp/ue-propuesta-directiva-precios-transferencia-2023-retirada.md`
