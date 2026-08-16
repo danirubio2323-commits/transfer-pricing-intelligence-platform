@@ -1,18 +1,74 @@
 """Configuración común a todos los entornos.
 
-Las cinco aplicaciones de `contrib` que entran aquí no son decorativas: este
-producto tiene cuentas y panel de administración (§8), y el panel es la razón
-por la que se eligió Django frente a FastAPI.
+La configuración que viene de fuera está tipada en `Settings`, y **este es el
+único punto del proyecto que lee `.env`**: todo lo demás —`manage.py`, pytest
+vía `DJANGO_SETTINGS_MODULE`, las vistas y los servicios— pasa por aquí. Los
+scripts de `scripts/` no leen ninguna variable de entorno.
 
-No se ejecuta `migrate` en el paso 1. La primera migración que se aplica al
-proyecto tiene que ser la de `apps.cuentas` con `AUTH_USER_MODEL` ya declarado
-(paso 4); aplicar antes las tablas de `auth` con el usuario por defecto es el
-estado del que Django no sabe salir.
+Ninguna variable es obligatoria en desarrollo, y eso no es un descuido: es lo
+que impide que un paso posterior rompa el gate de un paso anterior exigiendo un
+secreto que antes no hacía falta. La única sin valor por defecto es la clave de
+firma, y `local.py` le da uno de desarrollo explícito; `production.py` (paso 26)
+se niega a arrancar sin ella, que es exactamente el paso cuyo código la
+satisface.
+
+Las cinco aplicaciones de `contrib` que entran no son decorativas: este producto
+tiene cuentas y panel de administración, y el panel es la razón por la que se
+eligió Django frente a FastAPI.
 """
 
+from __future__ import annotations
+
+from decimal import Decimal
 from pathlib import Path
 
+from pydantic import Field, model_validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+from config.logging import configure_logging
+
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
+
+
+class Settings(BaseSettings):
+    """Configuración externa, tipada y validada en el arranque."""
+
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+
+    @model_validator(mode="before")
+    @classmethod
+    def _vacio_es_ausente(cls, valores: object) -> object:
+        """Una variable declarada y vacía en `.env` cuenta como no definida.
+
+        `.env.example` se versiona con todas las claves presentes y los valores
+        vacíos, y el arranque lo copia a `.env` tal cual. Sin esto, un
+        `ANTHROPIC_API_KEY=` llegaría como cadena vacía en vez de `None` —y la
+        capa de IA no podría distinguir «sin definir» de «definida a nada»— y un
+        `PRECIO_ENTRADA_EUR_POR_MTOK=` reventaría la validación del decimal.
+        """
+        if isinstance(valores, dict):
+            return {
+                clave: valor
+                for clave, valor in valores.items()
+                if not (isinstance(valor, str) and not valor.strip())
+            }
+        return valores
+
+    django_secret_key: str
+    django_debug: bool = True
+    django_allowed_hosts: str = "127.0.0.1,localhost"
+    anthropic_api_key: str | None = None
+    anthropic_model: str | None = None
+    precio_entrada_eur_por_mtok: Decimal = Field(default=Decimal("0"))
+    precio_salida_eur_por_mtok: Decimal = Field(default=Decimal("0"))
+
+    @property
+    def allowed_hosts(self) -> list[str]:
+        """`a.example,b.example` es una lista de dos, no una cadena con una coma."""
+        return [h.strip() for h in self.django_allowed_hosts.split(",") if h.strip()]
+
+
+configure_logging()
 
 INSTALLED_APPS = [
     "django.contrib.admin",
