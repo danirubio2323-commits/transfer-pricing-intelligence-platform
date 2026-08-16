@@ -77,6 +77,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "apps.cuentas",
 ]
 
 MIDDLEWARE = [
@@ -120,3 +121,6 @@ TIME_ZONE = "Europe/Madrid"
 USE_TZ = True
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+#: Modelo de usuario propio, fijado antes de la primera migración (paso 4).
+AUTH_USER_MODEL = "cuentas.Usuario"
