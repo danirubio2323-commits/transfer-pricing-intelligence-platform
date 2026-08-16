@@ -53,21 +53,24 @@ class ClaudeUnavailable(RuntimeError):
 # ---------------------------------------------------------------------------
 
 def resolve_api_key() -> Optional[str]:
-    """Devuelve la primera clave disponible, o None si no hay ninguna."""
-    try:  # 1. Streamlit Cloud
-        import streamlit as st
+    """
+    Devuelve la primera clave disponible, o None si no hay ninguna.
 
-        key = st.secrets.get("ANTHROPIC_API_KEY")
-        if key:
-            return str(key)
-    except Exception:  # noqa: BLE001 - sin streamlit, sin secrets o fuera de app
-        pass
+    Antes había un primer eslabón que leía los secretos de Streamlit Cloud. Se
+    retira con la interfaz de Streamlit: era la única dependencia de esta capa
+    con un framework, y esta capa tiene que poder importarse sin ninguno
+    —`tests/web/test_rescate.py` lo comprueba en un intérprete limpio—.
 
-    key = os.environ.get("ANTHROPIC_API_KEY")  # 2. entorno
+    La aplicación web no llama a esta función: le pasa la clave que ya ha leído
+    su propia configuración tipada, que es el único punto del proyecto que lee
+    `.env`. Estos dos eslabones existen para quien use la capa de IA suelta,
+    desde un script o una prueba.
+    """
+    key = os.environ.get("ANTHROPIC_API_KEY")  # 1. entorno
     if key:
         return key
 
-    try:  # 3. .env local
+    try:  # 2. .env local
         from dotenv import dotenv_values
 
         return dotenv_values(".env").get("ANTHROPIC_API_KEY") or None
