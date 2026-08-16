@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cambiar contraseña — TPIP</title>
+</head>
+<body>
+  <main>
+    <h1>Cambiar contraseña</h1>
+
+    <form method="post" action="{% url 'cuentas:contrasena' %}">
+      {% csrf_token %}
+      {{ formulario.as_p }}
+      <button type="submit">Cambiar</button>
+    </form>
+  </main>
+</body>
+</html>

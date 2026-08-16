@@ -87,6 +87,7 @@ MIDDLEWARE = [
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
+    "apps.comun.middleware.ExigirAutenticacion",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -124,3 +125,16 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 #: Modelo de usuario propio, fijado antes de la primera migración (paso 4).
 AUTH_USER_MODEL = "cuentas.Usuario"
+
+# --- Sesión y acceso (paso 5) ---
+LOGIN_URL = "/entrar/"
+LOGIN_REDIRECT_URL = "/casos/"
+LOGOUT_REDIRECT_URL = "/entrar/"
+
+#: Ocho horas: una jornada. Más allá, se vuelve a pedir la contraseña.
+SESSION_COOKIE_AGE = 8 * 60 * 60
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+#: La cookie no es legible desde JavaScript, que es lo que impide robarla con
+#: un script inyectado. Nunca un token en almacenamiento del navegador (§20.3).
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = "Lax"
