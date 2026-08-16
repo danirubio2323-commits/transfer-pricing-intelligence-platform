@@ -241,3 +241,11 @@ knowledge/
 
 # Catálogo de entorno personal — no forma parte del producto
 Catalogo_Herramientas_IA_Daru.md
+
+# --- Migracion a Django (blueprints/tpip) ---
+!.env.example
+.venv/
+staticfiles/
+copias/
+blueprints/
+pyproject.toml.pre-django
