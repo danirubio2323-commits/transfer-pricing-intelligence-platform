@@ -40,6 +40,24 @@ build_report(result, "report.pdf")
 The report is generated without any API call. The AI explanation is an
 additive section: its absence does not degrade the document.
 
+## Legal traceability
+
+Every source the engine can cite lives in a closed registry
+(`tp_domain/sources.py`), not in free text. Each entry carries a jurisdiction,
+a typed locator (a BOE identifier, an official URL, or a reference into a
+local offline document — never a bare, unstructured string), the date it was
+last checked, and, when it has no public identifier, a literal quote of the
+provision plus a disclaimer explaining why it can't be resolved by a third
+party. Sources confirmed against their primary text are marked distinctly
+from ones read only through a secondary, non-exhaustive summary
+(`verification_confidence`) — a verification date alone should not read as
+more certainty than what was actually checked.
+
+The PDF report and the Streamlit UI both print this for every source an
+analysis cites: jurisdiction, locator, verification date and confidence. The
+engine can only cite what is already in the registry — `AnalysisResult`
+cannot be constructed if it references a source id the engine did not emit.
+
 ## AI layer (optional)
 
 Claude writes a narrative explanation **of an already-calculated analysis**.

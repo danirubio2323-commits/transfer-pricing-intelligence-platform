@@ -103,6 +103,35 @@ class SourceKind(str, Enum):
     DATASET = "dataset"
 
 
+class LocatorType(str, Enum):
+    """
+    Tipo del identificador público de una fuente.
+
+    Distingue una fuente resoluble por un tercero (BOE_ID, URL) de una que no
+    lo es (OFFLINE) o que es interna al propio proyecto (INTERNAL, el dataset
+    sintético). Sustituye a `official_ref` como texto libre sin tipo, que
+    mezclaba un id BOE real con una cita que no era identificador de nada.
+    """
+    BOE_ID = "boe_id"
+    URL = "url"
+    OFFLINE = "offline"
+    INTERNAL = "internal"
+
+
+class VerificationConfidence(str, Enum):
+    """
+    Cuán verificable es una fuente contra su texto primario — distinto de si
+    tiene fecha de verificación. Una fecha de verificación uniforme puede
+    sobre-representar la fiabilidad de una fuente leída de forma dirigida
+    frente a una confirmada contra su texto oficial.
+    """
+    #: Leída y confirmada contra el texto primario (resoluble o no).
+    PRIMARY_SOURCE_VERIFIED = "primary_source_verified"
+    #: Lectura dirigida, no exhaustiva, sin confirmación directa del texto
+    #: primario vigente en el momento de citarla.
+    DIRECTED_READING = "directed_reading"
+
+
 class RejectionReason(str, Enum):
     INDUSTRY_MISMATCH = "industry_mismatch"
     STALE_YEAR = "stale_year"
@@ -145,6 +174,43 @@ class Source(BaseModel):
     official_ref: Optional[str] = None
     research_note: Optional[str] = None
     disclaimer: Optional[str] = None
+
+    # --- Fase 1 (2026-08-10): ampliación de trazabilidad jurídica ---
+    #: "ES" | "DE" | "OECD" | "GLOBAL" (dataset interno, sin jurisdicción).
+    jurisdiction: str
+    locator_type: LocatorType
+    #: Identificador o ruta concreta. Obligatorio incluso en OFFLINE/INTERNAL:
+    #: una fuente sin localizador público sigue debiendo apuntar a algo
+    #: verificable (ruta de fichero, portal oficial sin URL profunda, etc.).
+    locator: str
+    verified_at: dt.date
+    #: None solo para kind=DATASET, donde no aplica "verificar contra fuente
+    #: primaria legal" — la honestidad ahí la da el disclaimer, no este campo.
+    verification_confidence: Optional[VerificationConfidence] = None
+    #: Extracto literal breve de la disposición. Obligatorio si locator_type
+    #: es OFFLINE (ver validador) — es la única evidencia verificable que
+    #: queda cuando no hay identificador público resoluble.
+    quote: Optional[str] = None
+    in_force_from: Optional[dt.date] = None
+    in_force_to: Optional[dt.date] = None
+    #: id de otra Source que sustituye a esta si quedó derogada.
+    superseded_by: Optional[str] = None
+
+    @model_validator(mode="after")
+    def _offline_requires_quote_and_disclaimer(self) -> "Source":
+        if self.locator_type == LocatorType.OFFLINE and self.kind != SourceKind.DATASET:
+            if not self.quote:
+                raise ValueError(
+                    f"{self.id}: locator_type OFFLINE exige 'quote' — es la "
+                    "única evidencia verificable que queda sin localizador "
+                    "público."
+                )
+            if not self.disclaimer:
+                raise ValueError(
+                    f"{self.id}: locator_type OFFLINE exige 'disclaimer' "
+                    "explicando por qué no es resoluble públicamente."
+                )
+        return self
 
 
 # ===========================================================================

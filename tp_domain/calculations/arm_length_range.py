@@ -25,7 +25,6 @@ from tp_domain.models import (
     ComparableDataset,
     DefensibilityLevel,
     PartyRole,
-    RangePosition,
     RangeRule,
     RejectedComparable,
     RejectionReason,
@@ -72,11 +71,6 @@ def load_dataset(path: Optional[Path] = None) -> ComparableDataset:
         version=version,
         comparables=[Comparable(**item) for item in items],
     )
-
-
-def load_comparables(path: Optional[Path] = None) -> List[Comparable]:
-    """Atajo para quien solo necesita los comparables."""
-    return load_dataset(path).comparables
 
 
 # ---------------------------------------------------------------------------
@@ -160,11 +154,6 @@ def calculate_percentiles(values: List[float]) -> dict:
         "p90": round(float(np.percentile(arr, 90)), 2),
         "count": len(values),
     }
-
-
-def calculate_defensibility_score(position: RangePosition) -> int:
-    """Puntuación 1-10 derivada de la posición en el rango. Ver POSITION_SCORING."""
-    return statistical_rules.POSITION_SCORING[position][1]
 
 
 # ---------------------------------------------------------------------------

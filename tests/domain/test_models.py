@@ -21,11 +21,14 @@ from tp_domain.models import (
     DefensibilityLevel,
     Industry,
     JurisdictionAssessment,
+    LocatorType,
     PartyRole,
     RangeRule,
     RiskCode,
     RiskFactor,
     Severity,
+    Source,
+    SourceKind,
     TPMethod,
     Transaction,
     TransactionType,
@@ -146,6 +149,99 @@ def test_resolve_rejects_unknown_ids():
 def test_resolve_deduplicates_preserving_order():
     got = resolve(["de-astg-1-3a", "es-lis-art18-4", "de-astg-1-3a"])
     assert [s.id for s in got] == ["de-astg-1-3a", "es-lis-art18-4"]
+
+
+# ---------------------------------------------------------------------------
+# Trazabilidad jurídica de las fuentes (Fase 1: jurisdiction, locator,
+# verificación). Ampliación de `Source` sobre el registro cerrado que ya
+# exigía sources_cited ⊆ SOURCE_REGISTRY — estos campos son los que permiten
+# distinguir una fuente verificada contra su texto primario de una que no.
+# ---------------------------------------------------------------------------
+
+def test_every_source_has_jurisdiction_locator_and_verification_date():
+    for source in SOURCE_REGISTRY.values():
+        assert source.jurisdiction
+        assert source.locator_type is not None
+        assert source.locator
+        assert source.verified_at is not None
+
+
+def test_only_the_dataset_source_lacks_verification_confidence():
+    """
+    Las 4 fuentes legales tienen que declarar si se verificaron contra el
+    texto primario o mediante lectura dirigida. El dataset sintético no es
+    una fuente jurídica que verificar de esa forma — su honestidad la da el
+    disclaimer, no este campo.
+    """
+    for source_id, source in SOURCE_REGISTRY.items():
+        if source.kind is SourceKind.DATASET:
+            assert source.verification_confidence is None, source_id
+        else:
+            assert source.verification_confidence is not None, source_id
+
+
+def test_offline_source_without_quote_is_rejected():
+    with pytest.raises(ValidationError, match="quote"):
+        Source(
+            id="test-offline-no-quote", kind=SourceKind.LEGISLATION,
+            citation="Norma de prueba", jurisdiction="ES",
+            locator_type=LocatorType.OFFLINE, locator="raw/test.pdf",
+            verified_at=REF_DATE, disclaimer="Sin localizador público.",
+        )
+
+
+def test_offline_source_without_disclaimer_is_rejected():
+    with pytest.raises(ValidationError, match="disclaimer"):
+        Source(
+            id="test-offline-no-disclaimer", kind=SourceKind.LEGISLATION,
+            citation="Norma de prueba", jurisdiction="ES",
+            locator_type=LocatorType.OFFLINE, locator="raw/test.pdf",
+            verified_at=REF_DATE, quote="Texto literal de prueba.",
+        )
+
+
+def test_offline_source_with_quote_and_disclaimer_is_accepted():
+    source = Source(
+        id="test-offline-ok", kind=SourceKind.LEGISLATION,
+        citation="Norma de prueba", jurisdiction="ES",
+        locator_type=LocatorType.OFFLINE, locator="raw/test.pdf",
+        verified_at=REF_DATE, quote="Texto literal de prueba.",
+        disclaimer="Sin localizador público.",
+    )
+    assert source.quote and source.disclaimer
+
+
+def test_dataset_kind_is_exempt_from_the_offline_quote_requirement():
+    """
+    El dataset sintético usa locator_type OFFLINE (no tiene identificador
+    público) pero no es una disposición jurídica con extracto que citar — el
+    validador lo exime explícitamente de exigir quote/disclaimer.
+    """
+    source = Source(
+        id="test-dataset-offline", kind=SourceKind.DATASET,
+        citation="Dataset de prueba", jurisdiction="GLOBAL",
+        locator_type=LocatorType.OFFLINE, locator="tp_domain/test.json",
+        verified_at=REF_DATE,
+    )
+    assert source.quote is None and source.disclaimer is None
+
+
+def test_non_offline_source_does_not_require_quote_or_disclaimer():
+    source = Source(
+        id="test-boe-id", kind=SourceKind.LEGISLATION,
+        citation="Norma de prueba", jurisdiction="ES",
+        locator_type=LocatorType.BOE_ID, locator="BOE-A-9999-99999",
+        verified_at=REF_DATE,
+    )
+    assert source.quote is None and source.disclaimer is None
+
+
+def test_source_validity_fields_default_to_none():
+    """Ninguna de las 5 fuentes de Fase 1 tiene vigencia cerrada ni sucesora."""
+    for source in SOURCE_REGISTRY.values():
+        assert source.in_force_from is None
+        assert source.in_force_to is None
+        assert source.superseded_by is None
 
 
 # ---------------------------------------------------------------------------

@@ -34,6 +34,7 @@ from infrastructure.theme import (
     ROLE_LABEL,
     RULE_LABEL_SHORT,
     SEVERITY_LABEL,
+    VERIFICATION_CONFIDENCE_LABEL,
 )
 from tp_domain.calculations.arm_length_range import calculate_arm_length_range
 from tp_domain.models import Industry, RangeRule, Severity, Transaction
@@ -325,8 +326,13 @@ with st.expander(f"Fuentes citadas ({len(result.sources)})"):
     for source in result.sources:
         pinpoint = f" — {source.pinpoint}" if source.pinpoint else ""
         st.markdown(f"**{source.citation}**{pinpoint}")
-        if source.official_ref:
-            st.caption(source.official_ref)
+
+        verification = f"{source.jurisdiction} · {source.verified_at:%d/%m/%Y}"
+        if source.verification_confidence is not None:
+            verification += f" · {VERIFICATION_CONFIDENCE_LABEL[source.verification_confidence]}"
+        verification += f" · {source.locator_type.value}: {source.locator}"
+        st.caption(verification)
+
         if source.disclaimer:
             st.caption(source.disclaimer)
 

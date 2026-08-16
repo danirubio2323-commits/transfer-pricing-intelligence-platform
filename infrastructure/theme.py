@@ -32,6 +32,7 @@ from tp_domain.models import (
     RangeRule,
     RejectionReason,
     Severity,
+    VerificationConfidence,
 )
 
 # ---------------------------------------------------------------------------
@@ -112,6 +113,14 @@ RULE_LABEL_SHORT: Dict[RangeRule, str] = {
     RangeRule.NO_STATUTORY_RULE: "Sin regla estadística",
     RangeRule.INTERQUARTILE_MEDIAN_ADJUSTMENT: "Ajuste a la mediana",
     RangeRule.NOT_MODELLED: "No modelada",
+}
+
+#: Distingue una fuente confirmada contra su texto primario de una leída de
+#: forma dirigida — una fecha de verificación sola no debe sugerir el mismo
+#: grado de certeza en ambos casos (Fase 1, campo `Source.verification_confidence`).
+VERIFICATION_CONFIDENCE_LABEL: Dict[VerificationConfidence, str] = {
+    VerificationConfidence.PRIMARY_SOURCE_VERIFIED: "Verificado contra fuente primaria",
+    VerificationConfidence.DIRECTED_READING: "Lectura dirigida, no exhaustiva",
 }
 
 

@@ -51,6 +51,7 @@ from infrastructure.theme import (
     ROLE_LABEL,
     RULE_LABEL,
     SEVERITY_LABEL,
+    VERIFICATION_CONFIDENCE_LABEL,
     range_geometry,
 )
 from tp_domain.models import AnalysisResult
@@ -426,13 +427,17 @@ def _basis_section(result: AnalysisResult, st) -> list:
         detail = s.citation
         if s.pinpoint:
             detail += f" — {s.pinpoint}"
-        if s.official_ref:
-            detail += f" [{s.official_ref}]"
-        rows.append([s.kind.value, detail, s.disclaimer or "-"])
+
+        verification = f"{s.verified_at:%d/%m/%Y}"
+        if s.verification_confidence is not None:
+            verification += f" · {VERIFICATION_CONFIDENCE_LABEL[s.verification_confidence]}"
+        verification += f" · {s.locator_type.value}: {s.locator}"
+
+        rows.append([s.jurisdiction, s.kind.value, detail, verification, s.disclaimer or "-"])
 
     story.append(_data_table(
-        ["Tipo", "Referencia", "Nota"], rows,
-        (22 * mm, 68 * mm, 70 * mm), st["cell"],
+        ["Jurisdicción", "Tipo", "Referencia", "Verificación", "Nota"], rows,
+        (12 * mm, 14 * mm, 68 * mm, 32 * mm, 36 * mm), st["cell"],
     ))
     return story
 
