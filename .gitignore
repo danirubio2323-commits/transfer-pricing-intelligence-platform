@@ -247,5 +247,8 @@ Catalogo_Herramientas_IA_Daru.md
 .venv/
 staticfiles/
 copias/
-blueprints/
+# El bundle SI se versiona: dejo de ser un artefacto desechable en cuanto los
+# primeros pasos destaparon defectos que solo se ven ejecutando, y sus
+# correcciones viven en el. Que ruff, mypy y pytest no lo recorran lo decide
+# pyproject.toml, no este fichero.
 pyproject.toml.pre-django

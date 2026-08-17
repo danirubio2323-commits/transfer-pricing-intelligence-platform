@@ -1,17 +1,12 @@
-# =====================================================================
-# TPIP — ficheros que git no sigue.
-#
-# El bootstrap de §10 añade a este fichero, de forma idempotente, las
-# líneas que el proyecto necesita, y lo hace ANTES del primer commit. El
-# orden importa: una regla de ignorados no se aplica jamás a una ruta que
-# git ya sigue, así que llegar tarde equivale a no llegar.
-# =====================================================================
-
-# --- Python ---
+# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
 *$py.class
+
+# C extensions
 *.so
+
+# Distribution / packaging
 .Python
 build/
 develop-eggs/
@@ -19,80 +14,241 @@ dist/
 downloads/
 eggs/
 .eggs/
+lib/
+lib64/
+parts/
 sdist/
+var/
 wheels/
+share/python-wheels/
 *.egg-info/
+.installed.cfg
 *.egg
 MANIFEST
 
-# --- Entornos virtuales y gestor de paquetes ---
-.venv/
-venv/
-env/
-ENV/
-# uv.lock SÍ se versiona: sin él, `uv sync` no es reproducible.
+# PyInstaller
+#   Usually these files are written by a python script from a template
+#   before PyInstaller builds the exe, so as to inject date/other infos into it.
+*.manifest
+*.spec
 
-# --- Configuración local con secretos ---
-# `.env.example` es la excepción y va DESPUÉS del patrón que lo capturaría:
-# es el contrato de configuración y tiene que estar en el repositorio.
-.env
-.env.*
-!.env.example
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
 
-# --- Datos: no son código y no se versionan ---
-# La base de datos del usuario, con sus casos, su gasto y sus precedentes.
-db.sqlite3
-db.sqlite3-journal
-*.db
-*.sqlite3
-
-# Las copias de seguridad del paso 24, junto a sus ficheros de recuentos.
-# Contienen exactamente los mismos datos que la base de datos.
-copias/
-
-# --- Artefactos generados ---
-# Salida de `manage.py collectstatic` (STATIC_ROOT). Se regenera siempre.
-staticfiles/
-# static/css/tokens.css SÍ se versiona, aunque lo genere
-# `scripts/build_tokens.py`: el CSS tiene que funcionar sin ejecutar nada.
-
-# --- El bundle de The Architect ---
-# Vive DENTRO del árbol del proyecto, en blueprints/tpip/. No es código del
-# producto y no se versiona con él.
-#
-# Ojo: esta línea NO sustituye a las exclusiones que ya lleva
-# `pyproject.toml` para ruff, mypy y pytest. Son cosas distintas: aquella
-# impide que las herramientas encuentren dos raíces de configuración en un
-# mismo árbol; esta impide que el bundle entre en el repositorio. Hacen
-# falta las dos.
-blueprints/
-
-# --- Residuos de la etapa Streamlit ---
-# El bootstrap archiva aquí el pyproject.toml de setuptools antes de dejar
-# aterrizar el nuevo. Se conserva en disco por si hay que volver atrás,
-# pero no se versiona.
-pyproject.toml.pre-django
-
-# --- Pruebas y herramientas ---
-.pytest_cache/
-.mypy_cache/
-.ruff_cache/
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
 .coverage
 .coverage.*
-htmlcov/
+.cache
+nosetests.xml
 coverage.xml
+*.cover
+*.py.cover
+.hypothesis/
+.pytest_cache/
+cover/
 
-# --- Sistema operativo y editores ---
-.DS_Store
-Thumbs.db
-desktop.ini
-.idea/
-.vscode/
-*.swp
-*~
+# Translations
+*.mo
+*.pot
 
-# --- Configuración del agente ---
-# `.claude/settings.json`, `.claude/rules/` y `.claude/skills/` SÍ se
-# versionan: forman parte del proyecto. Solo se ignora lo que es local de
-# cada máquina.
-.claude/settings.local.json
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+.pybuilder/
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+#   For a library or package, you might want to ignore these files since the code is
+#   intended to run in multiple environments; otherwise, check them in:
+# .python-version
+
+# pipenv
+#   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
+#   However, in case of collaboration, if having platform-specific dependencies or dependencies
+#   having no cross-platform support, pipenv may install dependencies that don't work, or not
+#   install all needed dependencies.
+# Pipfile.lock
+
+# UV
+#   Similar to Pipfile.lock, it is generally recommended to include uv.lock in version control.
+#   This is especially recommended for binary packages to ensure reproducibility, and is more
+#   commonly ignored for libraries.
+# uv.lock
+
+# poetry
+#   Similar to Pipfile.lock, it is generally recommended to include poetry.lock in version control.
+#   This is especially recommended for binary packages to ensure reproducibility, and is more
+#   commonly ignored for libraries.
+#   https://python-poetry.org/docs/basic-usage/#commit-your-poetrylock-file-to-version-control
+# poetry.lock
+# poetry.toml
+
+# pdm
+#   Similar to Pipfile.lock, it is generally recommended to include pdm.lock in version control.
+#   pdm recommends including project-wide configuration in pdm.toml, but excluding .pdm-python.
+#   https://pdm-project.org/en/latest/usage/project/#working-with-version-control
+# pdm.lock
+# pdm.toml
+.pdm-python
+.pdm-build/
+
+# pixi
+#   Similar to Pipfile.lock, it is generally recommended to include pixi.lock in version control.
+# pixi.lock
+#   Pixi creates a virtual environment in the .pixi directory, just like venv module creates one
+#   in the .venv directory. It is recommended not to include this directory in version control.
+.pixi
+
+# PEP 582; used by e.g. github.com/David-OConnor/pyflow and github.com/pdm-project/pdm
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# Redis
+*.rdb
+*.aof
+*.pid
+
+# RabbitMQ
+mnesia/
+rabbitmq/
+rabbitmq-data/
+
+# ActiveMQ
+activemq-data/
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.envrc
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# pytype static type analyzer
+.pytype/
+
+# Cython debug symbols
+cython_debug/
+
+# PyCharm
+#   JetBrains specific template is maintained in a separate JetBrains.gitignore that can
+#   be found at https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore
+#   and can be added to the global gitignore or merged into this file.  For a more nuclear
+#   option (not recommended) you can uncomment the following to ignore the entire idea folder.
+# .idea/
+
+# Abstra
+#   Abstra is an AI-powered process automation framework.
+#   Ignore directories containing user credentials, local state, and settings.
+#   Learn more at https://abstra.io/docs
+.abstra/
+
+# Visual Studio Code
+#   Visual Studio Code specific template is maintained in a separate VisualStudioCode.gitignore 
+#   that can be found at https://github.com/github/gitignore/blob/main/Global/VisualStudioCode.gitignore
+#   and can be added to the global gitignore or merged into this file. However, if you prefer, 
+#   you could uncomment the following to ignore the entire vscode folder
+# .vscode/
+# Temporary file for partial code execution
+tempCodeRunnerFile.py
+
+# Ruff stuff:
+.ruff_cache/
+
+# PyPI configuration file
+.pypirc
+
+# Marimo
+marimo/_static/
+marimo/_lsp/
+__marimo__/
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Local tooling artifacts
+.agents/
+.claude/
+TPIP.bat.txt
+
+# Local execution script (machine-specific paths)
+TPIP.bat
+
+# ---------------------------------------------------------------------------
+# Corpus fiscal — vive fuera del repositorio (proyecto Cerebros_Fiscales).
+# TPIP consume material DERIVADO (documentation/tax-research/), nunca fuentes
+# de terceros. No reintroducir PDFs de OCDE, notas de firma ni doctrina.
+# ---------------------------------------------------------------------------
+tp_domain/knowledge/
+knowledge/
+**/.obsidian/
+
+# Documentos fuente: no se versionan en este repo.
+# Para un PDF legítimo (informe de demo), usar `git add -f` de forma deliberada.
+*.pdf
+*.epub
+
+# Catálogo de entorno personal — no forma parte del producto
+Catalogo_Herramientas_IA_Daru.md
+
+# --- Migracion a Django (blueprints/tpip) ---
+!.env.example
+.venv/
+staticfiles/
+copias/
+# El bundle SI se versiona: dejo de ser un artefacto desechable en cuanto los
+# primeros pasos destaparon defectos que solo se ven ejecutando, y sus
+# correcciones viven en el. Que ruff, mypy y pytest no lo recorran lo decide
+# pyproject.toml, no este fichero.
+pyproject.toml.pre-django

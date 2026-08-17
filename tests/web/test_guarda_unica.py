@@ -44,15 +44,30 @@ def test_la_guarda_existe_con_su_nombre_y_documenta_el_404():
     assert "404 y no 403" in codigo
 
 
+#: Llamadas al ORM que aplican el propietario. Se buscan estas y no la cadena
+#: `usuario=usuario` a secas, que también aparece en líneas de registro y
+#: produciría falsos positivos.
+ACOTACIONES_POR_DUENO = (
+    ".filter(usuario=",
+    ".create(usuario=",
+    "get_object_or_404(Caso",
+)
+
+#: Los únicos que pueden acotar por propietario. Añadir uno aquí es una decisión
+#: deliberada, no un descuido — que es exactamente el punto de esta prueba.
+PUERTAS_LEGITIMAS = {
+    "apps/comun/guardas.py",
+    "apps/comun/consultas.py",
+    "apps/comun/escrituras.py",
+}
+
+
 def test_el_acceso_con_propietario_vive_en_un_solo_sitio():
     """Dos puertas son cero puertas: la segunda es la que alguien olvidará cerrar."""
-    con_filtro_de_usuario = [
+    acotan = [
         f.relative_to(RAIZ).as_posix()
         for f in _fuentes(RAIZ / "apps")
-        if "usuario=usuario" in f.read_text(encoding="utf-8")
+        if any(p in f.read_text(encoding="utf-8") for p in ACOTACIONES_POR_DUENO)
     ]
 
-    assert set(con_filtro_de_usuario) <= {
-        "apps/comun/guardas.py",
-        "apps/comun/consultas.py",
-    }, con_filtro_de_usuario
+    assert set(acotan) <= PUERTAS_LEGITIMAS, sorted(set(acotan) - PUERTAS_LEGITIMAS)

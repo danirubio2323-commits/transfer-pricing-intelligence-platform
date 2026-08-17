@@ -2185,7 +2185,10 @@ sustituye).
 
 - `apps/analisis/services.py` — `crear_caso(usuario, transaction, titulo) -> Caso`: llama a
   `tp_domain.calculations.arm_length_range.calculate_arm_length_range`, vuelca el resultado y crea la
-  fila **con `usuario` puesto**. **Sin IA todavía**: el paso 17 la enchufa aquí. **Sin nada de HTTP
+  fila **con `usuario` puesto, a través de `apps/comun/escrituras.py`**. No la crea aquí: el gate de
+  este mismo paso prohíbe cualquier `Caso.objects` dentro de `apps/analisis/`, y las dos cosas no
+  podían ser ciertas a la vez. La resolución coherente es que **todo** acceso a una fila con
+  propietario —leer y escribir— pase por `apps/comun`, no solo la lectura. Verificado ejecutándolo. **Sin IA todavía**: el paso 17 la enchufa aquí. **Sin nada de HTTP
   dentro.** Emite un evento de `structlog` con el id, el usuario, las dos jurisdicciones y la posición
   en el rango.
 - `apps/analisis/views.py` — `formulario` (GET `/`), `crear` (POST `/casos/`) y `detalle`
