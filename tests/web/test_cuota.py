@@ -14,7 +14,7 @@ from decimal import Decimal
 import pytest
 from django.test import override_settings
 
-from apps.ia.cuota import CuotaSuperada, coste_de, comprobar_cuota, gasto_del_mes
+from apps.ia.cuota import CuotaSuperada, comprobar_cuota, coste_de, gasto_del_mes
 from apps.ia.models import LlamadaLLM
 from apps.ia.registro import registrar_llamada
 
