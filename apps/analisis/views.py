@@ -10,8 +10,8 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 
 from apps.analisis.forms import CasoForm
-from apps.analisis.services import crear_caso
 from apps.analisis.presentacion import tarjetas_de_jurisdiccion
+from apps.analisis.services import crear_caso
 from apps.comun.guardas import caso_del_usuario
 from infrastructure.charts import benchmark_range_svg
 from tp_domain.models import AnalysisResult

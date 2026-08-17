@@ -100,6 +100,16 @@ exclude = [
 # `norecursedirs` excluye el bundle: sin esa línea pytest recogería los tests
 # dos veces desde `blueprints/tpip/workspace/`.
 # ---------------------------------------------------------------------------
+# `exclude` de mypy solo salta los ficheros al DESCUBRIRLOS, no al seguirlos
+# desde un import. En cuanto `apps/analisis/views.py` importa
+# `infrastructure.charts`, mypy entra en el codigo rescatado y lo analiza igual.
+# La forma documentada de dejarlo fuera de verdad es un override por modulo.
+# El motivo es el mismo que el de `exclude`: esta migracion no reescribe el
+# codigo rescatado, y sus 180 pruebas son la garantia que lo cubre.
+[[tool.mypy.overrides]]
+module = ["tp_domain.*", "ai.*", "infrastructure.*", "tests.*", "scripts.*"]
+ignore_errors = true
+
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "config.settings.local"
 python_files = ["test_*.py"]
