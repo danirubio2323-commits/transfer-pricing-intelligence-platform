@@ -21,7 +21,6 @@ from ai.claude_client import (
     parse_draft,
     request_explanation,
     resolve_api_key,
-    resolve_model,
 )
 from ai.schemas import ExplanationRequest
 from ai.validators import ExplanationRejected
@@ -54,9 +53,10 @@ def _report_text(result) -> str:
 # Camino feliz
 # ---------------------------------------------------------------------------
 
+
 def test_valid_response_becomes_an_attached_explanation(result):
     client = FakeAnthropic(responses=[VALID_RESPONSE])
-    explanation = request_explanation(result, client=client, model="modelo-x")
+    explanation = request_explanation(result, client=client, model="modelo-x").explicacion
 
     assert isinstance(explanation, AIExplanation)
     assert explanation.model == "modelo-x"
@@ -82,12 +82,13 @@ def test_prompt_and_payload_reach_the_api(result):
 def test_fenced_json_is_tolerated(result):
     """Envolver el JSON en un bloque de código es el desliz más habitual."""
     client = FakeAnthropic(responses=[FENCED_VALID_RESPONSE])
-    assert request_explanation(result, client=client, model="m").text
+    assert request_explanation(result, client=client, model="m").explicacion.text
 
 
 # ---------------------------------------------------------------------------
 # Respuestas defectuosas
 # ---------------------------------------------------------------------------
+
 
 def test_invented_source_is_rejected(result):
     client = FakeAnthropic(responses=[INVENTED_SOURCE_RESPONSE] * 2)
@@ -125,24 +126,25 @@ def test_verdict_change_is_not_machine_detectable(result):
     la sección de IA, donde la contradicción queda a la vista de quien revisa.
     """
     client = FakeAnthropic(responses=[VERDICT_CHANGE_RESPONSE])
-    explanation = request_explanation(result, client=client, model="m")
+    explanation = request_explanation(result, client=client, model="m").explicacion
 
     enriched = result.model_copy(update={"ai_explanation": explanation})
     text = _report_text(enriched)
 
-    assert "dentro del rango" in explanation.text          # el modelo miente
-    assert "Por encima del P90" in text                     # el motor manda
+    assert "dentro del rango" in explanation.text  # el modelo miente
+    assert "Por encima del P90" in text  # el motor manda
     assert "Riesgo alto" in text
-    assert "10.1%" in text                                  # ajuste alemán intacto
+    assert "10.1%" in text  # ajuste alemán intacto
 
 
 # ---------------------------------------------------------------------------
 # Reintento
 # ---------------------------------------------------------------------------
 
+
 def test_retry_recovers_from_a_first_bad_draft(result):
     client = FakeAnthropic(responses=[INVENTED_SOURCE_RESPONSE, VALID_RESPONSE])
-    explanation = request_explanation(result, client=client, model="m")
+    explanation = request_explanation(result, client=client, model="m").explicacion
 
     assert explanation.sources_cited == ["es-lis-art18-4", "de-astg-1-3a"]
     assert client.call_count == 2
@@ -173,6 +175,7 @@ def test_only_one_retry(result):
 # ---------------------------------------------------------------------------
 # Degradación: nada tumba el informe
 # ---------------------------------------------------------------------------
+
 
 def test_explain_analysis_returns_none_instead_of_raising(result):
     client = FakeAnthropic(responses=[INVENTED_SOURCE_RESPONSE] * 2)
@@ -210,42 +213,52 @@ def test_build_client_without_key_is_explicit(monkeypatch):
 # Configuración
 # ---------------------------------------------------------------------------
 
-def test_env_var_takes_precedence_over_dotenv(monkeypatch):
+
+def test_la_clave_sale_del_entorno(monkeypatch):
+    """Único origen que conoce esta capa. `.env` lo lee la configuración de la app."""
     monkeypatch.setenv("ANTHROPIC_API_KEY", "clave-de-entorno")
     assert resolve_api_key() == "clave-de-entorno"
 
 
-def test_configured_model_wins(monkeypatch):
-    monkeypatch.setenv("ANTHROPIC_MODEL", "modelo-fijado-a-mano")
-    assert resolve_model(FakeAnthropic()) == "modelo-fijado-a-mano"
-
-
-def test_model_defaults_to_the_newest_available_sonnet(monkeypatch):
-    """
-    Sin ANTHROPIC_MODEL no se adivina un nombre: se pregunta al catálogo. El
-    valor por defecto envejece solo en lugar de quedar clavado en el código.
-    """
-    monkeypatch.delenv("ANTHROPIC_MODEL", raising=False)
-    assert resolve_model(FakeAnthropic()) == "claude-sonnet-test-2"
-
-
-def test_model_resolution_fails_loudly_when_no_sonnet_exists(monkeypatch):
-    monkeypatch.delenv("ANTHROPIC_MODEL", raising=False)
-    with pytest.raises(ClaudeUnavailable, match="ANTHROPIC_MODEL"):
-        resolve_model(FakeAnthropic(catalogue=[]))
-
-
-def test_resolved_model_id_is_recorded_for_reproducibility(result, monkeypatch):
-    monkeypatch.delenv("ANTHROPIC_MODEL", raising=False)
+def test_sin_modelo_la_capa_se_desactiva_sin_tocar_la_red(result):
+    """Antes se preguntaba al catálogo. Un modelo que no se conoce antes de
+    llamar tampoco se puede tarifar antes de llamar."""
     client = FakeAnthropic()
-    explanation = request_explanation(result, client=client)
-    assert explanation.model == "claude-sonnet-test-2"
-    assert client.calls[0]["model"] == "claude-sonnet-test-2"
+
+    with pytest.raises(ClaudeUnavailable, match="ANTHROPIC_MODEL"):
+        request_explanation(result, client=client, model=None)
+
+    assert client.call_count == 0
+
+
+def test_sin_modelo_explain_analysis_devuelve_none_y_no_lanza(result):
+    assert explain_analysis(result, client=FakeAnthropic(), model=None) is None
+
+
+def test_el_modelo_inyectado_queda_registrado_para_reproducibilidad(result):
+    """Un informe emitido hoy tiene que decir con qué modelo se redactó."""
+    client = FakeAnthropic()
+
+    respuesta = request_explanation(result, client=client, model="modelo-fijado")
+
+    assert respuesta.explicacion.model == "modelo-fijado"
+    assert client.calls[0]["model"] == "modelo-fijado"
+
+
+def test_el_uso_reportado_por_el_proveedor_viaja_sin_interpretar(result):
+    """Esta capa no cuenta tokens: transporta lo que dijo el proveedor."""
+    client = FakeAnthropic()
+
+    respuesta = request_explanation(result, client=client, model="m")
+
+    assert respuesta.usage is not None
+    assert hasattr(respuesta, "stop_reason")
 
 
 # ---------------------------------------------------------------------------
 # Utilidades
 # ---------------------------------------------------------------------------
+
 
 def test_extract_text_joins_text_blocks():
     from tests.ai.mocks import _Block, _Message
@@ -267,7 +280,14 @@ def test_request_projection_is_what_travels(result):
     """La entrada del modelo es la proyección, nunca el AnalysisResult."""
     payload = ExplanationRequest.from_result(result)
     assert set(payload.model_dump()) == {
-        "analysis_id", "method", "method_rationale", "transaction", "benchmark",
-        "position", "assessments", "risk_factors", "engine_conclusion",
+        "analysis_id",
+        "method",
+        "method_rationale",
+        "transaction",
+        "benchmark",
+        "position",
+        "assessments",
+        "risk_factors",
+        "engine_conclusion",
         "allowed_sources",
     }

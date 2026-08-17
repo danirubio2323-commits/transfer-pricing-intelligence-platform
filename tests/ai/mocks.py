@@ -77,6 +77,7 @@ MALFORMED_RESPONSE = "Claro, aquí tienes la explicación que me pides."
 # Dobles
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class _Block:
     text: str
@@ -84,8 +85,21 @@ class _Block:
 
 
 @dataclass
+class _Uso:
+    """Lo que el proveedor reporta. El doble lo simula porque la capa lo
+    transporta sin interpretarlo, y sin él no se podría comprobar que lo hace."""
+
+    input_tokens: int = 1200
+    output_tokens: int = 300
+    cache_creation_input_tokens: int = 0
+    cache_read_input_tokens: int = 0
+
+
+@dataclass
 class _Message:
     content: List[_Block]
+    usage: _Uso = field(default_factory=_Uso)
+    stop_reason: str = "end_turn"
 
 
 @dataclass
@@ -125,11 +139,13 @@ class FakeAnthropic:
     """
 
     responses: List[str] = field(default_factory=lambda: [VALID_RESPONSE])
-    catalogue: List[_Model] = field(default_factory=lambda: [
-        _Model(id="claude-sonnet-test-2", created_at="2026-02-01"),
-        _Model(id="claude-sonnet-test-1", created_at="2025-06-01"),
-        _Model(id="claude-opus-test-9", created_at="2026-05-01"),
-    ])
+    catalogue: List[_Model] = field(
+        default_factory=lambda: [
+            _Model(id="claude-sonnet-test-2", created_at="2026-02-01"),
+            _Model(id="claude-sonnet-test-1", created_at="2025-06-01"),
+            _Model(id="claude-opus-test-9", created_at="2026-05-01"),
+        ]
+    )
     raises: Exception = None
     calls: List[dict] = field(default_factory=list)
 

@@ -6,17 +6,19 @@ informe**. Si no hay clave, si la API cae, si el modelo devuelve algo que no
 pasa la validación — la función devuelve `None` y el PDF sale sin sección de IA.
 Ninguna ruta de error propaga hacia arriba.
 
-Precedencia de la clave:
-    1. `st.secrets` (despliegue en Streamlit)
-    2. variable de entorno `ANTHROPIC_API_KEY`
-    3. fichero `.env` local (nunca versionado)
-    4. ninguna -> la capa se desactiva
+**El modelo se inyecta; esta capa no lo descubre.** Antes, sin `ANTHROPIC_MODEL`
+se preguntaba al catálogo en ejecución y se elegía el Sonnet más reciente. Eso
+rompía la reproducibilidad —dos informes idénticos en todo lo demás podían
+haberse redactado con modelos distintos sin que nadie lo decidiera—, convertía
+una llamada de red opcional en obligatoria, y hacía imposible tarifar antes de
+llamar, que es lo que exige el tope de gasto. Ahora, sin modelo la capa se
+desactiva y lo dice.
 
-El modelo NO está fijado en el código. Se toma de `ANTHROPIC_MODEL` y, si no
-está definida, se resuelve en ejecución consultando los modelos disponibles y
-eligiendo el Sonnet más reciente. El identificador exacto que se acabe usando
-viaja dentro de `AIExplanation.model`, para que un informe emitido hoy diga con
-qué modelo se redactó.
+La clave se lee de `ANTHROPIC_API_KEY` del entorno, o la inyecta el llamante.
+Quien carga `.env` es la configuración tipada de la aplicación y nadie más.
+
+El identificador exacto que se acabe usando viaja dentro de `AIExplanation.model`,
+para que un informe emitido hoy diga con qué modelo se redactó.
 """
 
 from __future__ import annotations
@@ -26,7 +28,7 @@ import logging
 import os
 import re
 from pathlib import Path
-from typing import List, Optional
+from typing import Any, List, NamedTuple, Optional
 
 from ai.schemas import PROMPT_VERSION, ExplanationDraft, ExplanationRequest
 from ai.validators import ExplanationRejected, validate_draft
@@ -52,6 +54,7 @@ class ClaudeUnavailable(RuntimeError):
 # Configuración
 # ---------------------------------------------------------------------------
 
+
 def resolve_api_key() -> Optional[str]:
     """
     Devuelve la primera clave disponible, o None si no hay ninguna.
@@ -62,53 +65,11 @@ def resolve_api_key() -> Optional[str]:
     —`tests/web/test_rescate.py` lo comprueba en un intérprete limpio—.
 
     La aplicación web no llama a esta función: le pasa la clave que ya ha leído
-    su propia configuración tipada, que es el único punto del proyecto que lee
-    `.env`. Estos dos eslabones existen para quien use la capa de IA suelta,
-    desde un script o una prueba.
+    su propia configuración tipada, que es **el único punto del proyecto que lee
+    `.env`**. Este eslabón existe para quien use la capa de IA suelta, desde un
+    script o una prueba.
     """
-    key = os.environ.get("ANTHROPIC_API_KEY")  # 1. entorno
-    if key:
-        return key
-
-    try:  # 2. .env local
-        from dotenv import dotenv_values
-
-        return dotenv_values(".env").get("ANTHROPIC_API_KEY") or None
-    except Exception:  # noqa: BLE001
-        return None
-
-
-def resolve_model(client) -> str:
-    """
-    Identificador del modelo a usar.
-
-    `ANTHROPIC_MODEL` manda. Sin ella, se pregunta a la API por los modelos
-    disponibles y se toma el Sonnet más reciente: así el valor por defecto
-    envejece solo, en vez de quedar clavado a un nombre que puede desaparecer.
-    """
-    configured = os.environ.get("ANTHROPIC_MODEL")
-    if configured:
-        return configured
-
-    try:
-        available = list(client.models.list(limit=50))
-    except Exception as exc:  # noqa: BLE001
-        raise ClaudeUnavailable(
-            "No se ha podido consultar el catálogo de modelos. Define "
-            "ANTHROPIC_MODEL para fijar uno explícitamente."
-        ) from exc
-
-    sonnets = [m for m in available if "sonnet" in getattr(m, "id", "").lower()]
-    if not sonnets:
-        raise ClaudeUnavailable(
-            "No hay ningún modelo Sonnet disponible para esta clave. Define "
-            "ANTHROPIC_MODEL con el identificador que quieras usar."
-        )
-
-    # El catálogo llega ordenado del más reciente al más antiguo; el orden se
-    # reafirma por fecha cuando está disponible.
-    sonnets.sort(key=lambda m: str(getattr(m, "created_at", "")), reverse=True)
-    return sonnets[0].id
+    return os.environ.get("ANTHROPIC_API_KEY") or None
 
 
 def load_system_prompt(version: str = PROMPT_VERSION) -> str:
@@ -136,6 +97,7 @@ def build_client(api_key: Optional[str] = None):
 # ---------------------------------------------------------------------------
 # Parseo de la respuesta
 # ---------------------------------------------------------------------------
+
 
 def extract_text(message) -> str:
     """Concatena los bloques de texto de una respuesta de la API."""
@@ -177,6 +139,7 @@ def parse_draft(raw: str) -> ExplanationDraft:
 # Flujo
 # ---------------------------------------------------------------------------
 
+
 def _retry_message(reasons: List[str]) -> str:
     """
     Mensaje del segundo intento.
@@ -195,19 +158,41 @@ def _retry_message(reasons: List[str]) -> str:
     )
 
 
+class RespuestaIA(NamedTuple):
+    """Lo que devuelve una llamada que ha ido bien.
+
+    `usage` y `stop_reason` viajan **sin interpretar**: esta capa no cuenta
+    tokens ni calcula coste. El único recuento fiable es el que reporta el
+    proveedor, y quien lo persiste es la capa web (`LlamadaLLM`, paso 16).
+    Contarlos aquí sería estimar, y una estimación no sirve para un tope.
+    """
+
+    explicacion: AIExplanation
+    usage: Any = None
+    stop_reason: Optional[str] = None
+
+
 def request_explanation(
     result: AnalysisResult,
     client=None,
     model: Optional[str] = None,
-) -> AIExplanation:
+) -> RespuestaIA:
     """
-    Pide la explicación y la devuelve validada.
+    Pide la explicación y la devuelve validada, con el uso que reportó el proveedor.
+
+    **Exige `model`.** Si no llega, la capa se desactiva en vez de adivinar: un
+    modelo que no se conoce antes de llamar tampoco se puede tarifar antes de
+    llamar, y sin tarifa no hay tope de gasto comprobable antes del gasto.
 
     Lanza `ClaudeUnavailable` o `ExplanationRejected`. Para uso normal desde la
     aplicación, prefiere `explain_analysis`, que no lanza.
     """
+    if not model:
+        raise ClaudeUnavailable(
+            "No hay ANTHROPIC_MODEL configurado: la capa de IA queda desactivada. "
+            "El modelo se fija en configuración, no se resuelve en ejecución."
+        )
     client = client or build_client()
-    model = model or resolve_model(client)
     system = load_system_prompt()
     payload = ExplanationRequest.from_result(result)
 
@@ -230,12 +215,18 @@ def request_explanation(
 
         try:
             draft = parse_draft(raw)
-            return validate_draft(draft, payload, model=model)
+            return RespuestaIA(
+                explicacion=validate_draft(draft, payload, model=model),
+                usage=getattr(message, "usage", None),
+                stop_reason=getattr(message, "stop_reason", None),
+            )
         except ExplanationRejected as rejection:
             last_error = rejection
             logger.warning(
                 "Borrador rechazado (intento %s/%s): %s",
-                attempt, MAX_ATTEMPTS, "; ".join(rejection.reasons),
+                attempt,
+                MAX_ATTEMPTS,
+                "; ".join(rejection.reasons),
             )
             if attempt == MAX_ATTEMPTS:
                 break
@@ -251,13 +242,13 @@ def explain_analysis(
     result: AnalysisResult,
     client=None,
     model: Optional[str] = None,
-) -> Optional[AIExplanation]:
+) -> Optional[RespuestaIA]:
     """
     Punto de entrada para la aplicación. **No lanza nunca.**
 
-    Devuelve la explicación validada, o `None` si no hay clave, la API falla o
-    el borrador no supera la validación en dos intentos. El informe se genera
-    igual: la sección de IA es aditiva.
+    Devuelve la respuesta validada, o `None` si no hay clave, no hay modelo, la
+    API falla o el borrador no supera la validación en dos intentos. El informe
+    se genera igual: la sección de IA es aditiva.
     """
     try:
         return request_explanation(result, client=client, model=model)
