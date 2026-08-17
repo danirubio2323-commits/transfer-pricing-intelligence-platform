@@ -207,3 +207,21 @@ li { margin-bottom: var(--tpip-espacio-8); }
     animation-duration: 0.01ms !important;
   }
 }
+
+/* --------------------------------------------------------------------- */
+/* Descarga del informe                                                    */
+/* --------------------------------------------------------------------- */
+
+.descarga { margin-top: var(--tpip-espacio-32); }
+
+.boton {
+  display: inline-block;
+  padding: var(--tpip-espacio-12) var(--tpip-espacio-24);
+  background: var(--tpip-accent);
+  color: var(--tpip-background);
+  text-decoration: none;
+  font-weight: 600;
+  border-radius: var(--tpip-radio-control);
+  transition: opacity var(--tpip-transicion);
+}
+.boton:hover { opacity: 0.88; }

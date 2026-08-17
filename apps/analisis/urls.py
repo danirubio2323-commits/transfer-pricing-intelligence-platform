@@ -8,4 +8,5 @@ urlpatterns = [
     path("", views.formulario, name="formulario"),
     path("casos/", views.crear, name="crear"),
     path("casos/<uuid:pk>/", views.detalle, name="detalle"),
+    path("casos/<uuid:pk>/informe.pdf", views.informe, name="informe"),
 ]

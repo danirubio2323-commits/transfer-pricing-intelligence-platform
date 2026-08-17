@@ -5,8 +5,8 @@ no puede distinguir un caso de B de un caso que no existe**. Por eso todo
 responde 404 y nunca 403 — un 403 confirmaría que ese identificador es real.
 
 Las rutas HTTP se añaden a este fichero según nacen: el detalle en el paso 11,
-el informe en el 14 y el listado en el 15. Aquí se prueba la guarda, que es lo
-que existe hoy y de lo que todas ellas dependerán.
+el informe en el 14 y el listado en el 15. La guarda se prueba directamente, y
+cada ruta que aparece se añade aquí con su caso cruzado.
 """
 
 from __future__ import annotations
@@ -89,3 +89,16 @@ def test_el_listado_solo_devuelve_los_propios(usuario, otro_usuario):
 
     assert len(mios) == 1
     assert mios[0].titulo == "Mío"
+
+
+@pytest.mark.django_db
+def test_el_informe_de_un_caso_ajeno_no_se_genera_siquiera(client, usuario, caso_de_otro):
+    """La guarda corta antes de invocar al generador: no se produce un PDF que
+    luego se descarte, no llega a existir."""
+    from django.urls import reverse
+
+    client.force_login(usuario)
+
+    respuesta = client.get(reverse("analisis:informe", kwargs={"pk": caso_de_otro.pk}))
+
+    assert respuesta.status_code == 404

@@ -9,6 +9,8 @@ from __future__ import annotations
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 
+from infrastructure.report import render_report_bytes
+
 from apps.analisis.forms import CasoForm
 from apps.analisis.presentacion import tarjetas_de_jurisdiccion
 from apps.analisis.services import crear_caso
@@ -51,3 +53,19 @@ def detalle(request: HttpRequest, pk) -> HttpResponse:
             "tarjetas": tarjetas_de_jurisdiccion(resultado),
         },
     )
+
+
+def informe(request: HttpRequest, pk) -> HttpResponse:
+    """Regenera el PDF desde el caso persistido. Sin red y sin recalcular.
+
+    El documento sale del `payload` guardado, no de volver a ejecutar el motor:
+    si se recalculase, dos descargas del mismo caso podrían diferir, y con la
+    capa de IA enchufada (paso 17) el texto redactado sería otro. Lo que el
+    usuario se lleva tiene que ser lo que vio en pantalla.
+    """
+    caso = caso_del_usuario(request.user, pk)
+    resultado = AnalysisResult.model_validate(caso.payload)
+
+    respuesta = HttpResponse(render_report_bytes(resultado), content_type="application/pdf")
+    respuesta["Content-Disposition"] = f'attachment; filename="tpip-{caso.pk}.pdf"'
+    return respuesta
