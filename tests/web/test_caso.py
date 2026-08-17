@@ -7,6 +7,7 @@ from datetime import UTC, datetime
 from decimal import Decimal
 
 import pytest
+from django.db import IntegrityError
 from django.db.models import ProtectedError
 
 from apps.analisis.models import Caso
@@ -61,8 +62,12 @@ def test_los_campos_desnormalizados_se_derivan_al_guardar(usuario, resultado):
 
 @pytest.mark.django_db
 def test_un_caso_sin_propietario_no_se_guarda(resultado):
-    """`usuario_id` es NOT NULL: un caso sin dueño no es aislable de nadie."""
-    with pytest.raises(Exception):
+    """`usuario_id` es NOT NULL: un caso sin dueño no es aislable de nadie.
+
+    Se afirma `IntegrityError` y no `Exception` a secas: la restricción tiene que
+    venir de la base de datos, no de que el ORM tropiece por otro motivo.
+    """
+    with pytest.raises(IntegrityError):
         Caso.objects.create(titulo="Huérfano", payload=resultado.model_dump(mode="json"))
 
 
