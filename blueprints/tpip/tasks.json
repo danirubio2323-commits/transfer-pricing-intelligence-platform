@@ -1,0 +1,928 @@
+[
+  {
+    "id": "E1-T1",
+    "title": "Esqueleto de Django ejecutable",
+    "epic": "01-cimientos-y-cuentas",
+    "dependencies": [],
+    "priority": "p0",
+    "acceptance": [
+      "WHEN `uv run python manage.py check` runs THE SYSTEM SHALL exit 0 and report zero issues.",
+      "WHEN `manage.py` is read THE SYSTEM SHALL contain the literal `config.settings.local` as the default value of `DJANGO_SETTINGS_MODULE`, identical to the value `pyproject.toml` declares for pytest.",
+      "WHEN `config.settings.local` is imported THE SYSTEM SHALL expose `INSTALLED_APPS` containing `django.contrib.admin`, `django.contrib.auth`, `django.contrib.sessions`, `django.contrib.contenttypes` and `django.contrib.messages`.",
+      "WHEN the project is inspected THE SYSTEM SHALL have applied zero migrations, because the first migration must be `cuentas`.",
+      "WHEN `uv run ruff check config manage.py` runs THE SYSTEM SHALL exit 0.",
+      "WHEN `uv run python manage.py check --list-tags` runs THE SYSTEM SHALL exit 0, proving the entry point is executable and not merely syntactically valid."
+    ],
+    "verify": [
+      "uv run python manage.py check; if ($LASTEXITCODE -ne 0) { throw 'manage.py check no sale 0' }",
+      "uv run python manage.py check --list-tags; if ($LASTEXITCODE -ne 0) { throw 'manage.py no es ejecutable' }",
+      "if (-not ((Get-Content -Raw 'manage.py') -match '\"DJANGO_SETTINGS_MODULE\",\\s*\"config\\.settings\\.local\"')) { throw 'manage.py no fija config.settings.local' }",
+      "if (-not ((Get-Content -Raw 'pyproject.toml') -match 'DJANGO_SETTINGS_MODULE\\s*=\\s*\"config\\.settings\\.local\"')) { throw 'pyproject.toml no fija config.settings.local' }",
+      "uv run python -c \"import os; os.environ['DJANGO_SETTINGS_MODULE']='config.settings.local'; import django; django.setup(); from django.conf import settings; faltan=[a for a in ('django.contrib.admin','django.contrib.auth','django.contrib.sessions','django.contrib.contenttypes','django.contrib.messages') if a not in settings.INSTALLED_APPS]; assert not faltan, faltan; print('INSTALLED_APPS OK')\"; if ($LASTEXITCODE -ne 0) { throw 'faltan aplicaciones de contrib' }",
+      "$aplicadas = (uv run python manage.py showmigrations --plan 2>&1 | Select-String -Pattern '^\\[X\\]').Count; if ($aplicadas -ne 0) { throw \"hay $aplicadas migraciones aplicadas; no debe haber ninguna antes de E1-T4\" }",
+      "uv run ruff check config manage.py; if ($LASTEXITCODE -ne 0) { throw 'ruff falla sobre el codigo nuevo' }"
+    ],
+    "checkpoint": "step-01-esqueleto",
+    "files": [
+      "manage.py",
+      "config/__init__.py",
+      "config/settings/**",
+      "config/urls.py",
+      "config/wsgi.py",
+      "config/asgi.py"
+    ],
+    "status": "pending"
+  },
+  {
+    "id": "E1-T2",
+    "title": "Configuración tipada y registro estructurado",
+    "epic": "01-cimientos-y-cuentas",
+    "dependencies": [
+      "E1-T1"
+    ],
+    "priority": "p0",
+    "acceptance": [
+      "WHEN `config.settings.local` is imported with an empty environment and no `.env` file THE SYSTEM SHALL load successfully and SHALL NOT raise a missing-variable error.",
+      "WHEN `ANTHROPIC_API_KEY` is absent THE SYSTEM SHALL expose `settings.ANTHROPIC_API_KEY` as `None` rather than an empty string, so the AI layer can tell unset from set to nothing.",
+      "WHEN `DJANGO_ALLOWED_HOSTS` contains `a.example,b.example` THE SYSTEM SHALL expose `ALLOWED_HOSTS` as a list of two entries, not a single comma-joined string.",
+      "WHEN `configure_logging()` runs and a bound logger emits an event THE SYSTEM SHALL produce a record carrying the bound keys.",
+      "WHEN `uv run pytest tests/web/test_settings.py` runs THE SYSTEM SHALL exit 0 with 0 failed and 0 skipped.",
+      "WHEN `uv run python manage.py check` runs THE SYSTEM SHALL still exit 0, so the previous task's gate does not regress."
+    ],
+    "verify": [
+      "uv run pytest tests/web/test_settings.py -q; if ($LASTEXITCODE -ne 0) { throw 'las pruebas de configuracion fallan' }",
+      "uv run python -c \"import os; [os.environ.pop(k, None) for k in ('DJANGO_SECRET_KEY','DJANGO_DEBUG','DJANGO_ALLOWED_HOSTS','ANTHROPIC_API_KEY','ANTHROPIC_MODEL')]; os.environ['DJANGO_SETTINGS_MODULE']='config.settings.local'; import django; django.setup(); from django.conf import settings; assert isinstance(settings.ALLOWED_HOSTS, list); print('config OK')\"; if ($LASTEXITCODE -ne 0) { throw 'la configuracion exige alguna variable' }",
+      "uv run python manage.py check; if ($LASTEXITCODE -ne 0) { throw 'el gate de E1-T1 ha dejado de pasar' }",
+      "uv run ruff check config tests/web; if ($LASTEXITCODE -ne 0) { throw 'ruff falla' }",
+      "uv run mypy config; if ($LASTEXITCODE -ne 0) { throw 'mypy falla sobre config/' }"
+    ],
+    "checkpoint": "step-02-configuracion",
+    "files": [
+      "config/settings/base.py",
+      "config/settings/local.py",
+      "config/logging.py",
+      "tests/web/__init__.py",
+      "tests/web/test_settings.py"
+    ],
+    "status": "pending"
+  },
+  {
+    "id": "E1-T3",
+    "title": "Retirar Streamlit y dejar en verde las 180 pruebas",
+    "epic": "01-cimientos-y-cuentas",
+    "dependencies": [
+      "E1-T2"
+    ],
+    "priority": "p0",
+    "acceptance": [
+      "WHEN `uv run pytest tests/domain tests/ai tests/report` runs THE SYSTEM SHALL report exactly 180 passed, 0 failed and 0 skipped.",
+      "WHEN the repository is searched for `import streamlit` THE SYSTEM SHALL find zero occurrences outside `blueprints/`.",
+      "WHEN `ui/` is looked for on disk THE SYSTEM SHALL NOT find it.",
+      "WHEN `tp_domain.sources.SOURCE_REGISTRY` is imported THE SYSTEM SHALL contain exactly the 5 source ids the engine can cite.",
+      "WHEN `uv run ruff check .` runs from the project root with the bundle present THE SYSTEM SHALL exit 0, proving the `blueprints` exclusion in `pyproject.toml` holds."
+    ],
+    "verify": [
+      "uv run pytest tests/domain tests/ai tests/report -q; if ($LASTEXITCODE -ne 0) { throw 'la red de seguridad rescatada NO esta en verde' }",
+      "$n = (uv run pytest tests/domain tests/ai tests/report --collect-only -q 2>&1 | Select-String -Pattern '^(\\d+) tests collected').Matches[0].Groups[1].Value; if ([int]$n -ne 180) { throw \"la suite rescatada tiene $n pruebas, se esperaban 180\" }",
+      "if (Test-Path 'ui') { throw 'ui/ sigue existiendo' }",
+      "if (Test-Path 'requirements.txt') { throw 'requirements.txt sigue existiendo' }",
+      "$hits = Select-String -Path (Get-ChildItem -Recurse -Filter '*.py' -File | Where-Object { $_.FullName -notmatch '\\\\(\\.venv|blueprints)\\\\' }).FullName -Pattern 'import streamlit' -SimpleMatch -ErrorAction SilentlyContinue; if ($hits) { throw 'queda alguna importacion de streamlit' }",
+      "uv run python -c \"from tp_domain.sources import SOURCE_REGISTRY; assert len(SOURCE_REGISTRY) == 5, len(SOURCE_REGISTRY); print('registro OK')\"; if ($LASTEXITCODE -ne 0) { throw 'el registro cerrado de fuentes ha cambiado' }",
+      "uv run ruff check .; if ($LASTEXITCODE -ne 0) { throw 'ruff falla desde la raiz con el bundle presente' }"
+    ],
+    "checkpoint": "step-03-rescate",
+    "files": [
+      "ui/**",
+      "requirements.txt",
+      "tpip.egg-info/**",
+      "tests/web/test_rescate.py"
+    ],
+    "status": "pending"
+  },
+  {
+    "id": "E1-T4",
+    "title": "Modelo de usuario propio y panel de administración",
+    "epic": "01-cimientos-y-cuentas",
+    "dependencies": [
+      "E1-T3"
+    ],
+    "priority": "p0",
+    "acceptance": [
+      "WHEN `settings.AUTH_USER_MODEL` is read THE SYSTEM SHALL be exactly `cuentas.Usuario`.",
+      "WHEN `uv run python manage.py migrate` runs against a fresh database THE SYSTEM SHALL exit 0 with `cuentas.0001_initial` applied before `admin.0001_initial` and before any table carrying a foreign key to the user — las migraciones de `auth` que crean grupos y permisos van necesariamente antes, porque `AbstractUser` depende de ellas, and `makemigrations --check --dry-run` SHALL then exit 0 — no model change left unmigrated.",
+      "WHEN two users are created with the same `email` THE SYSTEM SHALL raise an integrity error.",
+      "WHEN a `Usuario` is created without specifying `tope_gasto_mensual_eur` THE SYSTEM SHALL default it to `5.00`.",
+      "WHEN the admin registry is inspected THE SYSTEM SHALL have `cuentas.Usuario` registered.",
+      "WHEN any test in `tests/web/` requests the `usuario`, `otro_usuario` or `administrador` fixture THE SYSTEM SHALL resolve it from `tests/web/conftest.py`."
+    ],
+    "verify": [
+      "uv run python manage.py makemigrations cuentas; if ($LASTEXITCODE -ne 0) { throw 'makemigrations falla' }",
+      "uv run python manage.py migrate; if ($LASTEXITCODE -ne 0) { throw 'migrate falla' }",
+      "uv run python manage.py makemigrations --check --dry-run; if ($LASTEXITCODE -ne 0) { throw \"quedan cambios de modelo sin migrar (codigo $LASTEXITCODE)\" }",
+      "uv run python manage.py migrate --check; if ($LASTEXITCODE -ne 0) { throw 'la base de datos no esta al dia' }",
+      "uv run python -c \"import os; os.environ['DJANGO_SETTINGS_MODULE']='config.settings.local'; import django; django.setup(); from django.conf import settings; from django.contrib import admin; from apps.cuentas.models import Usuario; assert settings.AUTH_USER_MODEL=='cuentas.Usuario', settings.AUTH_USER_MODEL; assert Usuario in admin.site._registry, 'Usuario no esta registrado en el admin'; print('AUTH_USER_MODEL y admin OK')\"; if ($LASTEXITCODE -ne 0) { throw 'AUTH_USER_MODEL o el registro en el admin no son los esperados' }",
+      "uv run pytest tests/web -q; if ($LASTEXITCODE -ne 0) { throw 'las pruebas de cuentas fallan' }",
+      "uv run pytest tests/domain tests/ai tests/report -q; if ($LASTEXITCODE -ne 0) { throw 'la red de seguridad se ha roto' }"
+    ],
+    "checkpoint": "step-04-cuentas",
+    "files": [
+      "apps/__init__.py",
+      "apps/cuentas/**",
+      "config/settings/base.py",
+      "tests/web/conftest.py",
+      "tests/web/test_cuentas.py"
+    ],
+    "status": "pending"
+  },
+  {
+    "id": "E1-T5",
+    "title": "Acceso, cierre de sesión y cierre por omisión",
+    "epic": "01-cimientos-y-cuentas",
+    "dependencies": [
+      "E1-T4"
+    ],
+    "priority": "p0",
+    "acceptance": [
+      "WHEN an anonymous request hits any URL other than `/entrar/`, the static files or an error page THE SYSTEM SHALL respond `302` to `/entrar/` carrying the original path in `next`.",
+      "WHEN `/entrar/` receives wrong credentials, a username that does not exist, or an inactive account THE SYSTEM SHALL respond `422` with the same generic message in all three cases.",
+      "WHEN `/entrar/` receives valid credentials with a `next` pointing at an external host THE SYSTEM SHALL ignore it and redirect to the case list instead.",
+      "WHEN `/salir/` receives a `GET` THE SYSTEM SHALL respond `405` and SHALL NOT end the session.",
+      "WHEN a password is changed successfully THE SYSTEM SHALL rotate the session key so the old session cookie no longer authenticates.",
+      "WHEN `uv run pytest tests/web/test_acceso.py` runs THE SYSTEM SHALL exit 0 with 0 failed and 0 skipped."
+    ],
+    "verify": [
+      "uv run pytest tests/web/test_acceso.py -q; if ($LASTEXITCODE -ne 0) { throw 'las pruebas de acceso fallan' }",
+      "uv run python -c \"import os; os.environ['DJANGO_SETTINGS_MODULE']='config.settings.local'; import django; django.setup(); from django.conf import settings; assert any('ExigirAutenticacion' in m for m in settings.MIDDLEWARE), settings.MIDDLEWARE; print('middleware OK')\"; if ($LASTEXITCODE -ne 0) { throw 'el middleware de cierre por omision no esta instalado' }",
+      "uv run pytest tests/web -q; if ($LASTEXITCODE -ne 0) { throw 'la suite web falla' }",
+      "uv run pytest tests/domain tests/ai tests/report -q; if ($LASTEXITCODE -ne 0) { throw 'la red de seguridad se ha roto' }"
+    ],
+    "checkpoint": "step-05-acceso",
+    "files": [
+      "apps/comun/middleware.py",
+      "apps/cuentas/views.py",
+      "apps/cuentas/urls.py",
+      "templates/cuentas/**",
+      "tests/web/test_acceso.py",
+      "apps/comun/__init__.py",
+      "config/settings/base.py"
+    ],
+    "status": "pending"
+  },
+  {
+    "id": "E1-T6",
+    "title": "Entidad Caso: propietario, título y borrado suave",
+    "epic": "01-cimientos-y-cuentas",
+    "dependencies": [
+      "E1-T4"
+    ],
+    "priority": "p0",
+    "acceptance": [
+      "WHEN a `Caso` is saved and read back THE SYSTEM SHALL rehydrate it through `AnalysisResult.model_validate` without raising.",
+      "WHEN a `Caso` is created THE SYSTEM SHALL require a non-null `usuario`, and an attempt to save without one SHALL raise an integrity error.",
+      "WHEN a `Caso` has `deleted_at` set THE SYSTEM SHALL exclude it from `Caso.objects` and SHALL include it in `Caso.todos`.",
+      "WHEN `delete()` is called on a `Usuario` that owns at least one `Caso` THE SYSTEM SHALL raise `ProtectedError` and delete nothing.",
+      "WHEN `uv run python manage.py makemigrations --check --dry-run` runs THE SYSTEM SHALL exit 0.",
+      "WHEN `engine_version`, `dataset_version` and `has_ai_explanation` are read back THE SYSTEM SHALL find them equal to the values inside `payload`, derived at save time."
+    ],
+    "verify": [
+      "uv run python manage.py makemigrations analisis; if ($LASTEXITCODE -ne 0) { throw 'makemigrations falla' }",
+      "uv run python manage.py makemigrations --check --dry-run; if ($LASTEXITCODE -ne 0) { throw \"quedan cambios de modelo sin migrar (codigo $LASTEXITCODE)\" }",
+      "uv run python manage.py migrate; if ($LASTEXITCODE -ne 0) { throw 'migrate falla' }",
+      "uv run python manage.py migrate --check; if ($LASTEXITCODE -ne 0) { throw 'la base de datos no esta al dia' }",
+      "uv run python -c \"import os; os.environ['DJANGO_SETTINGS_MODULE']='config.settings.local'; import django; django.setup(); from django.db.models import PROTECT; from apps.analisis.models import Caso; f=Caso._meta.get_field('usuario'); assert not f.null, 'usuario admite null'; assert f.db_index, 'usuario no esta indexado'; assert f.remote_field.on_delete is PROTECT, f.remote_field.on_delete; print('usuario_id OK')\"; if ($LASTEXITCODE -ne 0) { throw 'la clave foranea al usuario no cumple lo exigido' }",
+      "uv run pytest tests/web -q; if ($LASTEXITCODE -ne 0) { throw 'las pruebas de Caso fallan' }",
+      "uv run pytest tests/domain tests/ai tests/report -q; if ($LASTEXITCODE -ne 0) { throw 'la red de seguridad se ha roto' }"
+    ],
+    "checkpoint": "step-06-caso",
+    "files": [
+      "apps/analisis/__init__.py",
+      "apps/analisis/models.py",
+      "apps/analisis/admin.py",
+      "config/settings/base.py",
+      "tests/web/test_caso.py",
+      "apps/analisis/apps.py"
+    ],
+    "status": "pending"
+  },
+  {
+    "id": "E1-T7",
+    "title": "Guarda de autorización única y aislamiento con 404",
+    "epic": "01-cimientos-y-cuentas",
+    "dependencies": [
+      "E1-T5",
+      "E1-T6"
+    ],
+    "priority": "p0",
+    "acceptance": [
+      "WHEN user A requests the detail of a case owned by user B THE SYSTEM SHALL respond `404`, not `403`, because a `403` would confirm the id exists.",
+      "WHEN user A requests a `pk` that exists in no table THE SYSTEM SHALL respond `404`, indistinguishable from the previous case.",
+      "WHEN user A lists their cases and user B owns cases too THE SYSTEM SHALL return only A's rows.",
+      "WHEN a case has `deleted_at` set and its owner requests it THE SYSTEM SHALL respond `404`.",
+      "WHEN `apps/analisis/` source is searched THE SYSTEM SHALL find zero `Caso.objects` accesses outside `apps/comun/`, so the guard is the only path.",
+      "WHEN `uv run pytest tests/web/test_aislamiento.py tests/web/test_guarda_unica.py` runs THE SYSTEM SHALL exit 0 with 0 failed and 0 skipped."
+    ],
+    "verify": [
+      "uv run pytest tests/web/test_aislamiento.py tests/web/test_guarda_unica.py -q; if ($LASTEXITCODE -ne 0) { throw 'el aislamiento por propietario falla' }",
+      "if (-not (Test-Path 'apps/comun/guardas.py')) { throw 'falta apps/comun/guardas.py' }",
+      "if ((Get-Content -Raw 'apps/comun/guardas.py') -notmatch 'def caso_del_usuario') { throw 'la guarda no tiene el nombre acordado' }",
+      "$sueltas = Select-String -Path (Get-ChildItem 'apps/analisis' -Recurse -Filter '*.py' -File).FullName -Pattern 'Caso\\.objects' -ErrorAction SilentlyContinue; if ($sueltas) { throw 'hay consultas directas a Caso.objects fuera de apps/comun' }",
+      "uv run pytest tests/web -q; if ($LASTEXITCODE -ne 0) { throw 'la suite web falla' }",
+      "uv run pytest tests/domain tests/ai tests/report -q; if ($LASTEXITCODE -ne 0) { throw 'la red de seguridad se ha roto' }"
+    ],
+    "checkpoint": "step-07-guarda",
+    "files": [
+      "apps/comun/guardas.py",
+      "apps/comun/consultas.py",
+      "tests/web/test_aislamiento.py",
+      "tests/web/test_guarda_unica.py"
+    ],
+    "status": "pending"
+  },
+  {
+    "id": "E2-T1",
+    "title": "Fijar el modelo de IA por configuración",
+    "epic": "02-analisis-y-presentacion",
+    "dependencies": [
+      "E1-T3"
+    ],
+    "priority": "p0",
+    "acceptance": [
+      "WHEN `ai/claude_client.py` is read THE SYSTEM SHALL contain no reference to `models.list` and no function named `resolve_model`.",
+      "WHEN `request_explanation` is called with `model=None` THE SYSTEM SHALL raise `ClaudeUnavailable` without making any network call.",
+      "WHEN `explain_analysis` is called with `model=None` THE SYSTEM SHALL return `None` and SHALL NOT raise.",
+      "WHEN a call succeeds THE SYSTEM SHALL return the provider's reported `usage` and `stop_reason` alongside the explanation, uninterpreted, so no token is counted locally.",
+      "WHEN `ai/claude_client.py` is imported THE SYSTEM SHALL NOT import `django` or `streamlit`.",
+      "WHEN `uv run pytest tests/domain tests/ai tests/report` runs THE SYSTEM SHALL still report exactly 180 passed, every retired test having been replaced by one covering the new behaviour."
+    ],
+    "verify": [
+      "if ((Get-Content -Raw 'ai/claude_client.py') -match 'models\\.list') { throw 'sigue consultando el catalogo de modelos' }",
+      "if ((Get-Content -Raw 'ai/claude_client.py') -match 'def resolve_model') { throw 'resolve_model sigue existiendo' }",
+      "if ((Get-Content -Raw 'ai/claude_client.py') -match 'import streamlit') { throw 'sigue importando streamlit' }",
+      "if ((Get-Content -Raw 'ai/claude_client.py') -match '(?m)^\\s*(from|import)\\s+django') { throw 'ai/ ha empezado a importar Django' }",
+      "uv run python -c \"import inspect; from ai.claude_client import request_explanation; assert 'model' in inspect.signature(request_explanation).parameters; print('firma OK')\"; if ($LASTEXITCODE -ne 0) { throw 'la firma de request_explanation no es la esperada' }",
+      "uv run pytest tests/ai -q; if ($LASTEXITCODE -ne 0) { throw 'las pruebas de la capa de IA fallan' }",
+      "uv run pytest tests/domain tests/ai tests/report -q; if ($LASTEXITCODE -ne 0) { throw 'la red de seguridad se ha roto' }",
+      "$n = (uv run pytest tests/domain tests/ai tests/report --collect-only -q 2>&1 | Select-String -Pattern '^(\\d+) tests collected').Matches[0].Groups[1].Value; if ([int]$n -ne 180) { throw \"la suite rescatada tiene $n pruebas, se esperaban 180\" }"
+    ],
+    "checkpoint": "step-08-modelo-fijado",
+    "files": [
+      "ai/claude_client.py",
+      "tests/ai/test_explanation_flow.py"
+    ],
+    "status": "pending"
+  },
+  {
+    "id": "E2-T2",
+    "title": "Paleta con superficies diferenciadas",
+    "epic": "02-analisis-y-presentacion",
+    "dependencies": [
+      "E1-T3"
+    ],
+    "priority": "p0",
+    "acceptance": [
+      "WHEN `infrastructure.theme.COLORS` is imported THE SYSTEM SHALL contain the keys `background`, `surface_sunken`, `border_strong` and `focus` with the literal values the design system states.",
+      "WHEN `infrastructure.theme.COLORS` is imported THE SYSTEM SHALL still contain every key it had before this task, with the same value.",
+      "WHEN every value in `COLORS` is read THE SYSTEM SHALL find each one is a 7-character `#RRGGBB` string.",
+      "WHEN `uv run pytest tests/report tests/domain` runs THE SYSTEM SHALL exit 0 with 0 failed and 0 skipped.",
+      "WHEN `uv run pytest tests/domain tests/ai tests/report` runs THE SYSTEM SHALL still report exactly 180 passed."
+    ],
+    "verify": [
+      "uv run python -c \"from infrastructure.theme import COLORS; esperado={'background':'#FFFFFF','surface_sunken':'#EBEEF3','border_strong':'#767676','focus':'#1F4E79','ink':'#1A1A1A','muted':'#5A5A5A','rule':'#C8C8C8','surface':'#F7F8FA','band_outer':'#DCE3EC','band_inner':'#9FB3C8','median':'#334E68','ok':'#2E6B4F','warn':'#8A6D1F','risk':'#8C2F2F'}; faltan=[k for k,v in esperado.items() if COLORS.get(k)!=v]; assert not faltan, faltan; malos=[k for k,v in COLORS.items() if not (len(v)==7 and v.startswith('#'))]; assert not malos, malos; print('paleta OK', len(COLORS))\"; if ($LASTEXITCODE -ne 0) { throw 'la paleta no tiene las superficies nuevas o ha perdido alguna vieja' }",
+      "uv run pytest tests/report tests/domain -q; if ($LASTEXITCODE -ne 0) { throw 'la ampliacion de la paleta ha roto el informe' }",
+      "uv run pytest tests/domain tests/ai tests/report -q; if ($LASTEXITCODE -ne 0) { throw 'la red de seguridad se ha roto' }",
+      "$n = (uv run pytest tests/domain tests/ai tests/report --collect-only -q 2>&1 | Select-String -Pattern '^(\\d+) tests collected').Matches[0].Groups[1].Value; if ([int]$n -ne 180) { throw \"la suite rescatada tiene $n pruebas, se esperaban 180\" }"
+    ],
+    "checkpoint": "step-09-paleta",
+    "files": [
+      "infrastructure/theme.py"
+    ],
+    "status": "pending"
+  },
+  {
+    "id": "E2-T3",
+    "title": "Formulario de operación",
+    "epic": "02-analisis-y-presentacion",
+    "dependencies": [
+      "E1-T6"
+    ],
+    "priority": "p0",
+    "acceptance": [
+      "WHEN the form receives a valid payload THE SYSTEM SHALL expose a `tp_domain.models.Transaction` in `cleaned_data[\"transaction\"]`.",
+      "WHEN `payer_country` and `recipient_country` are equal THE SYSTEM SHALL be invalid and SHALL surface the domain message about two distinct jurisdictions as a non-field error.",
+      "WHEN `transaction_type` is a value outside `SUPPORTED_TRANSACTION_TYPES` THE SYSTEM SHALL be invalid and the rendered select SHALL NOT have offered that value.",
+      "WHEN `amount_eur` is `0` or `rate_percent` is `101` THE SYSTEM SHALL be invalid with the error attached to that specific field.",
+      "WHEN `effective_date` is missing THE SYSTEM SHALL be invalid, because there is no today default.",
+      "WHEN `titulo` is submitted empty THE SYSTEM SHALL derive a non-empty title of at most 160 characters from `description`."
+    ],
+    "verify": [
+      "uv run pytest tests/web/test_forms.py -q; if ($LASTEXITCODE -ne 0) { throw 'las pruebas del formulario fallan' }",
+      "if ((Get-Content -Raw 'apps/analisis/forms.py') -notmatch 'SUPPORTED_TRANSACTION_TYPES') { throw 'las opciones de tipo no se derivan del dominio' }",
+      "uv run ruff check apps tests/web; if ($LASTEXITCODE -ne 0) { throw 'ruff falla' }",
+      "uv run mypy apps config; if ($LASTEXITCODE -ne 0) { throw 'mypy falla' }",
+      "uv run pytest tests/domain tests/ai tests/report -q; if ($LASTEXITCODE -ne 0) { throw 'la red de seguridad se ha roto' }"
+    ],
+    "checkpoint": "step-10-formulario",
+    "files": [
+      "apps/analisis/forms.py",
+      "tests/web/test_forms.py"
+    ],
+    "status": "pending"
+  },
+  {
+    "id": "E2-T4",
+    "title": "Vista de análisis: motor y persistencia con dueño",
+    "epic": "02-analisis-y-presentacion",
+    "dependencies": [
+      "E1-T7",
+      "E2-T3"
+    ],
+    "priority": "p0",
+    "acceptance": [
+      "WHEN `GET /` is requested by an authenticated user THE SYSTEM SHALL respond `200` with an empty form.",
+      "WHEN `POST /casos/` receives a valid payload THE SYSTEM SHALL respond `302` to the case detail and SHALL create exactly one `Caso` row whose `usuario` is the requesting user.",
+      "WHEN `POST /casos/` receives an invalid payload THE SYSTEM SHALL respond `422` and SHALL create zero `Caso` rows.",
+      "WHEN `GET` on the detail of a case owned by another user is requested THE SYSTEM SHALL respond `404`, because the guard is the only reader.",
+      "WHEN the persisted row is read back THE SYSTEM SHALL have `engine_version`, `dataset_version` and `has_ai_explanation` equal to the values derived from `payload` at save time.",
+      "WHEN a transaction is submitted whose industry matches no comparable THE SYSTEM SHALL still respond `302` and persist a case carrying a `no_comparables` risk factor, because an uncomputable range is a result and not a failure."
+    ],
+    "verify": [
+      "uv run pytest tests/web/test_analisis_view.py tests/web/test_aislamiento.py -q; if ($LASTEXITCODE -ne 0) { throw 'el ciclo de analisis o el aislamiento fallan' }",
+      "if ((Get-Content -Raw 'apps/analisis/views.py') -match 'tp_domain\\.calculations') { throw 'la vista importa el motor; debe pasar por services.py' }",
+      "$sueltas = Select-String -Path (Get-ChildItem 'apps/analisis' -Recurse -Filter '*.py' -File).FullName -Pattern 'Caso\\.objects' -ErrorAction SilentlyContinue; if ($sueltas) { throw 'hay consultas directas a Caso.objects fuera de apps/comun' }",
+      "uv run python manage.py check; if ($LASTEXITCODE -ne 0) { throw 'el gate de E1-T1 ha dejado de pasar' }",
+      "uv run pytest tests/web -q; if ($LASTEXITCODE -ne 0) { throw 'la suite web falla' }",
+      "uv run pytest tests/domain tests/ai tests/report -q; if ($LASTEXITCODE -ne 0) { throw 'la red de seguridad se ha roto' }"
+    ],
+    "checkpoint": "step-11-vista-analisis",
+    "files": [
+      "apps/analisis/services.py",
+      "apps/analisis/views.py",
+      "apps/analisis/urls.py",
+      "config/urls.py",
+      "tests/web/test_analisis_view.py",
+      "tests/web/test_aislamiento.py"
+    ],
+    "status": "pending"
+  },
+  {
+    "id": "E2-T5",
+    "title": "Plantilla base y plantilla de resultado",
+    "epic": "02-analisis-y-presentacion",
+    "dependencies": [
+      "E2-T4"
+    ],
+    "priority": "p0",
+    "acceptance": [
+      "WHEN a detail page is rendered for a case with comparables THE SYSTEM SHALL include an `svg` element for the benchmark range inside `main`.",
+      "WHEN a detail page is rendered for a case with no accepted comparables THE SYSTEM SHALL NOT include an `svg` element and SHALL include the text stating no range could be calculated.",
+      "WHEN a detail page is rendered THE SYSTEM SHALL contain one jurisdiction card per assessment, each naming its country and its rule label from `infrastructure.theme`.",
+      "WHEN a case has zero risk factors THE SYSTEM SHALL render the literal empty-state text, never an empty container.",
+      "WHEN any page is rendered THE SYSTEM SHALL contain `lang=\"es\"`, exactly one `h1`, one `main` with id `contenido`, and a skip link whose href is `#contenido`.",
+      "WHEN any authenticated page is rendered THE SYSTEM SHALL contain the permanent synthetic-data notice in the footer."
+    ],
+    "verify": [
+      "uv run pytest tests/web/test_result_template.py -q; if ($LASTEXITCODE -ne 0) { throw 'las pruebas de plantilla fallan' }",
+      "$rutasAMano = Select-String -Path (Get-ChildItem 'templates' -Recurse -Filter '*.html' -File).FullName -Pattern 'href=\"/casos|action=\"/casos|href=\"/fuentes|action=\"/entrar' -ErrorAction SilentlyContinue; if ($rutasAMano) { throw 'hay URLs escritas a mano en las plantillas' }",
+      "uv run pytest tests/web -q; if ($LASTEXITCODE -ne 0) { throw 'la suite web falla' }",
+      "uv run pytest tests/domain tests/ai tests/report -q; if ($LASTEXITCODE -ne 0) { throw 'la red de seguridad se ha roto' }"
+    ],
+    "checkpoint": "step-12-plantillas",
+    "files": [
+      "templates/base.html",
+      "templates/analisis/form.html",
+      "templates/analisis/detalle.html",
+      "templates/partials/**",
+      "tests/web/test_result_template.py",
+      "templates/400.html",
+      "templates/403.html",
+      "templates/404.html",
+      "templates/405.html",
+      "templates/500.html"
+    ],
+    "status": "pending"
+  },
+  {
+    "id": "E2-T6",
+    "title": "Tokens de diseño generados desde theme.py",
+    "epic": "02-analisis-y-presentacion",
+    "dependencies": [
+      "E2-T2",
+      "E2-T5"
+    ],
+    "priority": "p0",
+    "acceptance": [
+      "WHEN `uv run python -m scripts.build_tokens --check` runs against a synchronised tree THE SYSTEM SHALL exit 0 and write nothing.",
+      "WHEN `static/css/tokens.css` is read THE SYSTEM SHALL declare one custom property for every key of `infrastructure.theme.COLORS`, with the identical hex value.",
+      "WHEN `static/css/app.css` is searched for a hash followed by three or six hex digits THE SYSTEM SHALL find zero matches.",
+      "WHEN `uv run python scripts/build_tokens.py` is run as a plain file path THE SYSTEM SHALL fail to import `infrastructure`, which is the documented reason the project invokes scripts with `-m`.",
+      "WHEN `uv run pytest tests/web/test_theme_tokens.py` runs THE SYSTEM SHALL exit 0 with 0 failed and 0 skipped."
+    ],
+    "verify": [
+      "uv run python -m scripts.build_tokens --check; if ($LASTEXITCODE -ne 0) { throw \"tokens.css esta desincronizado con theme.py (codigo $LASTEXITCODE)\" }",
+      "uv run pytest tests/web/test_theme_tokens.py -q; if ($LASTEXITCODE -ne 0) { throw 'las pruebas de tokens fallan' }",
+      "$literales = Select-String -Path 'static/css/app.css' -Pattern '#[0-9A-Fa-f]{3,6}\\b' -ErrorAction SilentlyContinue; if ($literales) { throw 'app.css contiene colores literales' }",
+      "uv run ruff check scripts; if ($LASTEXITCODE -ne 0) { throw 'ruff falla sobre scripts/' }",
+      "uv run pytest tests/web -q; if ($LASTEXITCODE -ne 0) { throw 'la suite web falla' }",
+      "uv run pytest tests/domain tests/ai tests/report -q; if ($LASTEXITCODE -ne 0) { throw 'la red de seguridad se ha roto' }"
+    ],
+    "checkpoint": "step-13-tokens",
+    "files": [
+      "scripts/__init__.py",
+      "scripts/build_tokens.py",
+      "static/css/tokens.css",
+      "static/css/app.css",
+      "tests/web/test_theme_tokens.py"
+    ],
+    "status": "pending"
+  },
+  {
+    "id": "E2-T7",
+    "title": "Descarga del informe PDF",
+    "epic": "02-analisis-y-presentacion",
+    "dependencies": [
+      "E2-T4",
+      "E2-T6"
+    ],
+    "priority": "p0",
+    "acceptance": [
+      "WHEN the report of a case is requested by its owner THE SYSTEM SHALL respond `200` with content type `application/pdf`.",
+      "WHEN the served PDF is parsed with `pypdf` THE SYSTEM SHALL contain the literal `DATOS SINTÉTICOS`, the immovable notice, present in the document the user actually downloads.",
+      "WHEN the response headers are read THE SYSTEM SHALL carry `Content-Disposition` with `attachment` and a filename containing the case UUID.",
+      "WHEN the report of a case owned by another user is requested THE SYSTEM SHALL respond `404` and SHALL NOT generate a PDF.",
+      "WHEN the report view runs THE SYSTEM SHALL make no network call, producing the PDF from the persisted payload alone.",
+      "WHEN the same case is downloaded twice THE SYSTEM SHALL produce a document with the same synthetic-data notice both times and SHALL NOT create any new `Caso` row."
+    ],
+    "verify": [
+      "uv run pytest tests/web/test_informe_view.py tests/web/test_aislamiento.py -q; if ($LASTEXITCODE -ne 0) { throw 'la descarga del informe o su aislamiento fallan' }",
+      "uv run pytest tests/web -q; if ($LASTEXITCODE -ne 0) { throw 'la suite web falla' }",
+      "uv run pytest tests/report -q; if ($LASTEXITCODE -ne 0) { throw 'las pruebas de informe rescatadas fallan' }",
+      "uv run pytest tests/domain tests/ai tests/report -q; if ($LASTEXITCODE -ne 0) { throw 'la red de seguridad se ha roto' }"
+    ],
+    "checkpoint": "step-14-informe",
+    "files": [
+      "apps/analisis/views.py",
+      "apps/analisis/urls.py",
+      "templates/analisis/detalle.html",
+      "tests/web/test_informe_view.py",
+      "tests/web/test_aislamiento.py"
+    ],
+    "status": "pending"
+  },
+  {
+    "id": "E3-T1",
+    "title": "Listado de casos con búsqueda, orden y paginación",
+    "epic": "03-gasto-ia-y-contenido",
+    "dependencies": [
+      "E2-T5",
+      "E2-T7"
+    ],
+    "priority": "p0",
+    "acceptance": [
+      "WHEN a user with zero cases opens the case list THE SYSTEM SHALL respond `200` with the first-run empty state, and SHALL NOT show the no-matches text.",
+      "WHEN a search matches no case THE SYSTEM SHALL respond `200` with the no-matches empty state and a link that clears the filter.",
+      "WHEN user A lists cases and user B owns cases too THE SYSTEM SHALL return only A's rows, in every combination of search, filter and ordering.",
+      "WHEN a page size of 100000 is requested THE SYSTEM SHALL return at most 100 rows, because the server caps the page size regardless of what the client asks for.",
+      "WHEN a non-numeric page size or a page number beyond the last is requested THE SYSTEM SHALL respond `200` with the default page size and the last valid page, never `500`.",
+      "WHEN the owner posts a delete THE SYSTEM SHALL set `deleted_at`, keep the row in the database, and make the case return `404` afterwards."
+    ],
+    "verify": [
+      "uv run pytest tests/web/test_listado.py tests/web/test_aislamiento.py -q; if ($LASTEXITCODE -ne 0) { throw 'el listado o su aislamiento fallan' }",
+      "$borradosDuros = Select-String -Path (Get-ChildItem 'apps/analisis' -Recurse -Filter '*.py' -File).FullName -Pattern '\\.delete\\(\\)' -ErrorAction SilentlyContinue; if ($borradosDuros) { throw 'hay un borrado duro en apps/analisis' }",
+      "uv run pytest tests/web -q; if ($LASTEXITCODE -ne 0) { throw 'la suite web falla' }",
+      "uv run pytest tests/domain tests/ai tests/report -q; if ($LASTEXITCODE -ne 0) { throw 'la red de seguridad se ha roto' }"
+    ],
+    "checkpoint": "step-15-listado",
+    "files": [
+      "apps/comun/consultas.py",
+      "apps/analisis/views.py",
+      "apps/analisis/urls.py",
+      "templates/analisis/lista.html",
+      "tests/web/test_listado.py",
+      "tests/web/test_aislamiento.py"
+    ],
+    "status": "pending"
+  },
+  {
+    "id": "E3-T2",
+    "title": "LlamadaLLM y tope de gasto antes de llamar",
+    "epic": "03-gasto-ia-y-contenido",
+    "dependencies": [
+      "E1-T6",
+      "E2-T1"
+    ],
+    "priority": "p0",
+    "acceptance": [
+      "WHEN a user whose spend for the current month has reached their monthly cap triggers a request that would call the model THE SYSTEM SHALL reject it before any call to the provider, with zero new `LlamadaLLM` rows and zero recorded spend.",
+      "WHEN that rejection happens THE SYSTEM SHALL still complete the analysis and persist the case, because the cap disables the AI section and never blocks the product.",
+      "WHEN a call completes THE SYSTEM SHALL persist one `LlamadaLLM` row whose four token counters come from the provider's reported usage, never from a local count.",
+      "WHEN `coste_de` is given a usage object THE SYSTEM SHALL compute the cost from the configured rates, and with rates unset SHALL yield `0` rather than raising.",
+      "WHEN a user is one cent below the cap THE SYSTEM SHALL allow the call, and when exactly at the cap THE SYSTEM SHALL reject it, so the boundary is inclusive on the rejection side.",
+      "WHEN spend is summed THE SYSTEM SHALL count only rows of the current calendar month and only those belonging to that user."
+    ],
+    "verify": [
+      "uv run python manage.py makemigrations ia; if ($LASTEXITCODE -ne 0) { throw 'makemigrations falla' }",
+      "uv run python manage.py makemigrations --check --dry-run; if ($LASTEXITCODE -ne 0) { throw \"quedan cambios de modelo sin migrar (codigo $LASTEXITCODE)\" }",
+      "uv run python manage.py migrate; if ($LASTEXITCODE -ne 0) { throw 'migrate falla' }",
+      "uv run pytest tests/web/test_cuota.py -q; if ($LASTEXITCODE -ne 0) { throw 'el tope de gasto falla' }",
+      "$conteoPropio = Select-String -Path (Get-ChildItem 'apps/ia' -Recurse -Filter '*.py' -File).FullName -Pattern 'count_tokens|tiktoken' -ErrorAction SilentlyContinue; if ($conteoPropio) { throw 'apps/ia estima tokens por su cuenta; deben venir del proveedor' }",
+      "uv run pytest tests/web -q; if ($LASTEXITCODE -ne 0) { throw 'la suite web falla' }",
+      "uv run pytest tests/domain tests/ai tests/report -q; if ($LASTEXITCODE -ne 0) { throw 'la red de seguridad se ha roto' }"
+    ],
+    "checkpoint": "step-16-gasto",
+    "files": [
+      "apps/ia/**",
+      "config/settings/base.py",
+      "tests/web/test_cuota.py"
+    ],
+    "status": "pending"
+  },
+  {
+    "id": "E3-T3",
+    "title": "Capa de IA en la vista con degradación silenciosa",
+    "epic": "03-gasto-ia-y-contenido",
+    "dependencies": [
+      "E3-T2",
+      "E2-T7"
+    ],
+    "priority": "p0",
+    "acceptance": [
+      "WHEN the API key is unset THE SYSTEM SHALL complete the analysis, respond `302`, persist the case with no AI explanation and make no network call.",
+      "WHEN the API key is set but the model id is unset THE SYSTEM SHALL behave identically and SHALL make no network call, because the model is never discovered at runtime.",
+      "WHEN the user's monthly cap is already reached THE SYSTEM SHALL behave identically, SHALL make no network call and SHALL write no `LlamadaLLM` row.",
+      "WHEN the injected client raises THE SYSTEM SHALL still respond `302`, persist the case without an explanation, and record one `LlamadaLLM` row whose error names the failure category and whose cost is zero.",
+      "WHEN the model returns a draft citing a source id the engine did not emit THE SYSTEM SHALL persist the case without that explanation, because `AnalysisResult` cannot be constructed with it.",
+      "WHEN a valid draft is returned THE SYSTEM SHALL persist the case with its AI explanation, record one `LlamadaLLM` with purpose `explicacion` and the provider's reported token counts, and render the explanation with its model id and prompt version."
+    ],
+    "verify": [
+      "uv run pytest tests/web/test_ia_degradacion.py -q; if ($LASTEXITCODE -ne 0) { throw 'la degradacion de la capa de IA falla' }",
+      "$puentes = Select-String -Path (Get-ChildItem 'ai' -Recurse -Filter '*.py' -File).FullName -Pattern '(?m)^\\s*(from|import)\\s+django' -ErrorAction SilentlyContinue; if ($puentes) { throw 'ai/ ha empezado a importar Django' }",
+      "if ((Get-Content -Raw 'apps/analisis/views.py') -match 'claude_client') { throw 'la vista llama a la capa de IA; debe pasar por services.py' }",
+      "$src = Get-Content -Raw 'apps/analisis/services.py'; if ($src.IndexOf('comprobar_cuota') -lt 0) { throw 'services.py no comprueba la cuota' }",
+      "$src = Get-Content -Raw 'apps/analisis/services.py'; if ($src.IndexOf('comprobar_cuota') -gt $src.IndexOf('explain_analysis')) { throw 'la cuota se comprueba DESPUES de llamar al modelo' }",
+      "uv run pytest tests/web -q; if ($LASTEXITCODE -ne 0) { throw 'la suite web falla' }",
+      "uv run pytest tests/domain tests/ai tests/report -q; if ($LASTEXITCODE -ne 0) { throw 'la red de seguridad se ha roto' }"
+    ],
+    "checkpoint": "step-17-ia",
+    "files": [
+      "apps/analisis/services.py",
+      "templates/analisis/detalle.html",
+      "tests/web/test_ia_degradacion.py"
+    ],
+    "status": "pending"
+  },
+  {
+    "id": "E3-T4",
+    "title": "Completar el frontmatter de las 9 fichas del corpus",
+    "epic": "03-gasto-ia-y-contenido",
+    "dependencies": [
+      "E1-T4"
+    ],
+    "priority": "p1",
+    "acceptance": [
+      "WHEN every markdown file under the research directory that carries YAML frontmatter is read THE SYSTEM SHALL find exactly 9 of them, each with `titulo`, `fuente_primaria`, `rango_normativo`, `clase`, `tipo_localizador`, `localizador`, `verificada_el` and `confianza_verificacion` present and non-empty.",
+      "WHEN the corpus README is read THE SYSTEM SHALL find no YAML frontmatter, so the exclusion criterion is a property of the file and not a hardcoded name.",
+      "WHEN each ficha's `clase`, `tipo_localizador` and `confianza_verificacion` are read THE SYSTEM SHALL find every value inside the vocabulary `tp_domain/sources.py` already defines.",
+      "WHEN the three fichas that already have an entry in the closed source registry are read THE SYSTEM SHALL find their `localizador` identical, character for character, to the `locator` of that entry.",
+      "WHEN the seven pre-existing frontmatter keys are read THE SYSTEM SHALL find them unchanged, because this task only adds keys and removes none."
+    ],
+    "verify": [
+      "uv run python -c \"import frontmatter, pathlib; req={'titulo','fuente_primaria','rango_normativo','clase','tipo_localizador','localizador','verificada_el','confianza_verificacion'}; todos=sorted(pathlib.Path('documentation/tax-research').rglob('*.md')); fichas=[p for p in todos if frontmatter.load(p).metadata]; assert len(fichas)==9, [str(x) for x in fichas]; malas={str(p): sorted(req - set(frontmatter.load(p).metadata)) for p in fichas if req - set(frontmatter.load(p).metadata)}; assert not malas, malas; print('9 fichas completas')\"; if ($LASTEXITCODE -ne 0) { throw 'alguna ficha no cumple el contrato del indice' }",
+      "uv run python -c \"import frontmatter, pathlib; p=pathlib.Path('documentation/tax-research/README.md'); assert not frontmatter.load(p).metadata, 'README.md tiene frontmatter y dejaria de excluirse'; print('README excluido por ausencia de frontmatter')\"; if ($LASTEXITCODE -ne 0) { throw 'el criterio de exclusion del README ya no se cumple' }",
+      "uv run python -c \"import frontmatter, pathlib; from tp_domain.models import SourceKind, LocatorType, VerificationConfidence; ok_c={e.value for e in SourceKind}; ok_l={e.value for e in LocatorType}; ok_v={e.value for e in VerificationConfidence}; malas=[str(p) for p in pathlib.Path('documentation/tax-research').rglob('*.md') if frontmatter.load(p).metadata and not (frontmatter.load(p)['clase'] in ok_c and frontmatter.load(p)['tipo_localizador'] in ok_l and frontmatter.load(p)['confianza_verificacion'] in ok_v)]; assert not malas, malas; print('vocabulario OK')\"; if ($LASTEXITCODE -ne 0) { throw 'alguna ficha usa un valor fuera del vocabulario del dominio' }",
+      "uv run python -c \"import frontmatter, pathlib; from tp_domain.sources import SOURCE_REGISTRY; pares={'jurisdictions/spain/art18-lis-operaciones-vinculadas.md':'es-lis-art18-4','jurisdictions/germany/astg-rango-intercuartilico-ajuste-mediana.md':'de-astg-1-3a','frameworks/ocde-directrices-2022-marcos-riesgo-dempe-servicios.md':'oecd-tpg-2022-cap3'}; malas={r: (frontmatter.load(pathlib.Path('documentation/tax-research')/r)['localizador'], SOURCE_REGISTRY[i].locator) for r, i in pares.items() if frontmatter.load(pathlib.Path('documentation/tax-research')/r)['localizador'] != SOURCE_REGISTRY[i].locator}; assert not malas, malas; print('localizadores alineados con el registro')\"; if ($LASTEXITCODE -ne 0) { throw 'un localizador de ficha no coincide con el del registro cerrado' }",
+      "uv run pytest tests/domain tests/ai tests/report -q; if ($LASTEXITCODE -ne 0) { throw 'la red de seguridad se ha roto' }"
+    ],
+    "checkpoint": "step-18-frontmatter",
+    "files": [
+      "documentation/tax-research/jurisdictions/**/*.md",
+      "documentation/tax-research/frameworks/*.md",
+      "documentation/tax-research/processes/*.md"
+    ],
+    "status": "pending"
+  },
+  {
+    "id": "E3-T5",
+    "title": "Ficha: índice citable del corpus",
+    "epic": "03-gasto-ia-y-contenido",
+    "dependencies": [
+      "E1-T4",
+      "E3-T4"
+    ],
+    "priority": "p1",
+    "acceptance": [
+      "WHEN the corpus reindex command runs THE SYSTEM SHALL exit 0 and leave one `Ficha` row per markdown file under the research directory that carries YAML frontmatter, which is 9, because the README has none and is skipped.",
+      "WHEN the command runs twice in a row THE SYSTEM SHALL leave the identical set of rows, with identical file hashes, because it is idempotent.",
+      "WHEN a markdown file changes on disk and the command is re-run THE SYSTEM SHALL update that row's file hash, so drift between disk and index is detectable.",
+      "WHEN a ficha's frontmatter is missing a required key THE SYSTEM SHALL fail loudly naming the file and the key, and SHALL NOT leave the table half-rebuilt.",
+      "WHEN `Ficha` is opened in the admin THE SYSTEM SHALL present every field read-only, because the file on disk is the source of truth.",
+      "WHEN a source id emitted by the engine is looked up in `Ficha` THE SYSTEM SHALL resolve without a translation table, because both use the same identifier."
+    ],
+    "verify": [
+      "uv run python manage.py makemigrations corpus; if ($LASTEXITCODE -ne 0) { throw 'makemigrations falla' }",
+      "uv run python manage.py migrate; if ($LASTEXITCODE -ne 0) { throw 'migrate falla' }",
+      "uv run python manage.py reindexar_corpus; if ($LASTEXITCODE -ne 0) { throw 'el reindexado falla' }",
+      "uv run python manage.py reindexar_corpus; if ($LASTEXITCODE -ne 0) { throw 'el reindexado no es idempotente' }",
+      "uv run python -c \"import os; os.environ['DJANGO_SETTINGS_MODULE']='config.settings.local'; import django; django.setup(); from pathlib import Path; from apps.corpus.models import Ficha; import frontmatter; n=len([q for q in Path('documentation/tax-research').rglob('*.md') if frontmatter.load(q).metadata]); m=Ficha.objects.count(); assert m==n, (m, n); print('corpus indexado OK', n)\"; if ($LASTEXITCODE -ne 0) { throw 'el indice no coincide con los ficheros en disco' }",
+      "uv run pytest tests/web/test_corpus_indice.py -q; if ($LASTEXITCODE -ne 0) { throw 'las pruebas del indice fallan' }",
+      "uv run pytest tests/web -q; if ($LASTEXITCODE -ne 0) { throw 'la suite web falla' }",
+      "uv run pytest tests/domain tests/ai tests/report -q; if ($LASTEXITCODE -ne 0) { throw 'la red de seguridad se ha roto' }"
+    ],
+    "checkpoint": "step-19-fichas",
+    "files": [
+      "apps/corpus/models.py",
+      "apps/corpus/indexador.py",
+      "apps/corpus/admin.py",
+      "apps/corpus/management/**",
+      "tests/web/test_corpus_indice.py",
+      "apps/corpus/__init__.py",
+      "apps/corpus/apps.py",
+      "config/settings/base.py"
+    ],
+    "status": "pending"
+  },
+  {
+    "id": "E3-T6",
+    "title": "Publicar el corpus y enlazarlo desde las fuentes",
+    "epic": "03-gasto-ia-y-contenido",
+    "dependencies": [
+      "E2-T5",
+      "E3-T5"
+    ],
+    "priority": "p1",
+    "acceptance": [
+      "WHEN the corpus index is requested by an authenticated user THE SYSTEM SHALL respond `200` listing one entry per `Ficha` row, each with its title and its normative rank.",
+      "WHEN an existing ficha path is requested THE SYSTEM SHALL respond `200` containing that ficha's title, its citation and its verification date.",
+      "WHEN the requested path does not exist in the corpus THE SYSTEM SHALL respond `404` and read no file.",
+      "WHEN the requested path contains a parent-directory segment, is absolute, or resolves outside the research directory THE SYSTEM SHALL respond `400` and read no file.",
+      "WHEN a case detail page cites a source THE SYSTEM SHALL render a link to that source's ficha, resolved by the shared identifier.",
+      "WHEN an anonymous request hits the corpus index THE SYSTEM SHALL respond `302` to the login page, because the corpus is behind the session like everything else."
+    ],
+    "verify": [
+      "uv run pytest tests/web/test_corpus.py -q; if ($LASTEXITCODE -ne 0) { throw 'la publicacion del corpus falla' }",
+      "uv run pytest tests/web -q; if ($LASTEXITCODE -ne 0) { throw 'la suite web falla' }",
+      "uv run pytest tests/domain tests/ai tests/report -q; if ($LASTEXITCODE -ne 0) { throw 'la red de seguridad se ha roto' }"
+    ],
+    "checkpoint": "step-20-corpus-web",
+    "files": [
+      "apps/corpus/views.py",
+      "apps/corpus/urls.py",
+      "templates/corpus/**",
+      "templates/analisis/detalle.html",
+      "tests/web/test_corpus.py"
+    ],
+    "status": "pending"
+  },
+  {
+    "id": "E3-T7",
+    "title": "UnidadEstudio: módulo de estudio separado",
+    "epic": "03-gasto-ia-y-contenido",
+    "dependencies": [
+      "E3-T5",
+      "E3-T6"
+    ],
+    "priority": "p1",
+    "acceptance": [
+      "WHEN the study index is requested THE SYSTEM SHALL list only published units, ordered by their sequence field and then by title.",
+      "WHEN an unpublished unit's slug is requested directly THE SYSTEM SHALL respond `404`.",
+      "WHEN a unit linked to two fichas is rendered THE SYSTEM SHALL show a link to each of them.",
+      "WHEN `tp_domain.sources.SOURCE_REGISTRY` is inspected THE SYSTEM SHALL contain no identifier belonging to any study unit, because study material is never a citable source.",
+      "WHEN a report is generated for any case THE SYSTEM SHALL contain no study unit title or slug anywhere in its text.",
+      "WHEN a unit is created from the admin THE SYSTEM SHALL persist it, because unlike a ficha this content is authored in the panel and not on disk."
+    ],
+    "verify": [
+      "uv run python manage.py makemigrations estudio; if ($LASTEXITCODE -ne 0) { throw 'makemigrations falla' }",
+      "uv run python manage.py migrate; if ($LASTEXITCODE -ne 0) { throw 'migrate falla' }",
+      "uv run pytest tests/web/test_estudio.py -q; if ($LASTEXITCODE -ne 0) { throw 'el modulo de estudio falla' }",
+      "$fugas = Select-String -Path (Get-ChildItem 'tp_domain','infrastructure' -Recurse -Filter '*.py' -File).FullName -Pattern 'UnidadEstudio|apps\\.estudio' -ErrorAction SilentlyContinue; if ($fugas) { throw 'el dominio o el informe conocen UnidadEstudio; el material de estudio no es citable' }",
+      "uv run pytest tests/web -q; if ($LASTEXITCODE -ne 0) { throw 'la suite web falla' }",
+      "uv run pytest tests/domain tests/ai tests/report -q; if ($LASTEXITCODE -ne 0) { throw 'la red de seguridad se ha roto' }"
+    ],
+    "checkpoint": "step-21-estudio",
+    "files": [
+      "apps/estudio/**",
+      "templates/estudio/**",
+      "config/settings/base.py",
+      "tests/web/test_estudio.py"
+    ],
+    "status": "pending"
+  },
+  {
+    "id": "E4-T1",
+    "title": "CasoContrastado: biblioteca de precedentes",
+    "epic": "04-precedentes-evidencia-y-cierre",
+    "dependencies": [
+      "E3-T1"
+    ],
+    "priority": "p1",
+    "acceptance": [
+      "WHEN a curated case is published THE SYSTEM SHALL make it visible at its slug to every authenticated user, not only to its curator.",
+      "WHEN a curated case is not published THE SYSTEM SHALL respond `404` at its slug for a non-staff user.",
+      "WHEN a case is curated THE SYSTEM SHALL copy its payload and SHALL leave the original case unchanged and still private, so requesting it as another user still returns `404`.",
+      "WHEN the origin case is later soft-deleted THE SYSTEM SHALL keep the published precedent readable, with its frozen payload intact.",
+      "WHEN a curated case is rendered THE SYSTEM SHALL show its curator comment, because a precedent without the reason it is one is just another row.",
+      "WHEN an anonymous request hits the precedent list THE SYSTEM SHALL respond `302` to the login page."
+    ],
+    "verify": [
+      "uv run python manage.py makemigrations analisis; if ($LASTEXITCODE -ne 0) { throw 'makemigrations falla' }",
+      "uv run python manage.py makemigrations --check --dry-run; if ($LASTEXITCODE -ne 0) { throw \"quedan cambios de modelo sin migrar (codigo $LASTEXITCODE)\" }",
+      "uv run python manage.py migrate; if ($LASTEXITCODE -ne 0) { throw 'migrate falla' }",
+      "uv run pytest tests/web/test_contrastados.py tests/web/test_aislamiento.py -q; if ($LASTEXITCODE -ne 0) { throw 'la biblioteca de precedentes o el aislamiento fallan' }",
+      "uv run pytest tests/web -q; if ($LASTEXITCODE -ne 0) { throw 'la suite web falla' }",
+      "uv run pytest tests/domain tests/ai tests/report -q; if ($LASTEXITCODE -ne 0) { throw 'la red de seguridad se ha roto' }"
+    ],
+    "checkpoint": "step-22-contrastados",
+    "files": [
+      "apps/analisis/models.py",
+      "apps/analisis/admin.py",
+      "apps/analisis/views.py",
+      "templates/analisis/contrastado*.html",
+      "tests/web/test_contrastados.py",
+      "apps/analisis/urls.py",
+      "tests/web/test_aislamiento.py",
+      "templates/analisis/contrastados.html",
+      "templates/analisis/contrastado.html"
+    ],
+    "status": "pending"
+  },
+  {
+    "id": "E4-T2",
+    "title": "Arnés de evaluación con puerta de regresión",
+    "epic": "04-precedentes-evidencia-y-cierre",
+    "dependencies": [
+      "E3-T3"
+    ],
+    "priority": "p1",
+    "acceptance": [
+      "WHEN `evaluar --fijar-linea-base` runs THE SYSTEM SHALL create exactly one evaluation run marked as the baseline, so later comparisons have something to compare against and do not exit `2`.",
+      "WHEN the harness runs against the baseline and the hit rate equals or exceeds it THE SYSTEM SHALL exit `0`.",
+      "WHEN the hit rate falls below the baseline THE SYSTEM SHALL exit `1` specifically, so a usage error cannot pass for a regression.",
+      "WHEN no baseline row exists THE SYSTEM SHALL exit `2` with a message saying so, distinguishable from both a pass and a regression.",
+      "WHEN an evaluation run is written THE SYSTEM SHALL record the commit sha, the total cost and the p50 and p95 latencies next to the hit rate.",
+      "WHEN a case is decided by the deterministic scorer THE SYSTEM SHALL NOT invoke any more expensive scorer for that case, and SHALL record zero provider calls for it."
+    ],
+    "verify": [
+      "uv run python manage.py makemigrations evaluacion; if ($LASTEXITCODE -ne 0) { throw 'makemigrations falla' }",
+      "uv run python manage.py migrate; if ($LASTEXITCODE -ne 0) { throw 'migrate falla' }",
+      "uv run python manage.py reindexar_evaluacion; if ($LASTEXITCODE -ne 0) { throw 'el reindexado del conjunto dorado falla' }",
+      "uv run python manage.py reindexar_evaluacion; if ($LASTEXITCODE -ne 0) { throw 'el reindexado no es idempotente' }",
+      "uv run python manage.py evaluar --fijar-linea-base; if ($LASTEXITCODE -ne 0) { throw 'no se ha podido fijar la linea base' }",
+      "uv run python manage.py evaluar --contra-linea-base; if ($LASTEXITCODE -ne 0) { throw \"comparar contra la linea base recien fijada deberia salir 0 (codigo $LASTEXITCODE)\" }",
+      "uv run pytest tests/web/test_evaluacion.py -q; if ($LASTEXITCODE -ne 0) { throw 'el arnes de evaluacion falla' }",
+      "uv run python manage.py evaluar --autocomprobar-regresion; if ($LASTEXITCODE -ne 1) { throw \"con una tasa por debajo de la linea base se esperaba codigo 1, obtenido $LASTEXITCODE\" }",
+      "uv run pytest tests/web -q; if ($LASTEXITCODE -ne 0) { throw 'la suite web falla' }",
+      "uv run pytest tests/domain tests/ai tests/report -q; if ($LASTEXITCODE -ne 0) { throw 'la red de seguridad se ha roto' }"
+    ],
+    "checkpoint": "step-23-evaluacion",
+    "files": [
+      "evaluacion/casos/**",
+      "apps/evaluacion/**",
+      "config/settings/base.py",
+      "tests/web/test_evaluacion.py"
+    ],
+    "status": "pending"
+  },
+  {
+    "id": "E4-T3",
+    "title": "Copia de seguridad y restauración verificada",
+    "epic": "04-precedentes-evidencia-y-cierre",
+    "dependencies": [
+      "E1-T6",
+      "E3-T2",
+      "E3-T5"
+    ],
+    "priority": "p0",
+    "acceptance": [
+      "WHEN the backup command runs THE SYSTEM SHALL exit `0` and write both a database file and its counts file under the backups directory.",
+      "WHEN the backup is taken THE SYSTEM SHALL use SQLite's online backup API, never a file copy, because a file copy of a database being written is silently corrupt.",
+      "WHEN the restore command restores into a clean directory THE SYSTEM SHALL exit `0` and the row count of each of the eight tables SHALL equal the count recorded at backup time.",
+      "WHEN a restored table's row count differs from the recorded one THE SYSTEM SHALL exit `1` specifically, naming the table and both numbers.",
+      "WHEN the named backup or its counts file does not exist THE SYSTEM SHALL exit `2`, distinguishable from a count mismatch.",
+      "WHEN the backups directory is checked against the ignore file THE SYSTEM SHALL find it excluded, because backups carry data and not code."
+    ],
+    "verify": [
+      "uv run python manage.py copia_seguridad; if ($LASTEXITCODE -ne 0) { throw 'la copia de seguridad falla' }",
+      "$copia = Get-ChildItem 'copias' -Filter '*.sqlite3' | Sort-Object LastWriteTime | Select-Object -Last 1; if (-not $copia) { throw 'no se ha escrito ninguna copia' }",
+      "$copia = Get-ChildItem 'copias' -Filter '*.sqlite3' | Sort-Object LastWriteTime | Select-Object -Last 1; if (-not (Test-Path ($copia.FullName -replace '\\.sqlite3$', '.recuentos.json'))) { throw 'falta el fichero de recuentos' }",
+      "$copia = Get-ChildItem 'copias' -Filter '*.sqlite3' | Sort-Object LastWriteTime | Select-Object -Last 1; $destino = Join-Path $env:TEMP (\"tpip-restauracion-\" + [guid]::NewGuid().ToString('N')); uv run python manage.py restaurar_copia --copia $copia.FullName --destino $destino; $c = $LASTEXITCODE; Remove-Item -Recurse -Force $destino -ErrorAction SilentlyContinue; if ($c -ne 0) { throw \"la restauracion no coincide en recuentos (codigo $c)\" }",
+      "git check-ignore -q 'copias'; if ($LASTEXITCODE -ne 0) { throw \"copias/ no esta ignorado (codigo $LASTEXITCODE)\" }",
+      "uv run pytest tests/web/test_copia.py -q; if ($LASTEXITCODE -ne 0) { throw 'las pruebas de copia fallan' }",
+      "uv run pytest tests/domain tests/ai tests/report -q; if ($LASTEXITCODE -ne 0) { throw 'la red de seguridad se ha roto' }"
+    ],
+    "checkpoint": "step-24-copia",
+    "files": [
+      "apps/comun/management/commands/copia_seguridad.py",
+      "apps/comun/management/commands/restaurar_copia.py",
+      "tests/web/test_copia.py"
+    ],
+    "status": "pending"
+  },
+  {
+    "id": "E4-T4",
+    "title": "Accesibilidad y aviso de privacidad",
+    "epic": "04-precedentes-evidencia-y-cierre",
+    "dependencies": [
+      "E2-T5",
+      "E3-T6",
+      "E3-T7"
+    ],
+    "priority": "p0",
+    "acceptance": [
+      "WHEN any authenticated page is rendered THE SYSTEM SHALL contain the privacy notice in a footer with role `contentinfo`, stating that administrators can access any user's cases.",
+      "WHEN the case creation form is rendered THE SYSTEM SHALL show that same notice next to the form, before the user types anything.",
+      "WHEN any page is rendered THE SYSTEM SHALL contain `lang=\"es\"`, exactly one `h1`, one `main`, one `header`, one `footer`, and a skip link whose href is `#contenido` as the first focusable element.",
+      "WHEN the form page is rendered THE SYSTEM SHALL emit a label whose `for` matches the id of every input and select on the page, so there are zero unlabelled controls.",
+      "WHEN the form is rendered after an invalid submission THE SYSTEM SHALL express every error as text inside an element with role `alert` or referenced by `aria-describedby`.",
+      "WHEN a detail page with a range is rendered THE SYSTEM SHALL emit the svg with role `img` and a non-empty title."
+    ],
+    "verify": [
+      "uv run pytest tests/web/test_accesibilidad.py -q; if ($LASTEXITCODE -ne 0) { throw 'las comprobaciones de accesibilidad fallan' }",
+      "if ((Get-Content -Raw 'static/css/app.css') -notmatch ':focus-visible') { throw 'falta el estilo de foco visible' }",
+      "if ((Get-Content -Raw 'static/css/app.css') -notmatch 'prefers-reduced-motion') { throw 'el movimiento no respeta prefers-reduced-motion' }",
+      "if ((Get-Content -Raw 'templates/base.html') -notmatch 'role=\"contentinfo\"') { throw 'falta el pie con el aviso de privacidad' }",
+      "if (-not (Test-Path 'templates/privacidad.html')) { throw 'falta la pagina de privacidad' }",
+      "uv run pytest tests/web -q; if ($LASTEXITCODE -ne 0) { throw 'la suite web falla' }",
+      "uv run pytest tests/domain tests/ai tests/report -q; if ($LASTEXITCODE -ne 0) { throw 'la red de seguridad se ha roto' }"
+    ],
+    "checkpoint": "step-25-accesibilidad",
+    "files": [
+      "templates/base.html",
+      "templates/analisis/form.html",
+      "templates/privacidad.html",
+      "static/css/app.css",
+      "tests/web/test_accesibilidad.py",
+      "templates/analisis/detalle.html"
+    ],
+    "status": "pending"
+  },
+  {
+    "id": "E4-T5",
+    "title": "Seguridad, cabeceras y ajustes de producción",
+    "epic": "04-precedentes-evidencia-y-cierre",
+    "dependencies": [
+      "E4-T4"
+    ],
+    "priority": "p0",
+    "acceptance": [
+      "WHEN the deploy check runs against the production settings with the secret key set THE SYSTEM SHALL exit `0` with zero issues.",
+      "WHEN the production settings are imported without the secret key THE SYSTEM SHALL fail at import with an error naming that variable, and SHALL NOT fall back to a default secret.",
+      "WHEN a case is posted without a CSRF token THE SYSTEM SHALL respond `403` and create zero `Caso` rows.",
+      "WHEN any response is inspected THE SYSTEM SHALL carry `X-Content-Type-Options: nosniff` and `Referrer-Policy: same-origin`.",
+      "WHEN local settings are loaded THE SYSTEM SHALL leave the secure session cookie flag false, because enabling it without TLS would make the application unusable locally.",
+      "WHEN the ordinary check runs with the local settings THE SYSTEM SHALL still exit `0`, so the development gate does not regress."
+    ],
+    "verify": [
+      "uv run pytest tests/web/test_seguridad.py -q; if ($LASTEXITCODE -ne 0) { throw 'las pruebas de seguridad fallan' }",
+      "$env:DJANGO_SECRET_KEY = 'clave-solo-para-esta-comprobacion-no-usar'; uv run python manage.py check --deploy --settings=config.settings.production; $c = $LASTEXITCODE; Remove-Item Env:\\DJANGO_SECRET_KEY; if ($c -ne 0) { throw 'check --deploy senala problemas' }",
+      "$salida = uv run python -c \"import os; os.environ.pop('DJANGO_SECRET_KEY', None); os.environ['DJANGO_SETTINGS_MODULE']='config.settings.production'; import django; django.setup(); print('ARRANCO SIN CLAVE')\" 2>&1 | Out-String; if ($salida -match 'ARRANCO SIN CLAVE') { throw 'produccion arranca sin DJANGO_SECRET_KEY' }",
+      "$salida = uv run python -c \"import os; os.environ.pop('DJANGO_SECRET_KEY', None); os.environ['DJANGO_SETTINGS_MODULE']='config.settings.production'; import django; django.setup()\" 2>&1 | Out-String; if ($salida -notmatch 'DJANGO_SECRET_KEY') { throw \"produccion fallo por otro motivo, no por la clave: $salida\" }",
+      "uv run python manage.py check; if ($LASTEXITCODE -ne 0) { throw 'el gate local se ha roto' }",
+      "uv run pytest tests/web -q; if ($LASTEXITCODE -ne 0) { throw 'la suite web falla' }",
+      "uv run pytest tests/domain tests/ai tests/report -q; if ($LASTEXITCODE -ne 0) { throw 'la red de seguridad se ha roto' }"
+    ],
+    "checkpoint": "step-26-seguridad",
+    "files": [
+      "config/settings/production.py",
+      "config/settings/base.py",
+      "tests/web/test_seguridad.py"
+    ],
+    "status": "pending"
+  },
+  {
+    "id": "E4-T6",
+    "title": "Integración continua, estáticos y cierre",
+    "epic": "04-precedentes-evidencia-y-cierre",
+    "dependencies": [
+      "E4-T1",
+      "E4-T2",
+      "E4-T3",
+      "E4-T5"
+    ],
+    "priority": "p0",
+    "acceptance": [
+      "WHEN the full acceptance gate is run in order THE SYSTEM SHALL exit `0` at every line.",
+      "WHEN the collectstatic command runs THE SYSTEM SHALL exit `0` and populate the static root.",
+      "WHEN the generated tokens file is deliberately corrupted THE SYSTEM SHALL make the token sync check exit `1` specifically, proving the sync gate can actually fail.",
+      "WHEN `README.md` is read THE SYSTEM SHALL contain no reference to streamlit and no editable pip install, and SHALL document creating the first account, both reindex commands and the backup command.",
+      "WHEN the CI workflow is read THE SYSTEM SHALL contain every command of the automated acceptance gate, including the evaluation regression gate.",
+      "WHEN this task's checkpoint has run THE SYSTEM SHALL list 27 tags matching the step prefix, one per build step."
+    ],
+    "verify": [
+      "uv run python manage.py collectstatic --noinput; if ($LASTEXITCODE -ne 0) { throw 'collectstatic falla' }",
+      "Copy-Item 'static/css/tokens.css' 'static/css/tokens.css.bak'; Add-Content 'static/css/tokens.css' '/* alteracion deliberada */'; uv run python -m scripts.build_tokens --check; $c = $LASTEXITCODE; Move-Item 'static/css/tokens.css.bak' 'static/css/tokens.css' -Force; if ($c -ne 1) { throw \"con tokens.css alterado se esperaba codigo 1, obtenido $c\" }",
+      "uv run python -m scripts.build_tokens --check; if ($LASTEXITCODE -ne 0) { throw 'tokens.css no ha quedado restaurado' }",
+      "if ((Get-Content -Raw 'README.md') -match 'streamlit') { throw 'el README sigue hablando de streamlit' }",
+      "if ((Get-Content -Raw 'README.md') -match 'pip install -e') { throw 'el README sigue mandando instalar el paquete' }",
+      "if (-not (Test-Path '.github/workflows/ci.yml')) { throw 'falta el flujo de integracion continua' }",
+      "uv run ruff check .; if ($LASTEXITCODE -ne 0) { throw 'ruff falla' }",
+      "uv run ruff format --check .; if ($LASTEXITCODE -ne 0) { throw 'el formato no esta aplicado' }",
+      "uv run mypy .; if ($LASTEXITCODE -ne 0) { throw 'mypy falla' }",
+      "uv run pytest; if ($LASTEXITCODE -ne 0) { throw 'la suite completa falla' }"
+    ],
+    "checkpoint": "step-27-cierre",
+    "files": [
+      ".github/workflows/ci.yml",
+      "README.md"
+    ],
+    "status": "pending"
+  }
+]

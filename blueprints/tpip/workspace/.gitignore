@@ -1,0 +1,98 @@
+# =====================================================================
+# TPIP — ficheros que git no sigue.
+#
+# El bootstrap de §10 añade a este fichero, de forma idempotente, las
+# líneas que el proyecto necesita, y lo hace ANTES del primer commit. El
+# orden importa: una regla de ignorados no se aplica jamás a una ruta que
+# git ya sigue, así que llegar tarde equivale a no llegar.
+# =====================================================================
+
+# --- Python ---
+__pycache__/
+*.py[codz]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+sdist/
+wheels/
+*.egg-info/
+*.egg
+MANIFEST
+
+# --- Entornos virtuales y gestor de paquetes ---
+.venv/
+venv/
+env/
+ENV/
+# uv.lock SÍ se versiona: sin él, `uv sync` no es reproducible.
+
+# --- Configuración local con secretos ---
+# `.env.example` es la excepción y va DESPUÉS del patrón que lo capturaría:
+# es el contrato de configuración y tiene que estar en el repositorio.
+.env
+.env.*
+!.env.example
+
+# --- Datos: no son código y no se versionan ---
+# La base de datos del usuario, con sus casos, su gasto y sus precedentes.
+db.sqlite3
+db.sqlite3-journal
+*.db
+*.sqlite3
+
+# Las copias de seguridad del paso 24, junto a sus ficheros de recuentos.
+# Contienen exactamente los mismos datos que la base de datos.
+copias/
+
+# --- Artefactos generados ---
+# Salida de `manage.py collectstatic` (STATIC_ROOT). Se regenera siempre.
+staticfiles/
+# static/css/tokens.css SÍ se versiona, aunque lo genere
+# `scripts/build_tokens.py`: el CSS tiene que funcionar sin ejecutar nada.
+
+# --- El bundle de The Architect ---
+# Vive DENTRO del árbol del proyecto, en blueprints/tpip/. No es código del
+# producto y no se versiona con él.
+#
+# Ojo: esta línea NO sustituye a las exclusiones que ya lleva
+# `pyproject.toml` para ruff, mypy y pytest. Son cosas distintas: aquella
+# impide que las herramientas encuentren dos raíces de configuración en un
+# mismo árbol; esta impide que el bundle entre en el repositorio. Hacen
+# falta las dos.
+blueprints/
+
+# --- Residuos de la etapa Streamlit ---
+# El bootstrap archiva aquí el pyproject.toml de setuptools antes de dejar
+# aterrizar el nuevo. Se conserva en disco por si hay que volver atrás,
+# pero no se versiona.
+pyproject.toml.pre-django
+
+# --- Pruebas y herramientas ---
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+
+# --- Sistema operativo y editores ---
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+*.swp
+*~
+
+# --- Configuración del agente ---
+# `.claude/settings.json`, `.claude/rules/` y `.claude/skills/` SÍ se
+# versionan: forman parte del proyecto. Solo se ignora lo que es local de
+# cada máquina.
+.claude/settings.local.json

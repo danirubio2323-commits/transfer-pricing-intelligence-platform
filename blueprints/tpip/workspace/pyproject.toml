@@ -1,0 +1,107 @@
+[project]
+name = "tpip"
+version = "1.0.0"
+description = "TPIP — Transfer Pricing Intelligence Platform"
+authors = [{ name = "Daniel Rubio", email = "danirubio2323@gmail.com" }]
+requires-python = ">=3.12"
+dependencies = [
+    "django>=5.2,<5.3",
+    "pydantic>=2.13.4,<3",
+    "pydantic-settings>=2.15.0,<3",
+    "python-dotenv>=1.0.0",
+    "whitenoise>=6.12.0,<7",
+    "anthropic>=0.122.0,<1",
+    "structlog>=26.1.0,<27",
+    "python-frontmatter>=1.3.0,<2",
+    "Markdown>=3.10.3,<4",
+    "reportlab>=5.0.0,<6",
+    "numpy>=1.26",
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.16.3,<0.17",
+    "mypy>=2.3.1,<3",
+    "pytest>=9.1.1,<10",
+    "pytest-django>=4.14.0,<5",
+    "pytest-cov>=7.1.0,<8",
+    "pypdf>=5.0",
+]
+
+# El proyecto NO se empaqueta: no hay `[build-system]` y uv no lo instala en el
+# entorno. Los paquetes de primer nivel (`tp_domain`, `ai`, `infrastructure`,
+# `apps`, `config`) se importan porque `manage.py` y pytest ponen la raíz del
+# proyecto en `sys.path`. Ver §19.6, matriz de convención de resolución.
+[tool.uv]
+package = false
+
+# ---------------------------------------------------------------------------
+# ruff — lint y formato
+#
+# `extend-exclude` deja fuera dos cosas distintas:
+#   - `blueprints`: el bundle vive DENTRO del proyecto y trae una copia de este
+#     mismo fichero bajo `blueprints/tpip/workspace/`. Sin esta línea ruff
+#     encuentra dos raíces en un árbol y falla antes de mirar un solo fichero.
+#   - el código rescatado (`tp_domain`, `ai`, `infrastructure` y sus tests):
+#     son 1.133 + 638 + 913 líneas que esta migración NO reescribe y que están
+#     cubiertas por la suite existente. Lintarlas produciría un fallo que no
+#     corresponde a ningún paso de construcción. Incorporarlas al lint es
+#     trabajo de v2 (§20.4).
+# ---------------------------------------------------------------------------
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = [
+    ".venv",
+    # ruff formatea tambien los bloques de codigo Python EMBEBIDOS en Markdown.
+    # El repositorio trae documentacion con ejemplos que ningun paso de §9 toca
+    # (README.md y dos informes en documentation/), y sin esta linea el gate de
+    # §20.1 sale en rojo en el paso 27 por prosa, no por codigo. Verificado
+    # ejecutando `ruff format --check .` sobre el arbol real.
+    "*.md",
+    "blueprints",
+    "tp_domain",
+    "ai",
+    "infrastructure",
+    "tests/domain",
+    "tests/ai",
+    "tests/report",
+    "**/migrations/**",
+]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "SIM"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["apps", "config", "tp_domain", "ai", "infrastructure"]
+
+# ---------------------------------------------------------------------------
+# mypy — solo el código nuevo. Mismo razonamiento que ruff.
+# `ignore_missing_imports` evita exigir stubs de Django, que no están en la pila.
+# ---------------------------------------------------------------------------
+[tool.mypy]
+python_version = "3.12"
+ignore_missing_imports = true
+exclude = [
+    "^\\.venv/",
+    "^blueprints/",
+    "^tp_domain/",
+    "^ai/",
+    "^infrastructure/",
+    "^tests/",
+    "^static/",
+    "/migrations/",
+]
+
+# ---------------------------------------------------------------------------
+# pytest — pytest-django necesita DJANGO_SETTINGS_MODULE aquí; es el mecanismo
+# por el que los tests cargan la configuración y, con ella, el `.env`
+# (pydantic-settings lo lee en `config/settings/base.py`). Ver §19.6.
+# `norecursedirs` excluye el bundle: sin esa línea pytest recogería los tests
+# dos veces desde `blueprints/tpip/workspace/`.
+# ---------------------------------------------------------------------------
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings.local"
+python_files = ["test_*.py"]
+testpaths = ["tests"]
+norecursedirs = ["blueprints", ".venv", "static", "documentation", "copias"]
