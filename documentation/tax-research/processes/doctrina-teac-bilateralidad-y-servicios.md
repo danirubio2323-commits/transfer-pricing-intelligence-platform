@@ -1,10 +1,20 @@
 ---
-titulo: "Doctrina TEAC aplicable a operaciones vinculadas"
+clase: case_law
+confianza_verificacion: directed_reading
+enlaces:
+- sub_tp/lis-art18-operaciones-vinculadas-precios-transferencia
+- sub_tp/ocde-directrices-precios-transferencia-2022
 fecha_creacion: 2026-07-30
-origen: "Cerebros_Fiscales/wiki/sub_tp/teac-rg-*.md (3 fichas)"
-tipo: "criterio administrativo español"
-usar_en: "factores de riesgo cualitativos (Fase 2A), informe generado"
-enlaces: ["sub_tp/lis-art18-operaciones-vinculadas-precios-transferencia", "sub_tp/ocde-directrices-precios-transferencia-2022"]
+fuente_primaria: Resoluciones del TEAC RG 5109/2016, RG 5972/2021 y RG 7833/2023
+jurisdiccion: ES
+localizador: TEAC, RG 5109/2016, RG 5972/2021 y RG 7833/2023
+origen: Cerebros_Fiscales/wiki/sub_tp/teac-rg-*.md (3 fichas)
+rango_normativo: Doctrina administrativa
+tipo: criterio administrativo español
+tipo_localizador: offline
+titulo: Doctrina TEAC aplicable a operaciones vinculadas
+usar_en: factores de riesgo cualitativos (Fase 2A), informe generado
+verificada_el: 2026-08-17
 ---
 
 # Doctrina TEAC aplicable a operaciones vinculadas

@@ -1,11 +1,19 @@
 ---
-titulo: "España — RIS: documentación Masterfile / Local file"
+clase: legislation
+confianza_verificacion: directed_reading
+enlaces:
+- sub_tp/lis-art18-operaciones-vinculadas-precios-transferencia
+- matriz/ue-directiva-dac4-2016-881-ue
 fecha_creacion: 2026-07-30
-origen: "Cerebros_Fiscales/wiki/sub_is/ris-rd634-2015-reglamento-impuesto-sociedades.md"
-fuente_primaria: "RD 634/2015, Reglamento del Impuesto sobre Sociedades, Art. 13-19"
-tipo: "Desarrollo reglamentario"
-usar_en: "generación de informes (Fase 2B), defensibility_score (Fase 2A)"
-enlaces: ["sub_tp/lis-art18-operaciones-vinculadas-precios-transferencia", "matriz/ue-directiva-dac4-2016-881-ue"]
+fuente_primaria: RD 634/2015, Reglamento del Impuesto sobre Sociedades, Art. 13-19
+localizador: BOE-A-2015-7771
+origen: Cerebros_Fiscales/wiki/sub_is/ris-rd634-2015-reglamento-impuesto-sociedades.md
+rango_normativo: Reglamento
+tipo: Desarrollo reglamentario
+tipo_localizador: boe_id
+titulo: 'España — RIS: documentación Masterfile / Local file'
+usar_en: generación de informes (Fase 2B), defensibility_score (Fase 2A)
+verificada_el: 2026-08-17
 ---
 
 # España — RIS: documentación Masterfile / Local file

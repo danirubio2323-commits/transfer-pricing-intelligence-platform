@@ -1,11 +1,20 @@
 ---
-titulo: "Alemania — §1.3/1.3a AStG: rango intercuartílico y ajuste obligatorio a la mediana"
+clase: legislation
+confianza_verificacion: primary_source_verified
+enlaces:
+- sub_tp/lis-art18-operaciones-vinculadas-precios-transferencia
+- sub_tp/ocde-directrices-precios-transferencia-2022
 fecha_creacion: 2026-07-30
-origen: "Cerebros_Fiscales/wiki/matriz/de-astg-transparencia-precios.md"
-fuente_primaria: "Außensteuergesetz (AStG), §1.3 y §1.3a"
-tipo: "Derecho comparado, normativa vigente"
-usar_en: "tp_domain/rules/german_rules.py (Fase 2A)"
-enlaces: ["sub_tp/lis-art18-operaciones-vinculadas-precios-transferencia", "sub_tp/ocde-directrices-precios-transferencia-2022"]
+fuente_primaria: Außensteuergesetz (AStG), §1.3 y §1.3a
+localizador: https://www.gesetze-im-internet.de/astg/__1.html
+origen: Cerebros_Fiscales/wiki/matriz/de-astg-transparencia-precios.md
+rango_normativo: Ley federal alemana
+tipo: Derecho comparado, normativa vigente
+tipo_localizador: url
+titulo: 'Alemania — §1.3/1.3a AStG: rango intercuartílico y ajuste obligatorio a la
+  mediana'
+usar_en: tp_domain/rules/german_rules.py (Fase 2A)
+verificada_el: 2026-08-10
 ---
 
 # Alemania — §1.3/1.3a AStG: rango intercuartílico y ajuste obligatorio a la mediana

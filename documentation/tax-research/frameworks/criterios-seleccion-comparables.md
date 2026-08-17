@@ -1,9 +1,18 @@
 ---
-titulo: "Criterios de selección de comparables"
+clase: guidelines
+confianza_verificacion: directed_reading
 fecha_creacion: 2026-07-30
-origen: "síntesis de sub_tp/ocde-directrices-precios-transferencia-2022.md, matriz/de-astg-transparencia-precios.md, sub_is/ris-rd634-2015-reglamento-impuesto-sociedades.md"
-tipo: "taxonomía derivada, no ficha directa del corpus"
-usar_en: "tp_domain/calculations/comparable_scoring.py (Fase 2B)"
+fuente_primaria: OECD Transfer Pricing Guidelines 2022, Cap. I
+localizador: OECD Transfer Pricing Guidelines 2022, Cap. I — taxonomía derivada por
+  el proyecto
+origen: síntesis de sub_tp/ocde-directrices-precios-transferencia-2022.md, matriz/de-astg-transparencia-precios.md,
+  sub_is/ris-rd634-2015-reglamento-impuesto-sociedades.md
+rango_normativo: Directrices OCDE
+tipo: taxonomía derivada, no ficha directa del corpus
+tipo_localizador: offline
+titulo: Criterios de selección de comparables
+usar_en: tp_domain/calculations/comparable_scoring.py (Fase 2B)
+verificada_el: 2026-08-17
 ---
 
 # Criterios de selección de comparables

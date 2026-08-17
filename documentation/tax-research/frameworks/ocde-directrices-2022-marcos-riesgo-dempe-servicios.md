@@ -1,10 +1,22 @@
 ---
-titulo: "OCDE — Directrices de Precios de Transferencia 2022: los tres marcos"
+clase: guidelines
+confianza_verificacion: primary_source_verified
+enlaces:
+- sub_tp/beps-acciones-8-10-precios-transferencia
+- sub_tp/lis-art18-operaciones-vinculadas-precios-transferencia
+- sub_tp/teac-rg-7833-2023-servicios-intragrupo-doble-vinculacion
 fecha_creacion: 2026-07-30
-origen: "Cerebros_Fiscales/wiki/sub_tp/ocde-directrices-precios-transferencia-2022.md"
-fuente_primaria: "OECD Transfer Pricing Guidelines 2022, Cap. I, VI y VII"
-usar_en: "tp_domain/rules/comparable_selection.py, cuestionario de la UI (Fase 2B)"
-enlaces: ["sub_tp/beps-acciones-8-10-precios-transferencia", "sub_tp/lis-art18-operaciones-vinculadas-precios-transferencia", "sub_tp/teac-rg-7833-2023-servicios-intragrupo-doble-vinculacion"]
+fuente_primaria: OECD Transfer Pricing Guidelines 2022, Cap. I, VI y VII
+localizador: raw/Normativa_Internacional/OCDE_BEPS/OCDE, Transfer Pricing Guidelines
+  (ene 2022) Directrices Precios de Transferencia.pdf — p. 259 impresa (índice PDF
+  260), párr. 6.42
+origen: Cerebros_Fiscales/wiki/sub_tp/ocde-directrices-precios-transferencia-2022.md
+rango_normativo: Directrices OCDE
+tipo: Marco internacional, Directrices OCDE 2022
+tipo_localizador: offline
+titulo: 'OCDE — Directrices de Precios de Transferencia 2022: los tres marcos'
+usar_en: tp_domain/rules/comparable_selection.py, cuestionario de la UI (Fase 2B)
+verificada_el: 2026-08-10
 ---
 
 # OCDE — Directrices de Precios de Transferencia 2022: los tres marcos
