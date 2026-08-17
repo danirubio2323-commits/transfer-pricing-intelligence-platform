@@ -120,7 +120,9 @@ Los tokens se definen una vez en `infrastructure/theme.py` y se generan a `stati
 - **Radio:** 4px en controles, 8px en tarjetas, 0 en tablas.
 - **Elevación:** plana. Solo bordes de 1px.
 - **Movimiento:** 120ms `ease-out`, dentro de `prefers-reduced-motion: no-preference`.
-- **Disposición:** ancho máximo 72rem; cortes en 40rem y 64rem. Sin modo oscuro.
+- **Disposición:** ancho máximo 72rem; cortes en 40rem y 64rem.
+- **Dos superficies:** pantalla oscura e informe claro, con el mismo vocabulario de
+  tokens. No hay conmutador de tema: cada superficie tiene su destino fijo.
 
 ## Entorno
 

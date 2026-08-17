@@ -61,7 +61,8 @@ desentonar, no pertenece a esta interfaz.
 
 - **Sin fuentes web**: `-apple-system, "Segoe UI", Roboto, system-ui, sans-serif`.
 - **Sin sombras**: las superficies se separan por color y por `1px solid var(--tpip-rule)`.
-- **Sin modo oscuro**: el informe no lo tiene, y mantener dos paletas para parecerse a él en una sola
+- **Sin conmutador de tema**: hay dos superficies con destino fijo —`COLORS_PANTALLA` para la
+  interfaz y `COLORS` para el informe—, no una preferencia que el usuario alterne
   es trabajo con signo negativo.
 - Espaciado base 4px: 4, 8, 12, 16, 24, 32, 48, 64. Radio 4px en controles, 8px en tarjetas, 0 en
   tablas. Ancho máximo 72rem.

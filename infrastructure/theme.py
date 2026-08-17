@@ -43,11 +43,19 @@ from tp_domain.models import (
 # aparece donde comunica algo.
 # ---------------------------------------------------------------------------
 
+#: Paleta del INFORME, sobre papel blanco. Es la que ya existía y no se toca:
+#: renombrar una clave rompería `pdf_report.py` y las 38 pruebas de tests/report.
+#: El paso 9 solo AÑADE las superficies que una pantalla necesita y una hoja no.
 COLORS: Dict[str, str] = {
     "ink": "#1A1A1A",
     "muted": "#5A5A5A",
     "rule": "#C8C8C8",
+    "background": "#FFFFFF",
     "surface": "#F7F8FA",
+    "surface_sunken": "#EBEEF3",
+    "border_strong": "#767676",
+    "focus": "#1F4E79",
+    "accent": "#B45309",
     "band_outer": "#DCE3EC",   # P10-P90
     "band_inner": "#9FB3C8",   # P25-P75, rango intercuartílico
     "median": "#334E68",
@@ -55,6 +63,45 @@ COLORS: Dict[str, str] = {
     "warn": "#8A6D1F",
     "risk": "#8C2F2F",
 }
+
+#: Paleta de la PANTALLA, sobre fondo oscuro.
+#:
+#: Dos superficies, un mismo vocabulario. Los nombres significan lo mismo en las
+#: dos —`surface` es siempre "tarjeta", `risk` es siempre "riesgo alto"— y solo
+#: cambian los hexadecimales. La coherencia entre pantalla e informe vive en los
+#: SIGNIFICADOS, no en los valores: el papel es blanco y un informe fiscal con
+#: fondo negro no se imprime ni se presenta ante nadie.
+#:
+#: Dos decisiones que conviene no deshacer sin releer esto:
+#:
+#: 1. `accent` (#F59E0B) está reservado EN EXCLUSIVA a lo que exige atención: el
+#:    ajuste obligatorio a la mediana, el tipo que cae fuera del rango, la
+#:    conclusión. Es el único color vivo de la interfaz y por eso funciona.
+#: 2. `warn` es GRIS NEUTRO, no ámbar. Con ámbar significaría dos cosas a la vez
+#:    —"moderado" y "mira aquí"— y dejaría de comunicar. Y gris es más honesto:
+#:    moderado quiere decir que no hay señal fuerte en ninguna dirección.
+#:
+#: Contrastes medidos sobre el fondo (#0F172A) y sobre la tarjeta (#161F33):
+#:   ink 15,18 · muted 6,96 / 6,41 · accent 8,31 / 7,65 · ok 9,52 · warn 8,49
+#:   risk 6,11 · median y focus 8,00 · border_strong 3,82 / 3,52 (umbral 3:1)
+COLORS_PANTALLA: Dict[str, str] = {
+    "ink": "#E8EDF4",
+    "muted": "#94A3B8",
+    "rule": "#253044",
+    "background": "#0F172A",
+    "surface": "#161F33",
+    "surface_sunken": "#1B2438",
+    "border_strong": "#65758F",
+    "focus": "#7EB3E0",
+    "accent": "#F59E0B",
+    "band_outer": "#2C3E52",   # P10-P90
+    "band_inner": "#4A7CA8",   # P25-P75, rango intercuartílico
+    "median": "#7EB3E0",
+    "ok": "#3DD68C",
+    "warn": "#A8B4C4",         # gris neutro, no ámbar: ver nota 2
+    "risk": "#F26D6D",
+}
+
 
 LEVEL_COLOR: Dict[DefensibilityLevel, str] = {
     DefensibilityLevel.STRONG: COLORS["ok"],
