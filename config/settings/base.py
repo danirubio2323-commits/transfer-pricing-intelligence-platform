@@ -79,6 +79,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "apps.cuentas",
     "apps.analisis",
+    "apps.ia",
 ]
 
 MIDDLEWARE = [
