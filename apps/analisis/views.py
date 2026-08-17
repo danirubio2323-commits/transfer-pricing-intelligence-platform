@@ -8,9 +8,10 @@ from __future__ import annotations
 
 from django.core.paginator import Paginator
 from django.http import HttpRequest, HttpResponse, HttpResponseNotAllowed
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 
 from apps.analisis.forms import CasoForm
+from apps.analisis.models import CasoContrastado
 from apps.analisis.presentacion import fuentes_enlazadas, tarjetas_de_jurisdiccion
 from apps.analisis.services import crear_caso
 from apps.comun.consultas import ORDEN_POR_DEFECTO, ORDENES, casos_de
@@ -136,3 +137,35 @@ def casos(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         return crear(request)
     return lista(request)
+
+
+def contrastados(request: HttpRequest) -> HttpResponse:
+    """La biblioteca de precedentes, visible para toda cuenta autenticada."""
+    return render(
+        request,
+        "analisis/contrastados.html",
+        {"precedentes": CasoContrastado.objects.filter(publicado=True)},
+    )
+
+
+def contrastado(request: HttpRequest, slug: str) -> HttpResponse:
+    """Un precedente. Sin publicar, 404 — salvo para quien administra."""
+    consulta = CasoContrastado.objects.all()
+    if not request.user.is_staff:
+        consulta = consulta.filter(publicado=True)
+
+    precedente = get_object_or_404(consulta, slug=slug)
+    # Se lee igual que un caso: mismo payload, mismos parciales.
+    resultado = AnalysisResult.model_validate(precedente.payload)
+
+    return render(
+        request,
+        "analisis/contrastado.html",
+        {
+            "precedente": precedente,
+            "resultado": resultado,
+            "grafico": benchmark_range_svg(resultado),
+            "tarjetas": tarjetas_de_jurisdiccion(resultado),
+            "fuentes": fuentes_enlazadas(resultado),
+        },
+    )

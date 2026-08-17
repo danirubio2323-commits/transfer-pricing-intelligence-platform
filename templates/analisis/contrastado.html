@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block titulo %}{{ precedente.titulo }} — TPIP{% endblock %}
+{% block contenido %}
+  <h1>{{ precedente.titulo }}</h1>
+
+  {# La razón por la que esto es un precedente. Sin ella sería una fila más. #}
+  <aside class="comentario-curador" aria-label="Comentario del curador">
+    <h2>Por qué es un precedente</h2>
+    <p>{{ precedente.comentario_curador }}</p>
+  </aside>
+
+  {% include "partials/_rango.html" %}
+
+  <section aria-labelledby="t-conclusion">
+    <h2 id="t-conclusion">Conclusión</h2>
+    <p class="conclusion">{{ resultado.conclusion }}</p>
+  </section>
+
+  {% include "partials/_jurisdicciones.html" %}
+  {% include "partials/_riesgos.html" %}
+
+  <p><a href="{% url 'analisis:contrastados' %}">Volver a los precedentes</a></p>
+{% endblock %}

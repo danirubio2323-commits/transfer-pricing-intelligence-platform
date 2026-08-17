@@ -72,3 +72,33 @@ class Caso(models.Model):
     @property
     def esta_borrado(self) -> bool:
         return self.deleted_at is not None
+
+
+class CasoContrastado(models.Model):
+    """Un precedente curado: un caso congelado que sirve de referencia a todos.
+
+    **Curar no desprivatiza.** El `payload` se COPIA, no se comparte: el caso
+    original sigue siendo de su dueño y sigue detrás de la guarda. Y el
+    precedente sobrevive a que el original se borre, porque su copia es suya.
+
+    `comentario_curador` no es opcional en la práctica: un precedente sin la
+    razón por la que lo es no es un precedente, es una fila más.
+    """
+
+    slug = models.SlugField(max_length=80, unique=True)
+    titulo = models.CharField(max_length=160)
+    #: SET_NULL y no CASCADE: si el caso de origen desaparece, el precedente
+    #: sigue en pie con su copia intacta.
+    caso_origen = models.ForeignKey(Caso, null=True, blank=True, on_delete=models.SET_NULL)
+    payload = models.JSONField()
+    comentario_curador = models.TextField()
+    publicado = models.BooleanField(default=False)
+    curado_por = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+    creado_el = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "casos_contrastados"
+        ordering = ["-creado_el"]
+
+    def __str__(self) -> str:
+        return self.titulo

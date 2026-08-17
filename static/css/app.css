@@ -319,3 +319,12 @@ td form { margin: 0; }
 }
 .unidades h2 { margin-top: 0; font-size: var(--tpip-texto-md); }
 .resumen { color: var(--tpip-muted); }
+
+.comentario-curador {
+  padding: var(--tpip-espacio-16);
+  margin-bottom: var(--tpip-espacio-24);
+  background: var(--tpip-surface-sunken);
+  border-left: 3px solid var(--tpip-accent);
+  border-radius: var(--tpip-radio-control);
+}
+.comentario-curador h2 { margin-top: 0; font-size: var(--tpip-texto-md); }

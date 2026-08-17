@@ -13,4 +13,6 @@ urlpatterns = [
     path("casos/<uuid:pk>/", views.detalle, name="detalle"),
     path("casos/<uuid:pk>/informe.pdf", views.informe, name="informe"),
     path("casos/<uuid:pk>/borrar/", views.borrar, name="borrar"),
+    path("contrastados/", views.contrastados, name="contrastados"),
+    path("contrastados/<slug:slug>/", views.contrastado, name="contrastado"),
 ]

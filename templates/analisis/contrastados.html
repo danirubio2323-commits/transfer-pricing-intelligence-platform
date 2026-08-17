@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block titulo %}Precedentes — TPIP{% endblock %}
+{% block contenido %}
+  <h1>Precedentes</h1>
+  <p>Casos contrastados y curados, visibles para todas las cuentas. Sirven de
+     referencia; siguen siendo análisis sobre <strong>datos sintéticos</strong>.</p>
+
+  {% if precedentes %}
+    <ol class="unidades">
+      {% for p in precedentes %}
+        <li>
+          <h2><a href="{% url 'analisis:contrastado' slug=p.slug %}">{{ p.titulo }}</a></h2>
+          <p class="resumen">{{ p.comentario_curador|truncatewords:30 }}</p>
+        </li>
+      {% endfor %}
+    </ol>
+  {% else %}
+    <p class="vacio">Todavía no hay ningún precedente publicado.</p>
+  {% endif %}
+{% endblock %}
