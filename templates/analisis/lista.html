@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block titulo %}Mis casos — TPIP{% endblock %}
+{% block contenido %}
+  <h1>Mis casos</h1>
+
+  <form method="get" action="{% url 'analisis:lista' %}" class="filtros">
+    <div class="campo">
+      <label for="q">Buscar por título</label>
+      <input type="search" id="q" name="q" value="{{ texto }}">
+    </div>
+    <div class="campo">
+      <label for="jurisdiccion">Jurisdicción</label>
+      <input type="text" id="jurisdiccion" name="jurisdiccion" maxlength="2" value="{{ jurisdiccion }}">
+    </div>
+    <div class="campo">
+      <label for="orden">Orden</label>
+      <select id="orden" name="orden">
+        {% for clave in ordenes %}
+          <option value="{{ clave }}" {% if clave == orden %}selected{% endif %}>{{ clave }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <button type="submit">Filtrar</button>
+  </form>
+
+  {% if pagina.object_list %}
+    <table>
+      <thead>
+        <tr><th scope="col">Caso</th><th scope="col">Fecha</th><th scope="col">Motor</th><th scope="col"></th></tr>
+      </thead>
+      <tbody>
+        {% for caso in pagina %}
+          <tr>
+            <td><a href="{% url 'analisis:detalle' pk=caso.pk %}">{{ caso.titulo }}</a></td>
+            <td>{{ caso.created_at|date:"d/m/Y H:i" }}</td>
+            <td>{{ caso.engine_version }}</td>
+            <td>
+              <form method="post" action="{% url 'analisis:borrar' pk=caso.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="destructivo">Borrar</button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    {% if pagina.has_other_pages %}
+      <nav class="paginacion" aria-label="Paginación">
+        {% if pagina.has_previous %}
+          <a href="?pagina={{ pagina.previous_page_number }}&q={{ texto }}&jurisdiccion={{ jurisdiccion }}&orden={{ orden }}">Anterior</a>
+        {% endif %}
+        <span>Página {{ pagina.number }} de {{ pagina.paginator.num_pages }}</span>
+        {% if pagina.has_next %}
+          <a href="?pagina={{ pagina.next_page_number }}&q={{ texto }}&jurisdiccion={{ jurisdiccion }}&orden={{ orden }}">Siguiente</a>
+        {% endif %}
+      </nav>
+    {% endif %}
+
+  {% elif hay_filtro %}
+    {# Vacío de búsqueda: hay casos, pero ninguno coincide. #}
+    <p class="vacio">Ningún caso coincide con esta búsqueda.</p>
+    <p><a href="{% url 'analisis:lista' %}">Limpiar el filtro</a></p>
+
+  {% else %}
+    {# Vacío de primera vez: todavía no hay nada que buscar. #}
+    <p class="vacio">Todavía no has analizado ninguna operación.</p>
+    <p><a href="{% url 'analisis:formulario' %}">Analizar la primera</a></p>
+  {% endif %}
+{% endblock %}

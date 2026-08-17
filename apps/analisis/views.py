@@ -6,16 +6,18 @@ Ninguna importa el motor ni consulta `Caso` por su cuenta. El cálculo pasa por
 
 from __future__ import annotations
 
-from django.http import HttpRequest, HttpResponse
+from django.core.paginator import Paginator
+from django.http import HttpRequest, HttpResponse, HttpResponseNotAllowed
 from django.shortcuts import redirect, render
-
-from infrastructure.report import render_report_bytes
 
 from apps.analisis.forms import CasoForm
 from apps.analisis.presentacion import tarjetas_de_jurisdiccion
 from apps.analisis.services import crear_caso
+from apps.comun.consultas import ORDEN_POR_DEFECTO, ORDENES, casos_de
+from apps.comun.escrituras import borrar_caso_de
 from apps.comun.guardas import caso_del_usuario
 from infrastructure.charts import benchmark_range_svg
+from infrastructure.report import render_report_bytes
 from tp_domain.models import AnalysisResult
 
 
@@ -69,3 +71,67 @@ def informe(request: HttpRequest, pk) -> HttpResponse:
     respuesta = HttpResponse(render_report_bytes(resultado), content_type="application/pdf")
     respuesta["Content-Disposition"] = f'attachment; filename="tpip-{caso.pk}.pdf"'
     return respuesta
+
+
+#: Tope de página. Lo decide el servidor: un cliente no puede pedir la tabla
+#: entera pasando un número grande.
+POR_PAGINA_POR_DEFECTO = 20
+POR_PAGINA_MAXIMO = 100
+
+
+def _por_pagina(peticion: HttpRequest) -> int:
+    """Recorta al máximo del servidor. Un valor no numérico cae al defecto."""
+    try:
+        pedido = int(peticion.GET.get("por_pagina", POR_PAGINA_POR_DEFECTO))
+    except (TypeError, ValueError):
+        return POR_PAGINA_POR_DEFECTO
+    return max(1, min(pedido, POR_PAGINA_MAXIMO))
+
+
+def lista(request: HttpRequest) -> HttpResponse:
+    """Un caso que se guarda pero no se encuentra es un caso perdido."""
+    texto = request.GET.get("q", "").strip()
+    jurisdiccion = request.GET.get("jurisdiccion", "").strip()
+    orden = request.GET.get("orden", ORDEN_POR_DEFECTO)
+
+    consulta = casos_de(request.user, texto=texto, jurisdiccion=jurisdiccion, orden=orden)
+    paginador = Paginator(consulta, _por_pagina(request))
+    # `get_page` tolera una página fuera de rango y una no numérica: devuelve la
+    # última válida en vez de un 500, que es lo que haría `page()`.
+    pagina = paginador.get_page(request.GET.get("pagina"))
+
+    return render(
+        request,
+        "analisis/lista.html",
+        {
+            "pagina": pagina,
+            "texto": texto,
+            "jurisdiccion": jurisdiccion,
+            "orden": orden if orden in ORDENES else ORDEN_POR_DEFECTO,
+            "ordenes": ORDENES,
+            # Dos vacíos distintos: «aún no has analizado nada» no es lo mismo
+            # que «tu búsqueda no encuentra nada», y confundirlos desorienta.
+            "hay_filtro": bool(texto or jurisdiccion),
+        },
+    )
+
+
+def borrar(request: HttpRequest, pk) -> HttpResponse:
+    """Borrado suave, y solo por POST: con GET, un enlace borraría al pulsarlo."""
+    if request.method != "POST":
+        return HttpResponseNotAllowed(["POST"])
+
+    borrar_caso_de(request.user, caso_del_usuario(request.user, pk))
+    return redirect("analisis:lista")
+
+
+def casos(request: HttpRequest) -> HttpResponse:
+    """`/casos/` es una sola ruta con dos verbos, como manda §5.
+
+    GET lista, POST crea. Django enruta por camino y no por método, así que el
+    reparto se hace aquí en vez de inventar dos URLs distintas para lo que
+    conceptualmente es una colección.
+    """
+    if request.method == "POST":
+        return crear(request)
+    return lista(request)
