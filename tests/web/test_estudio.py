@@ -12,6 +12,7 @@ que **ninguna unidad de estudio puede alcanzar un informe**.
 from __future__ import annotations
 
 import datetime as dt
+
 import pytest
 from django.core.management import call_command
 from django.urls import reverse
