@@ -80,6 +80,7 @@ INSTALLED_APPS = [
     "apps.cuentas",
     "apps.analisis",
     "apps.ia",
+    "apps.corpus",
 ]
 
 MIDDLEWARE = [
