@@ -1,0 +1,48 @@
+/* GENERADO por `uv run python -m scripts.build_tokens`. NO EDITAR A MANO.
+ * La paleta vive en infrastructure/theme.py; aquí solo se proyecta a CSS.
+ * Editar este fichero es trabajo que la próxima generación borra. */
+
+:root {
+  /* Superficie de PANTALLA. La del informe vive en theme.COLORS y la
+     consume el generador de PDF, no este fichero. */
+  --tpip-ink: #E8EDF4;
+  --tpip-muted: #94A3B8;
+  --tpip-rule: #253044;
+  --tpip-background: #0F172A;
+  --tpip-surface: #161F33;
+  --tpip-surface-sunken: #1B2438;
+  --tpip-border-strong: #65758F;
+  --tpip-focus: #7EB3E0;
+  --tpip-accent: #F59E0B;
+  --tpip-band-outer: #2C3E52;
+  --tpip-band-inner: #4A7CA8;
+  --tpip-median: #7EB3E0;
+  --tpip-ok: #3DD68C;
+  --tpip-warn: #A8B4C4;
+  --tpip-risk: #F26D6D;
+
+  /* Espaciado, base 4px */
+  --tpip-espacio-4: 4px;
+  --tpip-espacio-8: 8px;
+  --tpip-espacio-12: 12px;
+  --tpip-espacio-16: 16px;
+  --tpip-espacio-24: 24px;
+  --tpip-espacio-32: 32px;
+  --tpip-espacio-48: 48px;
+  --tpip-espacio-64: 64px;
+
+  /* Escala tipográfica, en rem */
+  --tpip-texto-xs: 0.875rem;
+  --tpip-texto-base: 1rem;
+  --tpip-texto-md: 1.0625rem;
+  --tpip-texto-lg: 1.375rem;
+  --tpip-texto-xl: 2rem;
+
+  /* Radio */
+  --tpip-radio-control: 4px;
+  --tpip-radio-tarjeta: 8px;
+  --tpip-radio-tabla: 0;
+
+  /* Movimiento: 120ms, y solo si nadie ha pedido lo contrario */
+  --tpip-transicion: 120ms ease-out;
+}

@@ -1,0 +1,209 @@
+/* Hoja de estilos de TPIP.
+ *
+ * NI UN COLOR LITERAL. Todo sale de var(--tpip-*), que genera
+ * scripts/build_tokens.py desde infrastructure/theme.py. Si aquí apareciera un
+ * hexadecimal, la pantalla y el informe podrían divergir sin que nadie lo note,
+ * y este proyecto existe en parte para que no diverjan.
+ *
+ * Sin fuentes web: la familia se resuelve contra lo que ya hay en el sistema.
+ * Un tipo que no carga es una página que salta al recargar.
+ */
+
+/* --------------------------------------------------------------------- */
+/* Base                                                                    */
+/* --------------------------------------------------------------------- */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { color-scheme: dark; }
+
+body {
+  margin: 0;
+  background: var(--tpip-background);
+  color: var(--tpip-ink);
+  font-family: "IBM Plex Sans", -apple-system, "Segoe UI", Roboto, system-ui, sans-serif;
+  font-size: var(--tpip-texto-base);
+  line-height: 1.5;
+}
+
+/* Cifras tabulares en TODO. En una columna de percentiles, que los dígitos no
+   se alineen no es un detalle estético: obliga a leer número a número. */
+body { font-variant-numeric: tabular-nums; }
+
+main {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: var(--tpip-espacio-32) var(--tpip-espacio-24);
+}
+
+h1 { font-size: var(--tpip-texto-xl); line-height: 1.2; margin: 0 0 var(--tpip-espacio-24); }
+h2 { font-size: var(--tpip-texto-lg); margin: var(--tpip-espacio-32) 0 var(--tpip-espacio-12); }
+h3 { font-size: var(--tpip-texto-md); margin: 0 0 var(--tpip-espacio-8); }
+p  { margin: 0 0 var(--tpip-espacio-12); }
+
+a { color: var(--tpip-focus); }
+
+/* --------------------------------------------------------------------- */
+/* Foco: visible siempre. Quitarlo deja la aplicación inservible con teclado */
+/* --------------------------------------------------------------------- */
+
+:focus-visible {
+  outline: 2px solid var(--tpip-focus);
+  outline-offset: 2px;
+}
+
+.salto {
+  position: absolute;
+  left: -9999px;
+  background: var(--tpip-surface);
+  color: var(--tpip-ink);
+  padding: var(--tpip-espacio-8) var(--tpip-espacio-16);
+  border-radius: var(--tpip-radio-control);
+}
+.salto:focus { left: var(--tpip-espacio-8); top: var(--tpip-espacio-8); z-index: 10; }
+
+/* --------------------------------------------------------------------- */
+/* Cabecera y pie                                                          */
+/* --------------------------------------------------------------------- */
+
+header {
+  border-bottom: 1px solid var(--tpip-rule);
+  background: var(--tpip-surface);
+}
+header nav {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: var(--tpip-espacio-12) var(--tpip-espacio-24);
+  display: flex;
+  gap: var(--tpip-espacio-16);
+  align-items: center;
+  justify-content: space-between;
+}
+header form { margin: 0; }
+
+footer {
+  border-top: 1px solid var(--tpip-rule);
+  margin-top: var(--tpip-espacio-48);
+  padding: var(--tpip-espacio-24);
+  color: var(--tpip-muted);
+  font-size: var(--tpip-texto-xs);
+}
+footer .aviso-sintetico { max-width: 72rem; margin: 0 auto; }
+footer strong { color: var(--tpip-accent); }
+
+/* --------------------------------------------------------------------- */
+/* El rango: protagonista, ancho completo                                  */
+/* --------------------------------------------------------------------- */
+
+.rango {
+  margin: 0 0 var(--tpip-espacio-32);
+  padding: var(--tpip-espacio-24);
+  background: var(--tpip-surface);
+  border: 1px solid var(--tpip-rule);
+  border-radius: var(--tpip-radio-tarjeta);
+}
+.rango svg { width: 100%; height: auto; display: block; }
+.rango figcaption {
+  margin-top: var(--tpip-espacio-12);
+  color: var(--tpip-muted);
+  font-size: var(--tpip-texto-xs);
+}
+
+.sin-rango {
+  padding: var(--tpip-espacio-24);
+  background: var(--tpip-surface-sunken);
+  border-left: 3px solid var(--tpip-muted);
+  border-radius: var(--tpip-radio-control);
+}
+
+.conclusion { font-size: var(--tpip-texto-md); }
+
+/* --------------------------------------------------------------------- */
+/* Tarjetas de jurisdicción                                                */
+/* --------------------------------------------------------------------- */
+
+.jurisdiccion {
+  display: inline-block;
+  vertical-align: top;
+  width: 100%;
+  margin: 0 0 var(--tpip-espacio-16);
+  padding: var(--tpip-espacio-16);
+  background: var(--tpip-surface);
+  border: 1px solid var(--tpip-rule);
+  border-radius: var(--tpip-radio-tarjeta);
+}
+@media (min-width: 40rem) {
+  .jurisdiccion { width: calc(50% - var(--tpip-espacio-8)); }
+  .jurisdiccion + .jurisdiccion { margin-left: var(--tpip-espacio-16); }
+}
+
+.regla { color: var(--tpip-muted); font-size: var(--tpip-texto-xs); }
+.posicion { color: var(--tpip-muted); font-size: var(--tpip-texto-xs); margin: 0; }
+
+.veredicto { font-weight: 600; margin: var(--tpip-espacio-8) 0; }
+.veredicto--ok   { color: var(--tpip-ok); }
+.veredicto--warn { color: var(--tpip-warn); }
+.veredicto--risk { color: var(--tpip-risk); }
+
+/* --------------------------------------------------------------------- */
+/* Formulario                                                              */
+/* --------------------------------------------------------------------- */
+
+.campo { margin-bottom: var(--tpip-espacio-16); max-width: 32rem; }
+.campo label { display: block; margin-bottom: var(--tpip-espacio-4); font-weight: 500; }
+
+input, select, textarea {
+  width: 100%;
+  padding: var(--tpip-espacio-8) var(--tpip-espacio-12);
+  background: var(--tpip-surface);
+  color: var(--tpip-ink);
+  border: 1px solid var(--tpip-border-strong);
+  border-radius: var(--tpip-radio-control);
+  font: inherit;
+  transition: border-color var(--tpip-transicion);
+}
+input:hover, select:hover, textarea:hover { border-color: var(--tpip-focus); }
+
+button {
+  padding: var(--tpip-espacio-8) var(--tpip-espacio-24);
+  background: var(--tpip-accent);
+  color: var(--tpip-background);
+  border: 1px solid var(--tpip-accent);
+  border-radius: var(--tpip-radio-control);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity var(--tpip-transicion);
+}
+button:hover { opacity: 0.88; }
+
+.errores, .error { color: var(--tpip-risk); }
+.errores {
+  padding: var(--tpip-espacio-12) var(--tpip-espacio-16);
+  border: 1px solid var(--tpip-risk);
+  border-radius: var(--tpip-radio-control);
+  margin-bottom: var(--tpip-espacio-16);
+}
+.error { font-size: var(--tpip-texto-xs); margin: var(--tpip-espacio-4) 0 0; }
+
+/* --------------------------------------------------------------------- */
+/* Listas y vacíos                                                         */
+/* --------------------------------------------------------------------- */
+
+ul { padding-left: var(--tpip-espacio-24); }
+li { margin-bottom: var(--tpip-espacio-8); }
+
+/* Un vacío declarado, no un hueco. Un contenedor vacío se lee como una
+   página rota; esto se lee como una respuesta. */
+.vacio { color: var(--tpip-muted); font-style: italic; }
+
+/* --------------------------------------------------------------------- */
+/* Movimiento: solo si nadie ha pedido lo contrario                        */
+/* --------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
