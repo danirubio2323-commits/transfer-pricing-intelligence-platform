@@ -1,0 +1,11 @@
+<section aria-labelledby="t-jurisdicciones">
+  <h2 id="t-jurisdicciones">Tratamiento por jurisdicción</h2>
+  {% for tarjeta in tarjetas %}
+    <article class="jurisdiccion">
+      <h3>{{ tarjeta.pais }}</h3>
+      <p class="regla">{{ tarjeta.regla }}</p>
+      <p class="veredicto veredicto--{{ tarjeta.nivel_clave }}">{{ tarjeta.nivel }}</p>
+      {% if tarjeta.posicion %}<p class="posicion">{{ tarjeta.posicion }}</p>{% endif %}
+    </article>
+  {% endfor %}
+</section>

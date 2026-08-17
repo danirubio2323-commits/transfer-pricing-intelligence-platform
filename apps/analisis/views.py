@@ -11,7 +11,9 @@ from django.shortcuts import redirect, render
 
 from apps.analisis.forms import CasoForm
 from apps.analisis.services import crear_caso
+from apps.analisis.presentacion import tarjetas_de_jurisdiccion
 from apps.comun.guardas import caso_del_usuario
+from infrastructure.charts import benchmark_range_svg
 from tp_domain.models import AnalysisResult
 
 
@@ -36,8 +38,16 @@ def crear(request: HttpRequest) -> HttpResponse:
 def detalle(request: HttpRequest, pk) -> HttpResponse:
     """La guarda es la única lectura: un caso ajeno responde 404, no 403."""
     caso = caso_del_usuario(request.user, pk)
+    resultado = AnalysisResult.model_validate(caso.payload)
     return render(
         request,
         "analisis/detalle.html",
-        {"caso": caso, "resultado": AnalysisResult.model_validate(caso.payload)},
+        {
+            "caso": caso,
+            "resultado": resultado,
+            # El gráfico y las tarjetas se preparan aquí: la plantilla pinta,
+            # no decide. Un `{% if %}` sobre un enum es lógica sin probar.
+            "grafico": benchmark_range_svg(resultado),
+            "tarjetas": tarjetas_de_jurisdiccion(resultado),
+        },
     )

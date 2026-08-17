@@ -1,16 +1,27 @@
-{# Provisional: el paso 12 la sustituye por la definitiva sobre la plantilla base. #}
-<!doctype html>
-<html lang="es">
-<head><meta charset="utf-8"><title>Nuevo análisis — TPIP</title></head>
-<body>
+{% extends "base.html" %}
+{% block titulo %}Nuevo análisis — TPIP{% endblock %}
+{% block contenido %}
   <h1>Nuevo análisis</h1>
+
   {% if formulario.non_field_errors %}
-    <div role="alert">{{ formulario.non_field_errors }}</div>
+    {# Los errores que no son de un campo concreto: condiciones sobre la
+       operación entera, como que las dos jurisdicciones tienen que diferir. #}
+    <div role="alert" class="errores">
+      {% for error in formulario.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+    </div>
   {% endif %}
+
   <form method="post" action="{% url 'analisis:crear' %}">
     {% csrf_token %}
-    {{ formulario.as_p }}
+    {% for campo in formulario %}
+      <div class="campo">
+        <label for="{{ campo.id_for_label }}">{{ campo.label }}</label>
+        {{ campo }}
+        {% if campo.errors %}
+          <p class="error" id="error-{{ campo.name }}" role="alert">{{ campo.errors|join:" " }}</p>
+        {% endif %}
+      </div>
+    {% endfor %}
     <button type="submit">Analizar</button>
   </form>
-</body>
-</html>
+{% endblock %}

@@ -1,0 +1,12 @@
+<section aria-labelledby="t-riesgos">
+  <h2 id="t-riesgos">Factores de riesgo</h2>
+  {% if resultado.risk_factors %}
+    <ul>
+      {% for factor in resultado.risk_factors %}
+        <li><strong>{{ factor.severity.value }}</strong> — {{ factor.message }}</li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="vacio">El motor no ha detectado factores de riesgo en esta operación.</p>
+  {% endif %}
+</section>

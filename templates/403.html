@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block titulo %}Sin permiso — TPIP{% endblock %}
+{% block contenido %}
+  <h1>Sin permiso</h1>
+  <p>No tienes permiso para esta acción.</p>
+  <p><a href="{% url 'analisis:formulario' %}">Volver al inicio</a></p>
+{% endblock %}

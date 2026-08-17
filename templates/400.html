@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block titulo %}Petición incorrecta — TPIP{% endblock %}
+{% block contenido %}
+  <h1>Petición incorrecta</h1>
+  <p>La dirección pedida no es válida.</p>
+  <p><a href="{% url 'analisis:formulario' %}">Volver al inicio</a></p>
+{% endblock %}

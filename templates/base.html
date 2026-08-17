@@ -1,0 +1,41 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}TPIP{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/tokens.css' %}">
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+</head>
+<body>
+  {# Primer elemento enfocable: quien navega con teclado no debe recorrer toda
+     la cabecera antes de llegar a lo que ha venido a leer. #}
+  <a class="salto" href="#contenido">Saltar al contenido</a>
+
+  <header>
+    <nav aria-label="Principal">
+      <a href="{% url 'analisis:formulario' %}">Nuevo análisis</a>
+      {% if user.is_authenticated %}
+        <form method="post" action="{% url 'cuentas:salir' %}">
+          {% csrf_token %}
+          <button type="submit">Salir</button>
+        </form>
+      {% endif %}
+    </nav>
+  </header>
+
+  <main id="contenido">
+    {% block contenido %}{% endblock %}
+  </main>
+
+  <footer role="contentinfo">
+    {# Inamovible. No es un adorno: es lo que impide que alguien confunda esto
+       con un estudio de comparabilidad válido ante una administración. #}
+    <p class="aviso-sintetico"><strong>DATOS SINTÉTICOS.</strong>
+      Los comparables de esta herramienta son sintéticos. Ningún resultado sirve
+      para sustentar una posición fiscal ante una administración tributaria.</p>
+    {% block pie_privacidad %}{% endblock %}
+  </footer>
+</body>
+</html>

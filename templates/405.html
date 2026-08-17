@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block titulo %}Método no permitido — TPIP{% endblock %}
+{% block contenido %}
+  <h1>Método no permitido</h1>
+  <p>Esa acción requiere enviar un formulario.</p>
+  <p><a href="{% url 'analisis:formulario' %}">Volver al inicio</a></p>
+{% endblock %}

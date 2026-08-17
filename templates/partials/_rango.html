@@ -1,0 +1,10 @@
+{# El rango es el protagonista: ancho completo y por encima de todo lo demás. #}
+{% if grafico %}
+  <figure class="rango">
+    {{ grafico|safe }}
+    <figcaption>Rango de plena competencia y posición del tipo analizado.</figcaption>
+  </figure>
+{% else %}
+  <p class="sin-rango">No se ha podido calcular un rango: la muestra no tiene
+    comparables aceptados para este sector y ejercicio. Es un resultado, no un fallo.</p>
+{% endif %}
