@@ -11,7 +11,7 @@ from django.http import HttpRequest, HttpResponse, HttpResponseNotAllowed
 from django.shortcuts import redirect, render
 
 from apps.analisis.forms import CasoForm
-from apps.analisis.presentacion import tarjetas_de_jurisdiccion
+from apps.analisis.presentacion import fuentes_enlazadas, tarjetas_de_jurisdiccion
 from apps.analisis.services import crear_caso
 from apps.comun.consultas import ORDEN_POR_DEFECTO, ORDENES, casos_de
 from apps.comun.escrituras import borrar_caso_de
@@ -53,6 +53,7 @@ def detalle(request: HttpRequest, pk) -> HttpResponse:
             # no decide. Un `{% if %}` sobre un enum es lógica sin probar.
             "grafico": benchmark_range_svg(resultado),
             "tarjetas": tarjetas_de_jurisdiccion(resultado),
+            "fuentes": fuentes_enlazadas(resultado),
         },
     )
 

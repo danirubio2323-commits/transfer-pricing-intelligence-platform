@@ -2794,7 +2794,11 @@ git tag step-19-fichas
 - `templates/corpus/indice.html` y `templates/corpus/ficha.html`.
 - `templates/analisis/detalle.html` — cada fuente citada por el motor enlaza a su ficha. El enlace se
   resuelve por identificador, sin tabla de traducción, porque `Ficha.id` es el mismo id que emite
-  `tp_domain/sources.py` (§4).
+  `tp_domain/sources.py` (§4) — pero **eso hay que declararlo, no se infiere**: el motor cita
+  `es-lis-art18-4` y el fichero se llama `art18-lis-operaciones-vinculadas.md`. Las tres fichas
+  con entrada en el registro llevan `id_fuente` en su frontmatter y el indexador lo usa como
+  clave; las demás se identifican por el nombre del fichero. Sin esa declaración el enlace no
+  resuelve y nadie se entera hasta pulsarlo. Verificado ejecutándolo.
 - `tests/web/test_corpus.py`.
 
 **Done when**

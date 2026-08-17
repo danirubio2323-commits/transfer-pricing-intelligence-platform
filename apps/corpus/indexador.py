@@ -124,7 +124,11 @@ def leer_ficha(ruta: Path) -> FilaFicha | None:
     meta = documento.metadata
     localizador = str(meta["localizador"])
     return FilaFicha(
-        id=relativa.stem,
+        # El identificador del registro de fuentes se DECLARA en la ficha cuando
+        # existe. No se infiere: el motor cita `es-lis-art18-4` y el fichero se
+        # llama `art18-lis-...`, así que sin declararlo el enlace no resolvería.
+        # Las fichas sin entrada en el registro se identifican por su nombre.
+        id=str(meta.get("id_fuente") or relativa.stem),
         titulo=str(meta["titulo"]),
         jurisdiccion=_jurisdiccion_de(relativa, meta),
         clase=str(meta["clase"]),
@@ -154,3 +158,17 @@ def recorrer_corpus() -> list[FilaFicha]:
         if fila is not None:
             filas.append(fila)
     return filas
+
+
+def ruta_del_corpus(relativa: str) -> Path:
+    """Traduce una ruta relativa PEDIDA DESDE FUERA a una ruta segura del corpus.
+
+    Es la puerta que usa la web. Levanta `RutaFueraDelCorpus` ante cualquier
+    `..`, ruta absoluta o enlace que se salga, **antes** de mirar si existe: un
+    intento de salirse no es un «no encontrado», y confundirlos convertiría el
+    404 en un detector de qué ficheros hay fuera del corpus.
+    """
+    candidata = Path(relativa)
+    if candidata.is_absolute():
+        raise RutaFueraDelCorpus(f"{relativa} es una ruta absoluta")
+    return _dentro_del_corpus(DIRECTORIO_CORPUS / candidata)

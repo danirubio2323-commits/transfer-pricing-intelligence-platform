@@ -20,8 +20,15 @@
   <section aria-labelledby="t-fuentes">
     <h2 id="t-fuentes">Fuentes citadas</h2>
     <ul>
-      {% for fuente in resultado.sources %}
-        <li>{{ fuente.citation }}{% if fuente.pinpoint %} — {{ fuente.pinpoint }}{% endif %}</li>
+      {% for fuente in fuentes %}
+        <li>
+          {% if fuente.ruta %}
+            <a href="{% url 'corpus:ficha' ruta=fuente.ruta %}">{{ fuente.citation }}</a>
+          {% else %}
+            {{ fuente.citation }}
+          {% endif %}
+          {% if fuente.pinpoint %} — {{ fuente.pinpoint }}{% endif %}
+        </li>
       {% empty %}
         <li class="vacio">Este análisis no cita ninguna fuente.</li>
       {% endfor %}

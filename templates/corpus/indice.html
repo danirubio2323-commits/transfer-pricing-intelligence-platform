@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block titulo %}Fuentes — TPIP{% endblock %}
+{% block contenido %}
+  <h1>Fuentes</h1>
+  <p>El corpus que el motor puede citar. Se escribe en Markdown y se indexa;
+     el fichero en disco es la fuente de verdad.</p>
+
+  <form method="get" action="{% url 'corpus:indice' %}" class="filtros">
+    <div class="campo">
+      <label for="jurisdiccion">Jurisdicción</label>
+      <select id="jurisdiccion" name="jurisdiccion">
+        <option value="">Todas</option>
+        {% for j in jurisdicciones %}
+          <option value="{{ j }}" {% if j == jurisdiccion %}selected{% endif %}>{{ j }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <button type="submit">Filtrar</button>
+  </form>
+
+  {% if fichas %}
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">Ficha</th><th scope="col">Jurisdicción</th>
+          <th scope="col">Rango</th><th scope="col">Verificada</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for f in fichas %}
+          <tr>
+            <td><a href="{% url 'corpus:ficha' ruta=f.ruta_fichero|cut:'.md' %}">{{ f.titulo }}</a></td>
+            <td>{{ f.jurisdiccion }}</td>
+            <td>{{ f.rango_normativo }}</td>
+            <td>{{ f.verificada_el|date:"d/m/Y" }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="vacio">Ninguna ficha en esta jurisdicción.</p>
+  {% endif %}
+{% endblock %}

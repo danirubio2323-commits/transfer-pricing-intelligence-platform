@@ -7,6 +7,7 @@ enlaces:
 - sub_tp/teac-rg-7833-2023-servicios-intragrupo-doble-vinculacion
 fecha_creacion: 2026-07-30
 fuente_primaria: OECD Transfer Pricing Guidelines 2022, Cap. I, VI y VII
+id_fuente: oecd-tpg-2022-cap6
 localizador: raw/Normativa_Internacional/OCDE_BEPS/OCDE, Transfer Pricing Guidelines
   (ene 2022) Directrices Precios de Transferencia.pdf — p. 259 impresa (índice PDF
   260), párr. 6.42

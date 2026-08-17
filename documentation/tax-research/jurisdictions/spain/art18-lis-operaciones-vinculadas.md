@@ -8,6 +8,7 @@ enlaces:
 - sub_is/establecimiento-permanente
 fecha_creacion: 2026-07-30
 fuente_primaria: Ley 27/2014, del Impuesto sobre Sociedades, Art. 18
+id_fuente: es-lis-art18-4
 localizador: BOE-A-2014-12328
 origen: Cerebros_Fiscales/wiki/sub_tp/lis-art18-operaciones-vinculadas-precios-transferencia.md
 rango_normativo: Ley ordinaria

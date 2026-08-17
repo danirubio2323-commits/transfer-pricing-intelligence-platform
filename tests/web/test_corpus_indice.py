@@ -116,10 +116,20 @@ def test_sin_jurisdiccion_deducible_ni_declarada_falla(tmp_path, monkeypatch):
 
 @pytest.mark.django_db
 def test_el_identificador_es_el_mismo_que_usa_el_motor():
-    """Sin tabla de traducción: la fuente que el motor cita se resuelve directa."""
+    """Sin tabla de traducción: la fuente que el motor cita se resuelve directa.
+
+    El identificador del registro se DECLARA en el frontmatter (`id_fuente`), no
+    se infiere del nombre del fichero: el motor cita `es-lis-art18-4` y el
+    fichero se llama `art18-lis-...`. Sin declararlo, el enlace de la pantalla de
+    resultado a la ficha no resolvería, y nadie se enteraría hasta pulsarlo.
+    """
+    from tp_domain.sources import SOURCE_REGISTRY
+
     call_command("reindexar_corpus")
 
-    assert Ficha.objects.filter(pk="art18-lis-operaciones-vinculadas").exists()
+    for identificador in ("es-lis-art18-4", "de-astg-1-3a", "oecd-tpg-2022-cap6"):
+        assert identificador in SOURCE_REGISTRY
+        assert Ficha.objects.filter(pk=identificador).exists(), identificador
 
 
 @pytest.mark.django_db

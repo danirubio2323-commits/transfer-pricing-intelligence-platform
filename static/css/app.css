@@ -281,3 +281,26 @@ td form { margin: 0; }
   border-top: 1px solid var(--tpip-rule);
   padding-top: var(--tpip-espacio-8);
 }
+
+/* --------------------------------------------------------------------- */
+/* Corpus                                                                  */
+/* --------------------------------------------------------------------- */
+
+.cabecera-ficha {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: var(--tpip-espacio-8) var(--tpip-espacio-16);
+  padding: var(--tpip-espacio-16);
+  background: var(--tpip-surface);
+  border: 1px solid var(--tpip-rule);
+  border-radius: var(--tpip-radio-tarjeta);
+  margin-bottom: var(--tpip-espacio-24);
+}
+.cabecera-ficha dt { color: var(--tpip-muted); font-size: var(--tpip-texto-xs); }
+.cabecera-ficha dd { margin: 0; }
+
+/* Un localizador que no resuelve no se disfraza de enlace. */
+.sin-enlace { color: var(--tpip-muted); font-style: italic; }
+
+.cuerpo-ficha { max-width: 46rem; }
+.cuerpo-ficha table { margin: var(--tpip-espacio-16) 0; }

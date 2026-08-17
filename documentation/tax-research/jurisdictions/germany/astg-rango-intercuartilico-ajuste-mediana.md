@@ -6,6 +6,7 @@ enlaces:
 - sub_tp/ocde-directrices-precios-transferencia-2022
 fecha_creacion: 2026-07-30
 fuente_primaria: Außensteuergesetz (AStG), §1.3 y §1.3a
+id_fuente: de-astg-1-3a
 localizador: https://www.gesetze-im-internet.de/astg/__1.html
 origen: Cerebros_Fiscales/wiki/matriz/de-astg-transparencia-precios.md
 rango_normativo: Ley federal alemana

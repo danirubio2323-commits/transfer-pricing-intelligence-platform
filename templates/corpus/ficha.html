@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block titulo %}{{ ficha.titulo }} — TPIP{% endblock %}
+{% block contenido %}
+  <h1>{{ ficha.titulo }}</h1>
+
+  <dl class="cabecera-ficha">
+    <dt>Jurisdicción</dt><dd>{{ ficha.jurisdiccion }}</dd>
+    <dt>Rango normativo</dt><dd>{{ ficha.rango_normativo }}</dd>
+    <dt>Cita</dt><dd>{{ ficha.cita }}</dd>
+    <dt>Localizador</dt>
+    <dd>
+      {% if ficha.url_oficial %}
+        <a href="{{ ficha.url_oficial }}" rel="noopener noreferrer">{{ ficha.localizador }}</a>
+      {% else %}
+        {# Sin identificador público resoluble: se muestra la referencia tal cual,
+           nunca como un enlace que no lleva a ninguna parte. #}
+        <span class="sin-enlace">{{ ficha.localizador }}</span>
+      {% endif %}
+    </dd>
+    <dt>Verificación</dt>
+    <dd>
+      {{ ficha.verificada_el|date:"d/m/Y" }} —
+      {% if ficha.confianza_verificacion == "primary_source_verified" %}
+        verificada contra fuente primaria
+      {% else %}
+        lectura dirigida, no exhaustiva
+      {% endif %}
+    </dd>
+  </dl>
+
+  <article class="cuerpo-ficha">{{ cuerpo|safe }}</article>
+
+  <p><a href="{% url 'corpus:indice' %}">Volver a las fuentes</a></p>
+{% endblock %}

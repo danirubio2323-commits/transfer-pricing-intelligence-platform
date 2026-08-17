@@ -33,3 +33,28 @@ def tarjetas_de_jurisdiccion(resultado: AnalysisResult) -> list[dict[str, Any]]:
         }
         for veredicto in resultado.assessments
     ]
+
+
+def fuentes_enlazadas(resultado: AnalysisResult) -> list[dict[str, Any]]:
+    """Cada fuente citada, con la ruta de su ficha si el corpus la tiene.
+
+    El enlace se resuelve por **identificador compartido**: `Ficha.id` es el
+    mismo id que emite el registro de fuentes del motor, así que no hay tabla de
+    traducción entre uno y otro. Si una fuente no está en el corpus se muestra
+    sin enlace, nunca con uno roto.
+    """
+    from apps.corpus.models import Ficha
+
+    rutas = dict(
+        Ficha.objects.filter(pk__in=[f.id for f in resultado.sources]).values_list(
+            "pk", "ruta_fichero"
+        )
+    )
+    return [
+        {
+            "citation": fuente.citation,
+            "pinpoint": fuente.pinpoint,
+            "ruta": rutas[fuente.id].removesuffix(".md") if fuente.id in rutas else None,
+        }
+        for fuente in resultado.sources
+    ]
