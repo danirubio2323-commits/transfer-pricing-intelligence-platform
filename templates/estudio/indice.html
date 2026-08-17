@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block titulo %}Estudio — TPIP{% endblock %}
+{% block contenido %}
+  <h1>Estudio</h1>
+  <p>Material de aprendizaje. <strong>No es fuente citable</strong>: para eso están
+     las <a href="{% url 'corpus:indice' %}">fuentes</a>.</p>
+
+  {% if unidades %}
+    <ol class="unidades">
+      {% for u in unidades %}
+        <li>
+          <h2><a href="{% url 'estudio:unidad' slug=u.slug %}">{{ u.titulo }}</a></h2>
+          <p>{{ u.resumen }}</p>
+        </li>
+      {% endfor %}
+    </ol>
+  {% else %}
+    <p class="vacio">Todavía no hay ninguna unidad publicada.</p>
+  {% endif %}
+{% endblock %}

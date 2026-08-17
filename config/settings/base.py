@@ -81,6 +81,7 @@ INSTALLED_APPS = [
     "apps.analisis",
     "apps.ia",
     "apps.corpus",
+    "apps.estudio",
 ]
 
 MIDDLEWARE = [

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block titulo %}{{ unidad.titulo }} — TPIP{% endblock %}
+{% block contenido %}
+  <h1>{{ unidad.titulo }}</h1>
+  <p class="resumen">{{ unidad.resumen }}</p>
+
+  <article class="cuerpo-ficha">{{ cuerpo|safe }}</article>
+
+  {% if fichas %}
+    <section aria-labelledby="t-fuentes-estudio">
+      <h2 id="t-fuentes-estudio">Fuentes que estudia esta unidad</h2>
+      <ul>
+        {% for f in fichas %}
+          <li><a href="{% url 'corpus:ficha' ruta=f.ruta_fichero|cut:'.md' %}">{{ f.titulo }}</a></li>
+        {% endfor %}
+      </ul>
+    </section>
+  {% endif %}
+
+  <p><a href="{% url 'estudio:indice' %}">Volver al estudio</a></p>
+{% endblock %}
