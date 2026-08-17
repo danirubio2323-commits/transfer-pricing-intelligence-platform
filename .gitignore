@@ -219,7 +219,11 @@ __marimo__/
 
 # Local tooling artifacts
 .agents/
-.claude/
+# La configuracion del agente SI se versiona: reglas, skills y permisos son
+# parte del proyecto, no preferencias de una maquina. Lo dice §10 del
+# blueprint, en 'Ficheros que deben quedar versionados'. Lo unico que se
+# excluye es lo local de cada equipo.
+.claude/settings.local.json
 TPIP.bat.txt
 
 # Local execution script (machine-specific paths)
