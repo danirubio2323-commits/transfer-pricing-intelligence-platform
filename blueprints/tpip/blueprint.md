@@ -1544,7 +1544,10 @@ Ficheros:
 - `config/settings/base.py` — `BASE_DIR`, `INSTALLED_APPS` como arriba, `MIDDLEWARE` con seguridad,
   común, sesiones, CSRF, autenticación y mensajes, `ROOT_URLCONF`, `TEMPLATES` con `templates/` y los
   procesadores de contexto de `auth` y `messages`, `DATABASES` con SQLite en `BASE_DIR / "db.sqlite3"`,
-  `STATIC_URL`, `STATIC_ROOT = BASE_DIR / "staticfiles"`, `LANGUAGE_CODE = "es-es"`,
+  `STATIC_URL`, `STATIC_ROOT = BASE_DIR / "staticfiles"`, **`STATICFILES_DIRS = [BASE_DIR / "static"]`**
+  — sin esta última Django no encuentra `static/`: `{% static %}` devuelve una ruta y el navegador
+  un 404, y el `collectstatic` del paso 27 solo recoge lo del panel. La página se sirve sin estilos
+  y en silencio. Verificado ejecutándolo en el paso 13, `LANGUAGE_CODE = "es-es"`,
   `TIME_ZONE = "Europe/Madrid"`, `USE_TZ = True`, `DEFAULT_AUTO_FIELD`.
 - `config/settings/local.py` — importa todo de `base`, `DEBUG = True`,
   `ALLOWED_HOSTS = ["127.0.0.1", "localhost", "testserver"]`, y `SECRET_KEY` con un valor de desarrollo

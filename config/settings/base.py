@@ -117,6 +117,10 @@ DATABASES = {
 
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+#: Sin esto Django no encuentra `static/`: `{% static %}` devolvería una ruta y
+#: el navegador un 404, y `collectstatic` del paso 27 solo recogería lo del
+#: panel de administración. La página se serviría sin estilos, en silencio.
+STATICFILES_DIRS = [BASE_DIR / "static"]
 
 LANGUAGE_CODE = "es-es"
 TIME_ZONE = "Europe/Madrid"
