@@ -274,3 +274,10 @@ td form { margin: 0; }
   margin-top: var(--tpip-espacio-24);
   color: var(--tpip-muted);
 }
+
+.procedencia {
+  color: var(--tpip-muted);
+  font-size: var(--tpip-texto-xs);
+  border-top: 1px solid var(--tpip-rule);
+  padding-top: var(--tpip-espacio-8);
+}

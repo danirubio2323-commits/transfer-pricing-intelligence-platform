@@ -32,6 +32,13 @@
     <h2 id="t-ia">Fundamentación</h2>
     {% if resultado.ai_explanation %}
       <p>{{ resultado.ai_explanation.text }}</p>
+      {# El modelo y la versión de prompt viajan con la explicación: un informe
+         emitido hoy tiene que decir con qué se redactó. #}
+      <p class="procedencia">
+        Redactado por <code>{{ resultado.ai_explanation.model }}</code>,
+        prompt <code>{{ resultado.ai_explanation.prompt_version }}</code>.
+        La conclusión y las cifras son del motor.
+      </p>
     {% else %}
       <p class="vacio">Informe generado <strong>sin asistencia de IA</strong>.
         El análisis y su conclusión son íntegramente del motor.</p>
