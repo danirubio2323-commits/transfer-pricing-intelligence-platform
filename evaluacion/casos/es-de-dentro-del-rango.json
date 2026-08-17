@@ -1,0 +1,604 @@
+{
+  "id": "es-de-dentro-del-rango",
+  "descripcion": "Canon dentro del rango intercuartílico",
+  "entrada": {
+    "analysis_id": "TPIP-AF5E0C62",
+    "created_at": "2026-08-17T14:33:58.669075",
+    "engine_version": "0.2.0",
+    "dataset_version": "1.0",
+    "transaction": {
+      "id": null,
+      "description": "Canon dentro del rango intercuartílico",
+      "payer_country": "ES",
+      "recipient_country": "DE",
+      "transaction_type": "royalty",
+      "industry": "software",
+      "amount_eur": "1000000",
+      "rate_percent": "9.5",
+      "effective_date": "2026-01-01",
+      "method_hint": null
+    },
+    "method_applied": "cup",
+    "method_rationale": "CUP-based royalty benchmarking: el tipo de canon propuesto se contrasta con tipos de canon observados en operaciones comparables del mismo sector. Al comparar precio contra precio, el método aplicado es el de precio libre comparable (CUP). TNMM no procede aquí: exigiría contrastar el margen neto de una parte analizada, no el tipo de la operación.",
+    "benchmark": {
+      "percentile_10": 6.88,
+      "percentile_25": 8.35,
+      "percentile_50": 10.1,
+      "percentile_75": 11.2,
+      "percentile_90": 11.9,
+      "count_accepted": 19,
+      "percentile_method": "linear interpolation (numpy default)"
+    },
+    "comparables_accepted": [
+      {
+        "id": "comp_019",
+        "company_name": "Byteworks SL",
+        "country": "ES",
+        "industry": "software",
+        "royalty_rate": 8.3,
+        "gross_margin": 89.7,
+        "operating_margin": 28.3,
+        "data_year": 2025,
+        "source": "OECD TP Database (synthetic)"
+      },
+      {
+        "id": "comp_020",
+        "company_name": "Helvetic Cloud NV",
+        "country": "NL",
+        "industry": "software",
+        "royalty_rate": 10.0,
+        "gross_margin": 79.6,
+        "operating_margin": 17.4,
+        "data_year": 2025,
+        "source": "OECD TP Database (synthetic)"
+      },
+      {
+        "id": "comp_021",
+        "company_name": "Lyra Systems AG",
+        "country": "CH",
+        "industry": "software",
+        "royalty_rate": 13.9,
+        "gross_margin": 92.7,
+        "operating_margin": 31.7,
+        "data_year": 2024,
+        "source": "OECD TP Database (synthetic)"
+      },
+      {
+        "id": "comp_022",
+        "company_name": "Polder Software NV",
+        "country": "NL",
+        "industry": "software",
+        "royalty_rate": 7.1,
+        "gross_margin": 86.8,
+        "operating_margin": 12.8,
+        "data_year": 2024,
+        "source": "OECD TP Database (synthetic)"
+      },
+      {
+        "id": "comp_023",
+        "company_name": "Ebro Digital NV",
+        "country": "NL",
+        "industry": "software",
+        "royalty_rate": 6.9,
+        "gross_margin": 82.9,
+        "operating_margin": 24.8,
+        "data_year": 2024,
+        "source": "OECD TP Database (synthetic)"
+      },
+      {
+        "id": "comp_024",
+        "company_name": "Kernel Dynamics NV",
+        "country": "NL",
+        "industry": "software",
+        "royalty_rate": 10.1,
+        "gross_margin": 81.6,
+        "operating_margin": 25.3,
+        "data_year": 2024,
+        "source": "OECD TP Database (synthetic)"
+      },
+      {
+        "id": "comp_025",
+        "company_name": "Zurichsee Tech AG",
+        "country": "DE",
+        "industry": "software",
+        "royalty_rate": 14.0,
+        "gross_margin": 92.7,
+        "operating_margin": 15.5,
+        "data_year": 2024,
+        "source": "OECD TP Database (synthetic)"
+      },
+      {
+        "id": "comp_026",
+        "company_name": "Cortex Analytics SAS",
+        "country": "FR",
+        "industry": "software",
+        "royalty_rate": 10.7,
+        "gross_margin": 82.0,
+        "operating_margin": 28.3,
+        "data_year": 2024,
+        "source": "OECD TP Database (synthetic)"
+      },
+      {
+        "id": "comp_027",
+        "company_name": "Amstel Data SAS",
+        "country": "FR",
+        "industry": "software",
+        "royalty_rate": 11.1,
+        "gross_margin": 79.0,
+        "operating_margin": 23.3,
+        "data_year": 2024,
+        "source": "OECD TP Database (synthetic)"
+      },
+      {
+        "id": "comp_028",
+        "company_name": "Duero Software GmbH",
+        "country": "DE",
+        "industry": "software",
+        "royalty_rate": 6.8,
+        "gross_margin": 88.6,
+        "operating_margin": 29.5,
+        "data_year": 2024,
+        "source": "OECD TP Database (synthetic)"
+      },
+      {
+        "id": "comp_029",
+        "company_name": "Spree Labs SA",
+        "country": "FR",
+        "industry": "software",
+        "royalty_rate": 8.4,
+        "gross_margin": 86.1,
+        "operating_margin": 14.2,
+        "data_year": 2024,
+        "source": "OECD TP Database (synthetic)"
+      },
+      {
+        "id": "comp_030",
+        "company_name": "Aletsch Systems AG",
+        "country": "DE",
+        "industry": "software",
+        "royalty_rate": 8.8,
+        "gross_margin": 88.5,
+        "operating_margin": 30.2,
+        "data_year": 2024,
+        "source": "OECD TP Database (synthetic)"
+      },
+      {
+        "id": "comp_031",
+        "company_name": "Garonne Digital BV",
+        "country": "NL",
+        "industry": "software",
+        "royalty_rate": 10.8,
+        "gross_margin": 86.6,
+        "operating_margin": 16.9,
+        "data_year": 2024,
+        "source": "OECD TP Database (synthetic)"
+      },
+      {
+        "id": "comp_032",
+        "company_name": "Maasdata GmbH",
+        "country": "DE",
+        "industry": "software",
+        "royalty_rate": 9.1,
+        "gross_margin": 79.1,
+        "operating_margin": 29.2,
+        "data_year": 2025,
+        "source": "OECD TP Database (synthetic)"
+      },
+      {
+        "id": "comp_033",
+        "company_name": "Tajo Cloud NV",
+        "country": "NL",
+        "industry": "software",
+        "royalty_rate": 11.4,
+        "gross_margin": 86.1,
+        "operating_margin": 32.8,
+        "data_year": 2025,
+        "source": "OECD TP Database (synthetic)"
+      },
+      {
+        "id": "comp_034",
+        "company_name": "Isar Platforms AG",
+        "country": "DE",
+        "industry": "software",
+        "royalty_rate": 11.4,
+        "gross_margin": 74.9,
+        "operating_margin": 12.8,
+        "data_year": 2024,
+        "source": "OECD TP Database (synthetic)"
+      },
+      {
+        "id": "comp_035",
+        "company_name": "Lemanic Software AG",
+        "country": "CH",
+        "industry": "software",
+        "royalty_rate": 6.4,
+        "gross_margin": 86.6,
+        "operating_margin": 25.7,
+        "data_year": 2024,
+        "source": "OECD TP Database (synthetic)"
+      },
+      {
+        "id": "comp_036",
+        "company_name": "Seine Analytics AG",
+        "country": "DE",
+        "industry": "software",
+        "royalty_rate": 11.3,
+        "gross_margin": 91.4,
+        "operating_margin": 26.4,
+        "data_year": 2024,
+        "source": "OECD TP Database (synthetic)"
+      },
+      {
+        "id": "comp_037",
+        "company_name": "Batavia Systems GmbH",
+        "country": "DE",
+        "industry": "software",
+        "royalty_rate": 11.1,
+        "gross_margin": 87.9,
+        "operating_margin": 12.1,
+        "data_year": 2024,
+        "source": "OECD TP Database (synthetic)"
+      }
+    ],
+    "comparables_rejected": [
+      {
+        "comparable_id": "comp_001",
+        "company_name": "Nordwind Pharma GmbH",
+        "reason": "industry_mismatch",
+        "detail": "Industria 'pharmaceutical' distinta de la operación analizada ('software')."
+      },
+      {
+        "comparable_id": "comp_002",
+        "company_name": "Helvetia Biosciences GmbH",
+        "reason": "industry_mismatch",
+        "detail": "Industria 'pharmaceutical' distinta de la operación analizada ('software')."
+      },
+      {
+        "comparable_id": "comp_003",
+        "company_name": "Rhein Therapeutics SA",
+        "reason": "industry_mismatch",
+        "detail": "Industria 'pharmaceutical' distinta de la operación analizada ('software')."
+      },
+      {
+        "comparable_id": "comp_004",
+        "company_name": "Lumiere Pharma AG",
+        "reason": "industry_mismatch",
+        "detail": "Industria 'pharmaceutical' distinta de la operación analizada ('software')."
+      },
+      {
+        "comparable_id": "comp_005",
+        "company_name": "Delta Biopharm AG",
+        "reason": "industry_mismatch",
+        "detail": "Industria 'pharmaceutical' distinta de la operación analizada ('software')."
+      },
+      {
+        "comparable_id": "comp_006",
+        "company_name": "Iberia Life Sciences SL",
+        "reason": "industry_mismatch",
+        "detail": "Industria 'pharmaceutical' distinta de la operación analizada ('software')."
+      },
+      {
+        "comparable_id": "comp_007",
+        "company_name": "Alpenland Pharma NV",
+        "reason": "industry_mismatch",
+        "detail": "Industria 'pharmaceutical' distinta de la operación analizada ('software')."
+      },
+      {
+        "comparable_id": "comp_008",
+        "company_name": "Bruggen Medical SA",
+        "reason": "industry_mismatch",
+        "detail": "Industria 'pharmaceutical' distinta de la operación analizada ('software')."
+      },
+      {
+        "comparable_id": "comp_009",
+        "company_name": "Cortex Pharma SA",
+        "reason": "industry_mismatch",
+        "detail": "Industria 'pharmaceutical' distinta de la operación analizada ('software')."
+      },
+      {
+        "comparable_id": "comp_010",
+        "company_name": "Sequana Biotech AG",
+        "reason": "industry_mismatch",
+        "detail": "Industria 'pharmaceutical' distinta de la operación analizada ('software')."
+      },
+      {
+        "comparable_id": "comp_011",
+        "company_name": "Meridian Pharma SL",
+        "reason": "industry_mismatch",
+        "detail": "Industria 'pharmaceutical' distinta de la operación analizada ('software')."
+      },
+      {
+        "comparable_id": "comp_012",
+        "company_name": "Vandermeer Pharma NV",
+        "reason": "industry_mismatch",
+        "detail": "Industria 'pharmaceutical' distinta de la operación analizada ('software')."
+      },
+      {
+        "comparable_id": "comp_013",
+        "company_name": "Weser Biolabs SA",
+        "reason": "industry_mismatch",
+        "detail": "Industria 'pharmaceutical' distinta de la operación analizada ('software')."
+      },
+      {
+        "comparable_id": "comp_014",
+        "company_name": "Aurora Pharma SA",
+        "reason": "industry_mismatch",
+        "detail": "Industria 'pharmaceutical' distinta de la operación analizada ('software')."
+      },
+      {
+        "comparable_id": "comp_015",
+        "company_name": "Tessin Therapeutics SA",
+        "reason": "industry_mismatch",
+        "detail": "Industria 'pharmaceutical' distinta de la operación analizada ('software')."
+      },
+      {
+        "comparable_id": "comp_016",
+        "company_name": "Castilla Biotech AG",
+        "reason": "industry_mismatch",
+        "detail": "Industria 'pharmaceutical' distinta de la operación analizada ('software')."
+      },
+      {
+        "comparable_id": "comp_017",
+        "company_name": "Zuiderzee Pharma AG",
+        "reason": "industry_mismatch",
+        "detail": "Industria 'pharmaceutical' distinta de la operación analizada ('software')."
+      },
+      {
+        "comparable_id": "comp_018",
+        "company_name": "Konstanz Biopharm SA",
+        "reason": "industry_mismatch",
+        "detail": "Industria 'pharmaceutical' distinta de la operación analizada ('software')."
+      },
+      {
+        "comparable_id": "comp_038",
+        "company_name": "Stahlwerk Nord AG",
+        "reason": "industry_mismatch",
+        "detail": "Industria 'manufacturing' distinta de la operación analizada ('software')."
+      },
+      {
+        "comparable_id": "comp_039",
+        "company_name": "Jura Precision AG",
+        "reason": "industry_mismatch",
+        "detail": "Industria 'manufacturing' distinta de la operación analizada ('software')."
+      },
+      {
+        "comparable_id": "comp_040",
+        "company_name": "Loire Industries SA",
+        "reason": "industry_mismatch",
+        "detail": "Industria 'manufacturing' distinta de la operación analizada ('software')."
+      },
+      {
+        "comparable_id": "comp_041",
+        "company_name": "Zeeland Manufacturing BV",
+        "reason": "industry_mismatch",
+        "detail": "Industria 'manufacturing' distinta de la operación analizada ('software')."
+      },
+      {
+        "comparable_id": "comp_042",
+        "company_name": "Ebro Metalworks SAS",
+        "reason": "industry_mismatch",
+        "detail": "Industria 'manufacturing' distinta de la operación analizada ('software')."
+      },
+      {
+        "comparable_id": "comp_043",
+        "company_name": "Ruhr Components GmbH",
+        "reason": "industry_mismatch",
+        "detail": "Industria 'manufacturing' distinta de la operación analizada ('software')."
+      },
+      {
+        "comparable_id": "comp_044",
+        "company_name": "Ticino Precision SL",
+        "reason": "industry_mismatch",
+        "detail": "Industria 'manufacturing' distinta de la operación analizada ('software')."
+      },
+      {
+        "comparable_id": "comp_045",
+        "company_name": "Rhone Industrial NV",
+        "reason": "industry_mismatch",
+        "detail": "Industria 'manufacturing' distinta de la operación analizada ('software')."
+      },
+      {
+        "comparable_id": "comp_046",
+        "company_name": "Delta Werktuig BV",
+        "reason": "industry_mismatch",
+        "detail": "Industria 'manufacturing' distinta de la operación analizada ('software')."
+      },
+      {
+        "comparable_id": "comp_047",
+        "company_name": "Cantabria Steel SA",
+        "reason": "industry_mismatch",
+        "detail": "Industria 'manufacturing' distinta de la operación analizada ('software')."
+      },
+      {
+        "comparable_id": "comp_048",
+        "company_name": "Elbe Machinery AG",
+        "reason": "industry_mismatch",
+        "detail": "Industria 'manufacturing' distinta de la operación analizada ('software')."
+      },
+      {
+        "comparable_id": "comp_049",
+        "company_name": "Valais Components SA",
+        "reason": "industry_mismatch",
+        "detail": "Industria 'manufacturing' distinta de la operación analizada ('software')."
+      },
+      {
+        "comparable_id": "comp_050",
+        "company_name": "Somme Industries AG",
+        "reason": "industry_mismatch",
+        "detail": "Industria 'manufacturing' distinta de la operación analizada ('software')."
+      },
+      {
+        "comparable_id": "comp_051",
+        "company_name": "Twente Machinery SA",
+        "reason": "industry_mismatch",
+        "detail": "Industria 'manufacturing' distinta de la operación analizada ('software')."
+      },
+      {
+        "comparable_id": "comp_052",
+        "company_name": "Galicia Forge SA",
+        "reason": "industry_mismatch",
+        "detail": "Industria 'manufacturing' distinta de la operación analizada ('software')."
+      },
+      {
+        "comparable_id": "comp_053",
+        "company_name": "Main Systems SL",
+        "reason": "industry_mismatch",
+        "detail": "Industria 'manufacturing' distinta de la operación analizada ('software')."
+      },
+      {
+        "comparable_id": "comp_054",
+        "company_name": "Aare Precision SAS",
+        "reason": "industry_mismatch",
+        "detail": "Industria 'manufacturing' distinta de la operación analizada ('software')."
+      },
+      {
+        "comparable_id": "comp_055",
+        "company_name": "Picardie Metals SAS",
+        "reason": "industry_mismatch",
+        "detail": "Industria 'manufacturing' distinta de la operación analizada ('software')."
+      }
+    ],
+    "assessments": [
+      {
+        "country": "ES",
+        "role": "payer",
+        "range_rule": "no_statutory_rule",
+        "position": "within_iqr",
+        "defensibility_level": "strong",
+        "defensibility_score": 9,
+        "adjusted_rate": null,
+        "consequence": "ES: el tipo se sitúa dentro del rango intercuartílico (8.35%-11.2%). El Art. 18.4 LIS no impone regla estadística; la posición es defendible con la documentación del método.",
+        "source_ids": [
+          "es-lis-art18-4",
+          "oecd-tpg-2022-cap3"
+        ]
+      },
+      {
+        "country": "DE",
+        "role": "recipient",
+        "range_rule": "interquartile_median_adjustment",
+        "position": "within_iqr",
+        "defensibility_level": "strong",
+        "defensibility_score": 9,
+        "adjusted_rate": null,
+        "consequence": "DE: el tipo se sitúa dentro del rango intercuartílico (8.35%-11.2%). El §1.3a AStG no habilita ajuste.",
+        "source_ids": [
+          "de-astg-1-3a",
+          "oecd-tpg-2022-cap3"
+        ]
+      }
+    ],
+    "risk_factors": [
+      {
+        "code": "synthetic_data",
+        "severity": "info",
+        "message": "Los comparables empleados son sintéticos. Este análisis demuestra el funcionamiento del motor y no constituye un estudio de benchmarking oponible ante una administración.",
+        "source_ids": [
+          "tpip-dataset-v1"
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "id": "tpip-dataset-v1",
+        "kind": "dataset",
+        "citation": "TPIP — dataset de comparables sintético v1",
+        "pinpoint": null,
+        "official_ref": null,
+        "research_note": "documentation/tax-research/frameworks/criterios-seleccion-comparables.md",
+        "disclaimer": "DATOS SINTÉTICOS. Los comparables no proceden de compañías reales ni de bases comerciales (Orbis, Amadeus, Bloomberg). Son valores generados con rangos plausibles por sector para demostrar el funcionamiento del motor. Ningún resultado de esta herramienta constituye un estudio de benchmarking utilizable ante una administración tributaria.",
+        "jurisdiction": "GLOBAL",
+        "locator_type": "internal",
+        "locator": "tp_domain/comparables.json",
+        "verified_at": "2026-08-10",
+        "verification_confidence": null,
+        "quote": null,
+        "in_force_from": null,
+        "in_force_to": null,
+        "superseded_by": null
+      },
+      {
+        "id": "oecd-tpg-2022-cap6",
+        "kind": "guidelines",
+        "citation": "OECD Transfer Pricing Guidelines 2022, Cap. VI",
+        "pinpoint": "Intangibles — marco DEMPE (párr. 6.34); propiedad legal no confiere el retorno (párr. 6.42)",
+        "official_ref": null,
+        "research_note": "documentation/tax-research/frameworks/ocde-directrices-2022-marcos-riesgo-dempe-servicios.md",
+        "disclaimer": "Publicación OCDE de pago, sin identificador público equivalente a CELEX/ELI: localizador OFFLINE contra el PDF adquirido en el corpus local.",
+        "jurisdiction": "OECD",
+        "locator_type": "offline",
+        "locator": "raw/Normativa_Internacional/OCDE_BEPS/OCDE, Transfer Pricing Guidelines (ene 2022) Directrices Precios de Transferencia.pdf — p. 259 impresa (índice PDF 260), párr. 6.42",
+        "verified_at": "2026-08-10",
+        "verification_confidence": "primary_source_verified",
+        "quote": "6.42. ... For transfer pricing purposes, legal ownership of intangibles, by itself, does not confer any right ultimately to retain returns derived by the MNE group from exploiting the intangible ... The return ultimately retained by or attributed to the legal owner depends upon the functions it performs, the assets it uses, and the risks it assumes.",
+        "in_force_from": null,
+        "in_force_to": null,
+        "superseded_by": null
+      },
+      {
+        "id": "es-lis-art18-4",
+        "kind": "legislation",
+        "citation": "Ley 27/2014, del Impuesto sobre Sociedades, Art. 18.4",
+        "pinpoint": "Art. 18.4 — determinación del valor de mercado",
+        "official_ref": "BOE-A-2014-12328",
+        "research_note": "documentation/tax-research/jurisdictions/spain/art18-lis-operaciones-vinculadas.md",
+        "disclaimer": "El Art. 18.4 LIS no contiene regla estadística: no impone rango intercuartílico ni ajuste a la mediana. Exige aplicar el método más adecuado de entre los cinco de la OCDE.",
+        "jurisdiction": "ES",
+        "locator_type": "boe_id",
+        "locator": "BOE-A-2014-12328",
+        "verified_at": "2026-08-10",
+        "verification_confidence": "primary_source_verified",
+        "quote": null,
+        "in_force_from": null,
+        "in_force_to": null,
+        "superseded_by": null
+      },
+      {
+        "id": "oecd-tpg-2022-cap3",
+        "kind": "guidelines",
+        "citation": "OECD Transfer Pricing Guidelines 2022, Cap. III",
+        "pinpoint": "Análisis de comparabilidad y rango de plena competencia (párr. 3.55-3.59)",
+        "official_ref": null,
+        "research_note": "documentation/tax-research/frameworks/ocde-directrices-2022-marcos-riesgo-dempe-servicios.md",
+        "disclaimer": "Las Directrices no imponen un método de cálculo de percentiles. La convención empleada se declara en el propio informe. Publicación OCDE de pago, sin identificador público equivalente a CELEX/ELI: localizador OFFLINE contra el PDF adquirido en el corpus local. El Capítulo III no estaba investigado en ninguna ficha de Cerebros_Fiscales antes de Fase 1 — la ficha derivada de TPIP solo cubría los Capítulos I, VI y VII.",
+        "jurisdiction": "OECD",
+        "locator_type": "offline",
+        "locator": "raw/Normativa_Internacional/OCDE_BEPS/OCDE, Transfer Pricing Guidelines (ene 2022) Directrices Precios de Transferencia.pdf — p. 165 impresa (índice PDF 166), párr. 3.55-3.59",
+        "verified_at": "2026-08-10",
+        "verification_confidence": "primary_source_verified",
+        "quote": "3.57. ... In such cases, if the range includes a sizeable number of observations, statistical tools that take account of central tendency to narrow the range (e.g. the interquartile range or other percentiles) might help to enhance the reliability of the analysis.",
+        "in_force_from": null,
+        "in_force_to": null,
+        "superseded_by": null
+      },
+      {
+        "id": "de-astg-1-3a",
+        "kind": "legislation",
+        "citation": "Außensteuergesetz (AStG), §1.3a",
+        "pinpoint": "§1.3a — estrechamiento del rango y ajuste a la mediana",
+        "official_ref": "AStG §1 Abs. 3a",
+        "research_note": "documentation/tax-research/jurisdictions/germany/astg-rango-intercuartilico-ajuste-mediana.md",
+        "disclaimer": "La ficha de investigación original marcaba la lectura del §1.3 como dirigida, no exhaustiva. En Fase 1 (2026-08-10) se verificó el texto vigente del §1 Abs. 3a contra el portal oficial gesetze-im-internet.de (Bundesministerium der Justiz), coincidente con la copia en `raw/Derecho_Comparado/Alemania/`. Queda pendiente de re-verificación periódica: no existe MCP de vigilancia normativa alemana equivalente a MCP-BOE.",
+        "jurisdiction": "DE",
+        "locator_type": "url",
+        "locator": "https://www.gesetze-im-internet.de/astg/__1.html",
+        "verified_at": "2026-08-10",
+        "verification_confidence": "primary_source_verified",
+        "quote": "(3a) ... Liegt der vom Steuerpflichtigen für seine Einkünfteermittlung verwendete Wert außerhalb der Bandbreite gemäß Satz 1 oder der eingeengten Bandbreite, ist der Median maßgeblich, wenn der Steuerpflichtige nicht glaubhaft macht, dass ein anderer Wert innerhalb der Bandbreite dem Fremdvergleichsgrundsatz besser entspricht.",
+        "in_force_from": null,
+        "in_force_to": null,
+        "superseded_by": null
+      }
+    ],
+    "conclusion": "Canon del 9.5% (software), ES → DE. Posición defendible en ambas jurisdicciones analizadas. ES: el tipo se sitúa dentro del rango intercuartílico (8.35%-11.2%). El Art. 18.4 LIS no impone regla estadística; la posición es defendible con la documentación del método. DE: el tipo se sitúa dentro del rango intercuartílico (8.35%-11.2%). El §1.3a AStG no habilita ajuste.",
+    "ai_explanation": null
+  },
+  "propiedades_esperadas": {
+    "debe_citar_alguna_de": [
+      "es-lis-art18-4",
+      "de-astg-1-3a"
+    ],
+    "debe_mencionar_ajuste_a_la_mediana": false
+  },
+  "activo": true
+}

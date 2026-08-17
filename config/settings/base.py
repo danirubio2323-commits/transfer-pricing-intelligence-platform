@@ -82,6 +82,7 @@ INSTALLED_APPS = [
     "apps.ia",
     "apps.corpus",
     "apps.estudio",
+    "apps.evaluacion",
 ]
 
 MIDDLEWARE = [
