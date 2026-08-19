@@ -56,6 +56,13 @@ def benchmark_range_svg(result: AnalysisResult) -> Optional[str]:
         f'xmlns="http://www.w3.org/2000/svg" '
         f'style="font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif">',
 
+        # El <title> es lo que anuncia un lector de pantalla. Dice en texto lo
+        # mismo que el gráfico muestra: sin él, la imagen es un hueco mudo.
+        f'<title>Rango de plena competencia: P10 {benchmark.percentile_10}%, '
+        f'mediana {benchmark.percentile_50}%, P90 {benchmark.percentile_90}%. '
+        f'El tipo analizado, {rate}%, queda '
+        f'{"dentro" if inside else "fuera"} del rango intercuartílico.</title>',
+
         # Banda P10-P90
         f'<rect x="{x("p10"):.1f}" y="{_BAND_TOP}" '
         f'width="{x("p90") - x("p10"):.1f}" height="{_BAND_HEIGHT}" '

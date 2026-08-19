@@ -35,7 +35,7 @@
     <p class="aviso-sintetico"><strong>DATOS SINTÉTICOS.</strong>
       Los comparables de esta herramienta son sintéticos. Ningún resultado sirve
       para sustentar una posición fiscal ante una administración tributaria.</p>
-    {% block pie_privacidad %}{% endblock %}
+    {% if user.is_authenticated %}{% include "partials/_privacidad.html" %}{% endif %}
   </footer>
 </body>
 </html>

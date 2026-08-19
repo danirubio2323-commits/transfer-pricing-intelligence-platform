@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block titulo %}Privacidad — TPIP{% endblock %}
+{% block contenido %}
+  <h1>Qué se guarda y quién puede verlo</h1>
+
+  <section aria-labelledby="t-que">
+    <h2 id="t-que">Qué se guarda</h2>
+    <ul>
+      <li><strong>Tus casos.</strong> Los datos de la operación que introduces y el
+        resultado completo que calcula el motor, incluida la explicación de IA si la hubo.</li>
+      <li><strong>Tu cuenta.</strong> Usuario, correo y el tope de gasto mensual.</li>
+      <li><strong>Cada llamada al modelo.</strong> Qué modelo, cuántos tokens reportó el
+        proveedor, el coste y la latencia. <strong>Nunca el contenido de la respuesta</strong>,
+        ni el texto que escribiste.</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="t-quien">
+    <h2 id="t-quien">Quién puede verlo</h2>
+    <p>Tú ves solo tus casos: pedir el de otra persona responde «no encontrado»,
+       igual que pedir uno que no existe.</p>
+    <p><strong>Las cuentas con permiso de administración pueden acceder a los casos
+       de cualquier usuario.</strong> Se dice aquí sin rodeos porque es un hecho del
+       sistema, no un detalle: hace falta para dar de alta y de baja cuentas, curar
+       precedentes y revisar el gasto.</p>
+  </section>
+
+  <section aria-labelledby="t-donde">
+    <h2 id="t-donde">Dónde</h2>
+    <p>En un único fichero de base de datos, en el equipo donde corre la aplicación.
+       No se envía a ningún servicio externo. La única salida a la red es la llamada
+       al modelo, y solo si hay clave configurada.</p>
+  </section>
+
+  <section aria-labelledby="t-cuanto">
+    <h2 id="t-cuanto">Cuánto tiempo, y cómo se borra</h2>
+    <p>Los casos se conservan hasta que los borras. El borrado es <strong>suave</strong>:
+       la fila permanece marcada como borrada y deja de ser accesible, de modo que un
+       borrado accidental sea reversible y el gasto siga siendo auditable.</p>
+    <p>Para un borrado definitivo o la baja de una cuenta, pídelo a quien administra.
+       Dar de baja una cuenta la desactiva; nunca destruye sus análisis, porque las
+       claves están protegidas contra el borrado en cascada.</p>
+  </section>
+
+  <section aria-labelledby="t-sinteticos">
+    <h2 id="t-sinteticos">Y un recordatorio</h2>
+    <p>Los comparables de esta herramienta son <strong>sintéticos</strong>. Ningún
+       resultado sirve para sustentar una posición fiscal ante una administración
+       tributaria.</p>
+  </section>
+{% endblock %}

@@ -19,24 +19,26 @@
   </form>
 
   {% if fichas %}
-    <table>
-      <thead>
-        <tr>
-          <th scope="col">Ficha</th><th scope="col">Jurisdicción</th>
-          <th scope="col">Rango</th><th scope="col">Verificada</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for f in fichas %}
+    <div class="tabla-ancha">
+      <table>
+        <thead>
           <tr>
-            <td><a href="{% url 'corpus:ficha' ruta=f.ruta_fichero|cut:'.md' %}">{{ f.titulo }}</a></td>
-            <td>{{ f.jurisdiccion }}</td>
-            <td>{{ f.rango_normativo }}</td>
-            <td>{{ f.verificada_el|date:"d/m/Y" }}</td>
+            <th scope="col">Ficha</th><th scope="col">Jurisdicción</th>
+            <th scope="col">Rango</th><th scope="col">Verificada</th>
           </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {% for f in fichas %}
+            <tr>
+              <td><a href="{% url 'corpus:ficha' ruta=f.ruta_fichero|cut:'.md' %}">{{ f.titulo }}</a></td>
+              <td>{{ f.jurisdiccion }}</td>
+              <td>{{ f.rango_normativo }}</td>
+              <td>{{ f.verificada_el|date:"d/m/Y" }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   {% else %}
     <p class="vacio">Ninguna ficha en esta jurisdicción.</p>
   {% endif %}

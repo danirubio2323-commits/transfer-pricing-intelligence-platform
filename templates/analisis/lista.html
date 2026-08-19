@@ -24,26 +24,28 @@
   </form>
 
   {% if pagina.object_list %}
-    <table>
-      <thead>
-        <tr><th scope="col">Caso</th><th scope="col">Fecha</th><th scope="col">Motor</th><th scope="col"></th></tr>
-      </thead>
-      <tbody>
-        {% for caso in pagina %}
-          <tr>
-            <td><a href="{% url 'analisis:detalle' pk=caso.pk %}">{{ caso.titulo }}</a></td>
-            <td>{{ caso.created_at|date:"d/m/Y H:i" }}</td>
-            <td>{{ caso.engine_version }}</td>
-            <td>
-              <form method="post" action="{% url 'analisis:borrar' pk=caso.pk %}">
-                {% csrf_token %}
-                <button type="submit" class="destructivo">Borrar</button>
-              </form>
-            </td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+    <div class="tabla-ancha">
+      <table>
+        <thead>
+          <tr><th scope="col">Caso</th><th scope="col">Fecha</th><th scope="col">Motor</th><th scope="col"></th></tr>
+        </thead>
+        <tbody>
+          {% for caso in pagina %}
+            <tr>
+              <td><a href="{% url 'analisis:detalle' pk=caso.pk %}">{{ caso.titulo }}</a></td>
+              <td>{{ caso.created_at|date:"d/m/Y H:i" }}</td>
+              <td>{{ caso.engine_version }}</td>
+              <td>
+                <form method="post" action="{% url 'analisis:borrar' pk=caso.pk %}">
+                  {% csrf_token %}
+                  <button type="submit" class="destructivo">Borrar</button>
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
 
     {% if pagina.has_other_pages %}
       <nav class="paginacion" aria-label="Paginación">

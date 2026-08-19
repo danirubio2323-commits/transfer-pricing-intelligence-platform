@@ -52,6 +52,14 @@ a { color: var(--tpip-focus); }
   outline-offset: 2px;
 }
 
+/* Nadie apunta con la precisión de un pixel. 24x24 px CSS es el suelo de
+   2.5.8; se declara aquí y no control a control para que un botón nuevo lo
+   herede sin que haya que acordarse. */
+button, .boton, input[type="submit"], input[type="checkbox"], input[type="radio"] {
+  min-height: 24px;
+  min-width: 24px;
+}
+
 .salto {
   position: absolute;
   left: -9999px;
@@ -160,7 +168,6 @@ input, select, textarea {
   border: 1px solid var(--tpip-border-strong);
   border-radius: var(--tpip-radio-control);
   font: inherit;
-  transition: border-color var(--tpip-transicion);
 }
 input:hover, select:hover, textarea:hover { border-color: var(--tpip-focus); }
 
@@ -173,7 +180,6 @@ button {
   font: inherit;
   font-weight: 600;
   cursor: pointer;
-  transition: opacity var(--tpip-transicion);
 }
 button:hover { opacity: 0.88; }
 
@@ -201,11 +207,13 @@ li { margin-bottom: var(--tpip-espacio-8); }
 /* Movimiento: solo si nadie ha pedido lo contrario                        */
 /* --------------------------------------------------------------------- */
 
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    transition-duration: 0.01ms !important;
-    animation-duration: 0.01ms !important;
-  }
+/* La ausencia de movimiento es el punto de partida, y el movimiento se AÑADE
+   solo a quien no ha pedido lo contrario. Al revés —animar por defecto y luego
+   desactivar— cualquier transición que se olvide de la excepción se cuela. */
+@media (prefers-reduced-motion: no-preference) {
+  input, select, textarea { transition: border-color var(--tpip-transicion); }
+  button, .boton { transition: opacity var(--tpip-transicion); }
+  tbody tr { transition: background-color var(--tpip-transicion); }
 }
 
 /* --------------------------------------------------------------------- */
@@ -222,7 +230,6 @@ li { margin-bottom: var(--tpip-espacio-8); }
   text-decoration: none;
   font-weight: 600;
   border-radius: var(--tpip-radio-control);
-  transition: opacity var(--tpip-transicion);
 }
 .boton:hover { opacity: 0.88; }
 
@@ -238,6 +245,14 @@ li { margin-bottom: var(--tpip-espacio-8); }
   margin-bottom: var(--tpip-espacio-24);
 }
 .filtros .campo { margin-bottom: 0; max-width: 16rem; }
+
+/* La tabla no se encoge hasta ser ilegible: se desplaza dentro de su propio
+   contenedor. Poner el overflow en la pagina obligaria a mover TODA la
+   pantalla en horizontal para leer una columna. */
+.tabla-ancha {
+  overflow-x: auto;
+  margin-bottom: var(--tpip-espacio-24);
+}
 
 table {
   width: 100%;
@@ -256,7 +271,6 @@ thead th {
   letter-spacing: 0.04em;
   color: var(--tpip-muted);
 }
-tbody tr { transition: background-color var(--tpip-transicion); }
 tbody tr:hover { background: var(--tpip-surface); }
 td form { margin: 0; }
 

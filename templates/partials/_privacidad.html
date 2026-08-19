@@ -1,0 +1,11 @@
+{# El aviso de privacidad, en un parcial: se muestra en el pie de toda página
+   y también junto al formulario, que es el momento en que alguien está a punto
+   de escribir el dato. Decirlo solo en el pie sería decirlo tarde. #}
+<div class="aviso-privacidad">
+  <p><strong>Quién ve esto.</strong> Las cuentas con permiso de administración pueden
+     acceder a los casos de <em>cualquier</em> usuario, para dar de alta y de baja
+     cuentas, curar precedentes y revisar el gasto. De cada llamada al modelo se
+     registra el modelo usado, los tokens que reporta el proveedor, el coste y la
+     latencia — nunca el contenido de la respuesta.</p>
+  <p><a href="{% url 'comun:privacidad' %}">Qué se guarda, dónde y cómo se borra</a></p>
+</div>
