@@ -3209,16 +3209,21 @@ git tag step-25-accesibilidad
 uv run pytest tests/web/test_seguridad.py -q
 if ($LASTEXITCODE -ne 0) { throw 'las pruebas de seguridad fallan' }   # expect: exit 0, 0 failed, 0 skipped
 
-$env:DJANGO_SECRET_KEY = 'clave-solo-para-esta-comprobacion-no-usar'
+# 50 caracteres como minimo: por debajo, `check --deploy` avisa (W009) y
+# 'cero avisos' seria inalcanzable con una clave corta.
+$env:DJANGO_SECRET_KEY = 'clave-larga-solo-para-esta-comprobacion-no-usar-jamas-en-produccion'
 uv run python manage.py check --deploy --settings=config.settings.production
 if ($LASTEXITCODE -ne 0) { throw 'check --deploy senala problemas' }   # expect: exit 0, cero avisos
 Remove-Item Env:\DJANGO_SECRET_KEY
 
 # Sin clave, produccion NO arranca. No basta con "sale distinto de cero" —un error de uso
 # tambien lo haria—: se comprueba que el fallo NOMBRA la variable que falta.
-$salida = uv run python -c "import os; os.environ.pop('DJANGO_SECRET_KEY', None); os.environ['DJANGO_SETTINGS_MODULE']='config.settings.production'; import django; django.setup(); print('ARRANCO SIN CLAVE')" 2>&1 | Out-String
-if ($salida -match 'ARRANCO SIN CLAVE') { throw 'produccion arranca sin DJANGO_SECRET_KEY' }
-if ($salida -notmatch 'DJANGO_SECRET_KEY') { throw "produccion fallo por otro motivo, no por la clave: $salida" }
+# Las dos corrientes se miran POR SEPARADO: la traza de Python echoa la linea
+# `-c` entera, asi que el centinela aparece en stderr aunque nada haya arrancado.
+$normal = uv run python -c "import os; os.environ.pop('DJANGO_SECRET_KEY', None); os.environ['DJANGO_SETTINGS_MODULE']='config.settings.production'; import django; django.setup(); print('ARRANCO SIN CLAVE')" 2>$null | Out-String
+if ($normal -match 'ARRANCO SIN CLAVE') { throw 'produccion arranca sin DJANGO_SECRET_KEY' }
+$error_ = uv run python -c "import os; os.environ.pop('DJANGO_SECRET_KEY', None); os.environ['DJANGO_SETTINGS_MODULE']='config.settings.production'; import django; django.setup()" 2>&1 | Out-String
+if ($error_ -notmatch 'DJANGO_SECRET_KEY') { throw "produccion fallo por otro motivo, no por la clave: $error_" }
 
 uv run python manage.py check
 if ($LASTEXITCODE -ne 0) { throw 'el gate local se ha roto' }

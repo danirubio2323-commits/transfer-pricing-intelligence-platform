@@ -88,11 +88,18 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    # WhiteNoise va DETRAS de SecurityMiddleware y delante de todo lo demas: asi
+    # los estaticos salen con las cabeceras de seguridad puestas y sin pasar por
+    # sesiones ni autenticacion, que para un fichero CSS no pintan nada.
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
+    # Sin esta, `X_FRAME_OPTIONS` es una variable que nadie lee: la cabecera que
+    # impide enmarcar la aplicacion en un iframe ajeno la escribe este middleware.
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "apps.comun.middleware.ExigirAutenticacion",
 ]
 
@@ -126,6 +133,21 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 #: el navegador un 404, y `collectstatic` del paso 27 solo recogería lo del
 #: panel de administración. La página se serviría sin estilos, en silencio.
 STATICFILES_DIRS = [BASE_DIR / "static"]
+
+#: WhiteNoise comprime los estaticos en `collectstatic` y los sirve el.
+#:
+#: Aqui va la variante SIN manifiesto, a proposito. La variante `Manifest` exige
+#: que `collectstatic` haya corrido antes de resolver un solo `{% static %}`, y
+#: el corredor de pruebas fuerza `DEBUG = False`: con ella en base, la suite
+#: entera revienta con «Missing staticfiles manifest entry» en cuanto se
+#: renderiza una plantilla. `production.py` si la activa, que es donde el fallo
+#: al construir es lo que se quiere.
+STORAGES = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+    },
+}
 
 LANGUAGE_CODE = "es-es"
 TIME_ZONE = "Europe/Madrid"
