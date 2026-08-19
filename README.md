@@ -1,78 +1,154 @@
 # Transfer Pricing Intelligence Platform (TPIP)
 
-![Tests](https://github.com/danirubio2323-commits/transfer-pricing-intelligence-platform/actions/workflows/tests.yml/badge.svg)
+![Gate](https://github.com/danirubio2323-commits/transfer-pricing-intelligence-platform/actions/workflows/ci.yml/badge.svg)
 
-TP analysis platform for transfer pricing validation
+Contrasta el tipo de un canon intragrupo contra un rango de plena competencia y dice, por cada
+jurisdicción implicada, qué le pasa a ese tipo según el Derecho de esa jurisdicción.
 
-## Quick Start
+> **Los comparables son sintéticos.** El aviso `DATOS SINTÉTICOS` aparece en la portada, en el cuerpo
+> y en el pie de cada informe, y no se quita. Ningún resultado de esta herramienta sirve ante una
+> administración tributaria.
 
-### 1. Install dependencies
+## Puesta en marcha
+
+Python y las dependencias están fijados en `pyproject.toml` y resueltos en `uv.lock`. `uv` los
+provisiona; no hace falta instalar Python a mano ni crear el entorno virtual.
 
 ```bash
-pip install -r requirements.txt
-pip install -e .
+uv sync
 ```
-
-### 2. Run the app
 
 ```bash
-streamlit run ui/app.py
+uv run python manage.py migrate
 ```
 
-The app opens in your browser at `http://localhost:8501`
+```bash
+uv run python manage.py runserver
+```
 
-### Important
+La aplicación queda en http://127.0.0.1:8000. **Escucha solo en la interfaz local**: la v1 no se
+despliega en abierto, a propósito.
 
-- Always run `pip install -e .` first (makes `tp_domain` importable)
-- The project requires Python 3.10+
+### La primera cuenta
 
-## Report
+No hay auto-registro. Las cuentas las da de alta quien administra, y hasta que exista una la
+aplicación no deja pasar de la pantalla de acceso.
 
-Every analysis produces a professional PDF report — cover with dataset
-disclosure, executive summary, benchmark chart, legal basis per jurisdiction,
-and the full annex of accepted and rejected comparables.
+```bash
+uv run python manage.py createsuperuser
+```
+
+Sin interacción, tomando los valores de `.env` (`DJANGO_SUPERUSER_USERNAME`, `DJANGO_SUPERUSER_EMAIL`
+y `DJANGO_SUPERUSER_PASSWORD`):
+
+```bash
+uv run python manage.py createsuperuser --noinput
+```
+
+`is_staff` se reserva a quien administra. Una cuenta con ese permiso ve los casos de todos los
+usuarios desde el panel, y por eso el aviso de privacidad lo dice sin eufemismos en el pie de toda
+página y junto al formulario de creación.
+
+### Los dos índices reconstruibles
+
+El corpus jurídico vive en los `.md` de `documentation/tax-research/` y el conjunto dorado en los
+`.json` de `evaluacion/casos/`. Las tablas `Ficha` y `CasoEvaluacion` son **índices**: se tiran y se
+reconstruyen desde el disco, que es la fuente de verdad.
+
+```bash
+uv run python manage.py reindexar_corpus
+```
+
+```bash
+uv run python manage.py reindexar_evaluacion
+```
+
+### Copia de seguridad
+
+Usa la API de copia en línea de SQLite, no un `cp`: copiar el fichero mientras el proceso escribe
+produce algo corrupto sin avisar. Junto a la copia se escribe un `.recuentos.json` con las filas de
+cada una de las ocho tablas.
+
+```bash
+uv run python manage.py copia_seguridad
+```
+
+Una copia sin restaurar no es una copia. La restauración compara los recuentos y sale con `1` si
+alguna tabla no coincide, con `2` si no hay nada contra lo que comparar:
+
+```bash
+uv run python manage.py restaurar_copia --copia copias/tpip-AAAAMMDD-HHMMSS.sqlite3 --destino /tmp/verificacion
+```
+
+### Antes de dar nada por hecho
+
+```bash
+uv run ruff check . && uv run mypy . && uv run pytest
+```
+
+El gate completo está en `blueprints/tpip/blueprint.md` §20.1, y CI ejecuta el mismo conjunto.
+
+## El informe
+
+Cada análisis produce un PDF: portada con la declaración del conjunto de datos, resumen ejecutivo,
+gráfico del rango, fundamento jurídico por jurisdicción y el anexo completo de comparables aceptados
+y rechazados.
 
 ```python
 from infrastructure.report import build_report
-build_report(result, "report.pdf")
+
+build_report(result, "informe.pdf")
 ```
 
-The report is generated without any API call. The AI explanation is an
-additive section: its absence does not degrade the document.
+**El informe se genera sin una sola llamada de red.** La explicación de la IA es una sección
+aditiva: su ausencia no degrada el documento, lo declara.
 
-## Legal traceability
+## Trazabilidad jurídica
 
-Every source the engine can cite lives in a closed registry
-(`tp_domain/sources.py`), not in free text. Each entry carries a jurisdiction,
-a typed locator (a BOE identifier, an official URL, or a reference into a
-local offline document — never a bare, unstructured string), the date it was
-last checked, and, when it has no public identifier, a literal quote of the
-provision plus a disclaimer explaining why it can't be resolved by a third
-party. Sources confirmed against their primary text are marked distinctly
-from ones read only through a secondary, non-exhaustive summary
-(`verification_confidence`) — a verification date alone should not read as
-more certainty than what was actually checked.
+Toda fuente que el motor puede citar vive en un registro **cerrado** (`tp_domain/sources.py`), no en
+texto libre. Cada entrada lleva su jurisdicción, un localizador tipado —un identificador del BOE, una
+URL oficial o una referencia a un documento local, nunca una cadena suelta sin estructura—, la fecha
+en que se comprobó por última vez y, cuando no tiene identificador público, la cita literal del
+precepto más la advertencia de por qué un tercero no puede resolverlo.
 
-The PDF report and the Streamlit UI both print this for every source an
-analysis cites: jurisdiction, locator, verification date and confidence. The
-engine can only cite what is already in the registry — `AnalysisResult`
-cannot be constructed if it references a source id the engine did not emit.
+Las fuentes confirmadas contra su texto primario se marcan de forma distinta de las leídas solo a
+través de un resumen secundario y no exhaustivo (`verification_confidence`): una fecha de
+verificación a secas no debe leerse como más certeza de la que realmente se comprobó.
 
-## AI layer (optional)
+El informe en PDF y la pantalla imprimen esto de cada fuente que un análisis cita: jurisdicción,
+localizador, fecha y confianza. **El motor solo puede citar lo que ya está en el registro** —
+`AnalysisResult` no se construye si referencia un id de fuente que el motor no emitió.
 
-Claude writes a narrative explanation **of an already-calculated analysis**.
-It never computes, decides, or introduces sources the engine did not emit.
+Una jurisdicción sin ficha de investigación se queda en `NOT_MODELLED`. Nunca se le asigna la regla
+de otro país por analogía: eso sería inventar Derecho comparado.
+
+## Capa de IA (opcional)
+
+El modelo escribe una explicación narrativa **de un análisis ya calculado**. Nunca calcula, nunca
+decide y nunca introduce una fuente que el motor no emitiera.
 
 ```bash
-cp .env.example .env    # then fill in ANTHROPIC_API_KEY
+cp .env.example .env    # y rellena ANTHROPIC_API_KEY y ANTHROPIC_MODEL
 ```
 
-Key precedence: `st.secrets` > environment variable > `.env` > none.
-With no key the app runs normally and the PDF is generated without the AI
-section. The model id is read from `ANTHROPIC_MODEL`; if unset, the newest
-available Sonnet is resolved at runtime and recorded in the report.
+La clave sale del entorno o de `.env`, leídos en un único punto del proyecto
+(`config/settings/base.py`). **Sin clave la aplicación funciona igual**: el informe se genera completo
+y la sección de IA declara su ausencia en vez de dejar un hueco.
 
-Every draft is validated before it reaches the report: cited source ids must
-belong to the closed registry the engine emitted, and legal references found in
-the prose are checked against it too. A rejected draft is retried once with the
-rejection reasons only; if it fails again, the report ships without the section.
+**El modelo ya no se resuelve en ejecución.** Se fija a mano en `ANTHROPIC_MODEL`, y sin esa variable
+la capa de IA queda desactivada. La razón es el tope de gasto: un modelo que no se conoce antes de
+llamar tampoco se puede tarifar antes de llamar, y sin tarifa el tope vigilaría un número que no se
+paga. Los tokens los reporta siempre el proveedor; nunca se estiman aquí.
+
+Cada borrador se valida antes de llegar al informe: los ids de fuente citados deben pertenecer al
+registro cerrado que el motor emitió, y las referencias jurídicas que aparezcan en la prosa se
+contrastan también contra él. Un borrador rechazado se reintenta una vez, pasándole solo los motivos
+del rechazo; si vuelve a fallar, el informe sale sin la sección.
+
+## Documentación
+
+| Asunto | Dónde |
+|---|---|
+| Convenciones y fronteras del proyecto | `CLAUDE.md` |
+| Diseño completo, gate y orden de construcción | `blueprints/tpip/blueprint.md` |
+| Reglas por área | `.claude/rules/` |

@@ -1,0 +1,162 @@
+# El gate de §20.1, ejecutado en cada empujón. Un solo trabajo y en orden: si
+# una comprobación está en el gate, está aquí. Partirlo en trabajos paralelos
+# haría más rápido enterarse de la mitad de las cosas y perdería el orden, que
+# es parte de lo que se comprueba —los reindexados necesitan la base migrada, y
+# la puerta de regresión necesita el conjunto dorado ya indexado.
+#
+# SIN SECRETOS, a propósito. `ANTHROPIC_API_KEY` no se define, así que CI
+# ejercita permanentemente la ruta de degradación de la capa de IA: el informe
+# sale completo y la sección de IA declara su ausencia. El arnés corre con sus
+# puntuadores deterministas, que son los que no cuestan dinero.
+
+name: Gate
+
+on: [push, pull_request]
+
+permissions:
+  contents: read
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Instalar uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      # `--frozen` y no `uv sync` a secas: si el árbol no coincide con uv.lock,
+      # el fallo tiene que ser aquí y no una resolución silenciosa distinta de
+      # la que se probó en local.
+      - name: Sincronizar el entorno contra uv.lock
+        run: uv sync --frozen
+
+      - name: Lint
+        run: uv run ruff check .
+
+      - name: Formato
+        run: uv run ruff format --check .
+
+      - name: Tipos
+        run: uv run mypy .
+
+      - name: Comprobación de Django
+        run: uv run python manage.py check
+
+      # El gate de §20.1 da por supuesta una base ya migrada, que es lo normal
+      # en local. Aquí el clon es limpio y no hay `db.sqlite3` —no se versiona—,
+      # así que hay que crearla antes de poder afirmar que está al día.
+      - name: Aplicar migraciones
+        run: uv run python manage.py migrate
+
+      - name: La base está al día
+        run: uv run python manage.py migrate --check
+
+      - name: No quedan cambios de modelo sin migrar
+        run: uv run python manage.py makemigrations --check --dry-run
+
+      # El punto sin retorno del paso 4. Se comprueba en cada pasada porque
+      # cambiar AUTH_USER_MODEL después de la migración inicial es reescribir la
+      # capa de datos entera.
+      - name: AUTH_USER_MODEL sigue siendo cuentas.Usuario
+        run: >
+          uv run python -c "import os;
+          os.environ['DJANGO_SETTINGS_MODULE']='config.settings.local';
+          import django; django.setup();
+          from django.conf import settings;
+          assert settings.AUTH_USER_MODEL=='cuentas.Usuario', settings.AUTH_USER_MODEL;
+          print('AUTH_USER_MODEL OK')"
+
+      - name: Reindexar el corpus
+        run: uv run python manage.py reindexar_corpus
+
+      - name: Reindexar el conjunto dorado
+        run: uv run python manage.py reindexar_evaluacion
+
+      - name: tokens.css sincronizado con theme.py
+        run: uv run python -m scripts.build_tokens --check
+
+      - name: Suite completa
+        run: uv run pytest -q
+
+      # La red de seguridad de la migración, aparte y explícita: 89 + 53 + 38.
+      - name: Suite rescatada
+        run: uv run pytest tests/domain tests/ai tests/report -q
+
+      - name: La suite rescatada sigue teniendo 180 pruebas
+        run: >
+          uv run pytest tests/domain tests/ai tests/report --collect-only -q
+          | grep -qE '^180 tests collected'
+
+      # Si esto no pasa, el producto no es publicable.
+      - name: Aislamiento por propietario
+        run: uv run pytest tests/web/test_aislamiento.py tests/web/test_guarda_unica.py -q
+
+      # La línea base vive en la tabla `ejecuciones_evaluacion`, y la base de
+      # CI nace vacía en cada pasada. Fijarla aquí es lo único posible, y hay
+      # que decir qué significa: comprueba que la PUERTA funciona de extremo a
+      # extremo —el arnés corre, puntúa y compara—, no que no haya regresión
+      # frente al histórico. Esa comparación la hace quien construye, en local,
+      # contra la línea base que fijó el paso 23.
+      - name: Fijar la línea base de esta pasada
+        run: uv run python manage.py evaluar --fijar-linea-base
+
+      - name: Puerta de regresión del arnés
+        run: uv run python manage.py evaluar --contra-linea-base
+
+      # La puerta tiene que PODER fallar, y aquí el éxito ES el fallo: la
+      # autocomprobación monta una línea base inalcanzable y sale con 1 cuando
+      # la puerta la detecta. Se afirma ese 1 concreto —un error de uso también
+      # saldría distinto de cero— y se rechaza el 0, que significaría que la
+      # puerta se ha quedado ciega.
+      - name: La puerta de regresión puede fallar
+        run: |
+          set +e
+          uv run python manage.py evaluar --autocomprobar-regresion
+          codigo=$?
+          set -e
+          if [ "$codigo" -ne 1 ]; then
+            echo "la autocomprobacion esperaba codigo 1, obtenido $codigo"
+            exit 1
+          fi
+
+      - name: Copia de seguridad
+        run: uv run python manage.py copia_seguridad
+
+      - name: Restaurar y comparar por recuento de filas
+        run: |
+          copia=$(ls -t copias/*.sqlite3 | head -1)
+          uv run python manage.py restaurar_copia --copia "$copia" --destino "$RUNNER_TEMP/verificacion"
+
+      # Se ejecuta lo que se construye, no solo se construye.
+      - name: Estáticos
+        run: uv run python manage.py collectstatic --noinput
+
+      - name: El punto de entrada es ejecutable
+        run: uv run python manage.py check --list-tags
+
+      - name: Ajustes de producción
+        # 50 caracteres como mínimo: por debajo, check --deploy avisa (W009).
+        env:
+          DJANGO_SECRET_KEY: clave-larga-solo-para-el-gate-de-ci-no-usar-jamas-en-produccion
+        run: uv run python manage.py check --deploy --settings=config.settings.production
+
+      # El gate de sincronía de tokens también tiene que poder fallar, y por el
+      # código concreto: 1 = desincronizado · 2 = error de uso · 0 = no detecta.
+      - name: El gate de tokens puede fallar
+        run: |
+          cp static/css/tokens.css static/css/tokens.css.bak
+          echo '/* alteracion deliberada */' >> static/css/tokens.css
+          set +e
+          uv run python -m scripts.build_tokens --check
+          codigo=$?
+          set -e
+          mv -f static/css/tokens.css.bak static/css/tokens.css
+          if [ "$codigo" -ne 1 ]; then
+            echo "con tokens.css alterado se esperaba codigo 1, obtenido $codigo"
+            exit 1
+          fi
+          uv run python -m scripts.build_tokens --check
