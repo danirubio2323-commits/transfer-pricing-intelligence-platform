@@ -9,8 +9,8 @@
   <link rel="stylesheet" href="{% static 'css/app.css' %}">
 </head>
 <body>
-  {# Primer elemento enfocable: quien navega con teclado no debe recorrer toda
-     la cabecera antes de llegar a lo que ha venido a leer. #}
+  {% comment %}Primer elemento enfocable: quien navega con teclado no debe recorrer toda
+     la cabecera antes de llegar a lo que ha venido a leer.{% endcomment %}
   <a class="salto" href="#contenido">Saltar al contenido</a>
 
   <header>
@@ -30,8 +30,8 @@
   </main>
 
   <footer role="contentinfo">
-    {# Inamovible. No es un adorno: es lo que impide que alguien confunda esto
-       con un estudio de comparabilidad válido ante una administración. #}
+    {% comment %}Inamovible. No es un adorno: es lo que impide que alguien confunda esto
+       con un estudio de comparabilidad válido ante una administración.{% endcomment %}
     <p class="aviso-sintetico"><strong>DATOS SINTÉTICOS.</strong>
       Los comparables de esta herramienta son sintéticos. Ningún resultado sirve
       para sustentar una posición fiscal ante una administración tributaria.</p>

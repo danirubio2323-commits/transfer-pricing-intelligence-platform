@@ -12,8 +12,8 @@
       {% if ficha.url_oficial %}
         <a href="{{ ficha.url_oficial }}" rel="noopener noreferrer">{{ ficha.localizador }}</a>
       {% else %}
-        {# Sin identificador público resoluble: se muestra la referencia tal cual,
-           nunca como un enlace que no lleva a ninguna parte. #}
+        {% comment %}Sin identificador público resoluble: se muestra la referencia tal cual,
+           nunca como un enlace que no lleva a ninguna parte.{% endcomment %}
         <span class="sin-enlace">{{ ficha.localizador }}</span>
       {% endif %}
     </dd>

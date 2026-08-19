@@ -243,3 +243,54 @@ def test_las_tablas_anchas_se_desplazan_en_su_contenedor_y_no_en_la_pagina():
         html = plantilla.read_text(encoding="utf-8")
         if "<table>" in html:
             assert 'class="tabla-ancha"' in html, plantilla.name
+
+
+# ---------------------------------------------------------------------------
+# Nada de sintaxis de plantilla en la página
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.django_db
+def test_ninguna_pagina_imprime_sintaxis_de_plantilla(autenticado):
+    """Django solo admite `{# … #}` en UNA línea; multilínea se renderiza literal.
+
+    Salía impreso en el HTML —el aviso de privacidad venía precedido de su
+    propio comentario— y ninguna prueba lo veía, porque todas afirmaban
+    `«el texto esperado está»` y ninguna `«no hay nada que no debiera estar»`.
+    """
+    for nombre, html in _paginas(autenticado).items():
+        for resto in ("{#", "#}", "{%", "%}", "{{", "}}"):
+            assert resto not in html, f"{nombre}: queda {resto} sin procesar"
+
+
+def test_ninguna_plantilla_usa_un_comentario_multilinea_de_almohadilla():
+    """La forma correcta para varias líneas es `{% comment %}`."""
+    from pathlib import Path
+
+    raiz = Path(__file__).resolve().parents[2] / "templates"
+    culpables = [
+        f.name
+        for f in raiz.rglob("*.html")
+        for m in re.finditer(r"\{#.*?#\}", f.read_text(encoding="utf-8"), re.S)
+        if "\n" in m.group(0)
+    ]
+
+    assert culpables == []
+
+
+@pytest.mark.django_db
+def test_el_titulo_de_la_pestana_es_texto_y_nada_mas(autenticado, detalle):
+    """El `<title>` es lo primero que anuncia un lector de pantalla y lo que se
+    lee en la pestaña y en un marcador. Un bloque de HTML metido ahí por un
+    pegado suelto no rompe nada visible en la página, y por eso hay que mirarlo.
+    """
+    paginas = {**_paginas(autenticado), "detalle": detalle}
+
+    for nombre, html in paginas.items():
+        titulo = re.search(r"<title>(.*?)</title>", html, re.S)
+        assert titulo is not None, nombre
+        texto = titulo.group(1)
+
+        assert "<" not in texto and ">" not in texto, f"{nombre}: {texto[:80]}"
+        assert texto.strip() == texto.strip().splitlines()[0].strip(), nombre
+        assert texto.strip().endswith("TPIP"), nombre

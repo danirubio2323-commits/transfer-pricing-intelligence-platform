@@ -1,9 +1,5 @@
 {% extends "base.html" %}
-{% block titulo %}{{ caso.titulo }} — TPIP
-  <p class="descarga">
-    <a class="boton" href="{% url 'analisis:informe' pk=caso.pk %}">Descargar el informe en PDF</a>
-  </p>
-{% endblock %}
+{% block titulo %}{{ caso.titulo }} — TPIP{% endblock %}
 {% block contenido %}
   <h1>{{ caso.titulo }}</h1>
 
@@ -39,8 +35,8 @@
     <h2 id="t-ia">Fundamentación</h2>
     {% if resultado.ai_explanation %}
       <p>{{ resultado.ai_explanation.text }}</p>
-      {# El modelo y la versión de prompt viajan con la explicación: un informe
-         emitido hoy tiene que decir con qué se redactó. #}
+      {% comment %}El modelo y la versión de prompt viajan con la explicación: un informe
+         emitido hoy tiene que decir con qué se redactó.{% endcomment %}
       <p class="procedencia">
         Redactado por <code>{{ resultado.ai_explanation.model }}</code>,
         prompt <code>{{ resultado.ai_explanation.prompt_version }}</code>.

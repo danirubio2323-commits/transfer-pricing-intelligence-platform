@@ -60,6 +60,16 @@ button, .boton, input[type="submit"], input[type="checkbox"], input[type="radio"
   min-width: 24px;
 }
 
+/* Un enlace SUELTO en su propio parrafo es un objetivo por derecho propio: la
+   excepcion de 2.5.8 es para el enlace embebido en una frase, no para este.
+   Con la altura de linea sola se queda en 19-21 px. */
+.aviso-privacidad p > a:only-child,
+.descarga > a:only-child {
+  display: inline-block;
+  min-height: 24px;
+  padding-block: 3px;
+}
+
 .salto {
   position: absolute;
   left: -9999px;

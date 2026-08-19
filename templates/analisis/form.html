@@ -6,8 +6,8 @@
   {% include "partials/_privacidad.html" %}
 
   {% if formulario.non_field_errors %}
-    {# Los errores que no son de un campo concreto: condiciones sobre la
-       operación entera, como que las dos jurisdicciones tienen que diferir. #}
+    {% comment %}Los errores que no son de un campo concreto: condiciones sobre la
+       operación entera, como que las dos jurisdicciones tienen que diferir.{% endcomment %}
     <div role="alert" class="errores">
       {% for error in formulario.non_field_errors %}<p>{{ error }}</p>{% endfor %}
     </div>
@@ -20,8 +20,8 @@
         <label for="{{ campo.id_for_label }}">{{ campo.label }}</label>
         {{ campo }}
         {% if campo.errors %}
-          {# El error va como TEXTO y referenciado por aria-describedby: el color
-             solo no lo percibe todo el mundo. #}
+          {% comment %}El error va como TEXTO y referenciado por aria-describedby: el color
+             solo no lo percibe todo el mundo.{% endcomment %}
           <p class="error" id="error-{{ campo.name }}" role="alert">{{ campo.errors|join:" " }}</p>
         {% endif %}
       </div>
