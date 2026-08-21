@@ -11,7 +11,7 @@ arrancar es ruidoso y se arregla en un minuto; arrancar con una clave conocida
 es silencioso y no se descubre nunca.
 
 Todo lo demás de este fichero da por supuesto que hay TLS delante. La v1 se
-ejecuta en local (§2) y por eso `local.py` no activa ninguna de estas marcas:
+ejecuta en local (apartado 2) y por eso `local.py` no activa ninguna de estas marcas:
 `SESSION_COOKIE_SECURE` sin HTTPS deja la aplicación inservible, y una medida de
 seguridad que obliga a desactivarla para trabajar acaba desactivada también el
 día que se despliega.

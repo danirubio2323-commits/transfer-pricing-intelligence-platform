@@ -128,7 +128,7 @@ def borrar(request: HttpRequest, pk) -> HttpResponse:
 
 
 def casos(request: HttpRequest) -> HttpResponse:
-    """`/casos/` es una sola ruta con dos verbos, como manda §5.
+    """`/casos/` es una sola ruta con dos verbos, como manda el apartado 5.
 
     GET lista, POST crea. Django enruta por camino y no por método, así que el
     reparto se hace aquí en vez de inventar dos URLs distintas para lo que

@@ -91,7 +91,7 @@ class CasoForm(forms.Form):
     def _titulo(self, datos: dict) -> str:
         """Si no lo ponen, se deriva. Y si el derivado ya existe, se desambigua.
 
-        La restricción única parcial de §4 impide que dos casos vivos del mismo
+        La restricción única parcial del apartado 4 impide que dos casos vivos del mismo
         usuario compartan título; sin desambiguar, guardar el segundo fallaría
         con un error de base de datos en vez de con algo legible.
         """

@@ -167,6 +167,6 @@ LOGOUT_REDIRECT_URL = "/entrar/"
 SESSION_COOKIE_AGE = 8 * 60 * 60
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 #: La cookie no es legible desde JavaScript, que es lo que impide robarla con
-#: un script inyectado. Nunca un token en almacenamiento del navegador (§20.3).
+#: un script inyectado. Nunca un token en almacenamiento del navegador (apartado 20.3).
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = "Lax"

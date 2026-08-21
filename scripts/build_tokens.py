@@ -28,10 +28,10 @@ from infrastructure.theme import COLORS_PANTALLA
 RAIZ = Path(__file__).resolve().parent.parent
 DESTINO = RAIZ / "static" / "css" / "tokens.css"
 
-#: Escala de espaciado de §7, base 4px. Ningún valor arbitrario fuera de aquí.
+#: Escala de espaciado del apartado 7, base 4px. Ningún valor arbitrario fuera de aquí.
 ESPACIADO = (4, 8, 12, 16, 24, 32, 48, 64)
 
-#: Escala tipográfica de §7, en rem.
+#: Escala tipográfica del apartado 7, en rem.
 TIPOGRAFIA = {
     "xs": "0.875",
     "base": "1",

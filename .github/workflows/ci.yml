@@ -1,5 +1,5 @@
-# El gate de §20.1, ejecutado en cada empujón. Un solo trabajo y en orden: si
-# una comprobación está en el gate, está aquí. Partirlo en trabajos paralelos
+# El gate del apartado 20.1, ejecutado en cada empujón. Un solo trabajo y en
+# orden: si una comprobación está en el gate, está aquí. Partirlo en trabajos paralelos
 # haría más rápido enterarse de la mitad de las cosas y perdería el orden, que
 # es parte de lo que se comprueba —los reindexados necesitan la base migrada, y
 # la puerta de regresión necesita el conjunto dorado ya indexado.
@@ -46,8 +46,8 @@ jobs:
       - name: Comprobación de Django
         run: uv run python manage.py check
 
-      # El gate de §20.1 da por supuesta una base ya migrada, que es lo normal
-      # en local. Aquí el clon es limpio y no hay `db.sqlite3` —no se versiona—,
+      # El gate del apartado 20.1 da por supuesta una base ya migrada, que es
+      # lo normal en local. Aquí el clon es limpio y no hay `db.sqlite3` —no se versiona—,
       # así que hay que crearla antes de poder afirmar que está al día.
       - name: Aplicar migraciones
         run: uv run python manage.py migrate

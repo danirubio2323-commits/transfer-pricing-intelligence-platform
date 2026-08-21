@@ -86,7 +86,8 @@ uv run python manage.py restaurar_copia --copia copias/tpip-AAAAMMDD-HHMMSS.sqli
 uv run ruff check . && uv run mypy . && uv run pytest
 ```
 
-El gate completo está en `blueprints/tpip/blueprint.md` §20.1, y CI ejecuta el mismo conjunto.
+El gate completo está en el apartado 20.1 de `blueprints/tpip/blueprint.md`, y CI ejecuta el
+mismo conjunto.
 
 ## El informe
 

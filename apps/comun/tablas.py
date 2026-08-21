@@ -8,7 +8,7 @@ la que le falta.
 
 from __future__ import annotations
 
-#: Nombre de tabla → etiqueta legible. El orden es el de §4.
+#: Nombre de tabla → etiqueta legible. El orden es el del apartado 4.
 TABLAS: dict[str, str] = {
     "usuarios": "Cuentas",
     "casos": "Casos",
