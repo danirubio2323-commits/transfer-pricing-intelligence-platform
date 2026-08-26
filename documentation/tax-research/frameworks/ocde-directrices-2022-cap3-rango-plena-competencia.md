@@ -26,8 +26,7 @@ verificada_el: 2026-08-20
 # OCDE — Directrices 2022, Cap. III: el rango de plena competencia
 
 **Fuente primaria:** OECD Transfer Pricing Guidelines 2022, Cap. III, apdo. A.7
-**Alcance de esta ficha:** el apartado A.7 completo, párrafos 3.55 a 3.66. El resto del
-Capítulo III —factores de comparabilidad, búsqueda de comparables, ajustes— queda sin desarrollar.
+**Alcance de esta ficha:** el apartado A.7 completo, párrafos 3.55 a 3.66. El resto del Capítulo III (factores de comparabilidad, búsqueda de comparables, ajustes) queda sin desarrollar.
 **Usar en:** `tp_domain/calculations/arm_length_range.py`, `tp_domain/rules/statistical_rules.py`
 
 Esta ficha existe porque el motor de TPIP cita `oecd-tpg-2022-cap3` en **todos** los análisis y no
@@ -106,7 +105,7 @@ Dos regímenes, no uno:
 | Situación | Qué dice la OCDE |
 |---|---|
 | Resultados de fiabilidad alta y pareja | **Cualquier punto** del rango satisface el principio |
-| Quedan defectos de comparabilidad (3.57) | **Puede ser apropiado** acudir a la tendencia central — mediana, media, medias ponderadas |
+| Quedan defectos de comparabilidad (3.57) | **Puede ser apropiado** acudir a la tendencia central: mediana, media, medias ponderadas |
 
 La mediana no es la regla por defecto de las Directrices. Es una de varias medidas de tendencia
 central, disponible solo en el segundo supuesto, y en potencial.
@@ -130,12 +129,12 @@ con ella un tercer Estado.
 No hay conflicto entre 3.62 y el §1.3a AStG: el segundo ejerce una opción que el primero permite. Lo
 que sí hay es una **tensión de expectativas**: un asesor acostumbrado al ajuste alemán tiende a leer
 la mediana como la consecuencia natural de estar fuera del rango, y en el texto de la OCDE no lo es.
-La lectura inversa —española— tiende a olvidar que fuera de las fronteras la mediana sí puede ser
+La lectura española, al revés, tiende a olvidar que fuera de las fronteras la mediana sí puede ser
 automática.
 
 ## Resultados extremos
 
-**3.63-3.66.** Un resultado extremo —pérdidas o beneficios anormalmente altos— exige entender **por
+**3.63-3.66.** Un resultado extremo (pérdidas o beneficios anormalmente altos) exige entender **por
 qué** lo es. Y la regla de exclusión es estricta:
 
 > An extreme result may be excluded on the basis that a previously overlooked significant
@@ -152,14 +151,13 @@ qué** lo es. Y la regla de exclusión es estricta:
 
 ### Consecuencia para TPIP
 
-Los motivos de rechazo del motor son de comparabilidad —industria distinta, ejercicio fuera de plazo,
-sin tipo informado—, nunca «el tipo se aleja mucho de los demás». Eso es exactamente lo que 3.63
+Los motivos de rechazo del motor son de comparabilidad (industria distinta, ejercicio fuera de plazo, sin tipo informado), nunca «el tipo se aleja mucho de los demás». Eso es exactamente lo que 3.63
 prohíbe, y conviene que siga siendo así si algún día se añade un filtro nuevo.
 
 ## Nota sobre el localizador
 
 La entrada `oecd-tpg-2022-cap3` del registro cerrado sitúa el párrafo 3.55 en la **página 165
-impresa**, y eso es exacto. El índice de PDF que da entre paréntesis —166— está desplazado en una
+impresa**, y eso es exacto. El índice de PDF que da entre paréntesis, el 166, está desplazado en una
 página: la 165 impresa es la **167** del PDF. La página impresa, que es la que se cita, está bien.
 
 ## Aplicación en TPIP

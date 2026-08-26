@@ -47,8 +47,7 @@ apartados y cada uno decide una cosa distinta.
 > dell'art. 4, **qualora gli stessi siano riferibili a un numero di operazioni non controllate,
 > ognuna delle quali risulti parimenti comparabile** all'operazione controllata.
 
-La condición es la comparabilidad **igual** de cada observación —*parimenti comparabile*—, no un
-número mínimo de comparables ni un umbral de dispersión.
+La condición es la comparabilidad **igual** de cada observación (*parimenti comparabile*), no un número mínimo de comparables ni un umbral de dispersión.
 
 ### Comma 2 — dentro del intervalo
 
@@ -70,8 +69,8 @@ Coincide con el párrafo 3.60 de las Directrices de la OCDE: dentro, no hay ajus
 El ajuste devuelve el indicador **al interior del intervalo**. No a la mediana. El decreto **no
 nombra la mediana en ningún punto**, ni el rango intercuartílico, ni ningún percentil.
 
-Y el derecho de alegación del contribuyente está expresamente reconocido —igual que en el párrafo
-3.61 de la OCDE—, con una precisión que la OCDE no hace: la Administración puede **no tener en
+Y el derecho de alegación del contribuyente está expresamente reconocido (igual que en el párrafo
+3.61 de la OCDE), con una precisión que la OCDE no hace: la Administración puede **no tener en
 cuenta** esos elementos, pero solo *adducendo idonea motivazione*. La motivación es requisito, no
 cortesía.
 
@@ -93,9 +92,7 @@ Estado.
 
 ## El otro contraste: Italia sí ordena los métodos
 
-El art. 4, comma 1, del decreto adopta la regla del método más apropiado, con cuatro criterios
-—fortalezas y debilidades de cada método, adecuación a las características económicamente
-relevantes, disponibilidad de información fiable y grado de comparabilidad—.
+El art. 4, comma 1, del decreto adopta la regla del método más apropiado, con cuatro criterios: fortalezas y debilidades de cada método, adecuación a las características económicamente relevantes, disponibilidad de información fiable y grado de comparabilidad.
 
 Pero el **comma 3** añade lo que el art. 18.4 LIS deliberadamente no tiene:
 
@@ -107,7 +104,7 @@ Pero el **comma 3** añade lo que el art. 18.4 LIS deliberadamente no tiene:
 
 Es decir: **a igual fiabilidad**, los métodos tradicionales (confronto di prezzo, prezzo di
 rivendita, costo maggiorato) se prefieren a los transaccionales (margine netto, ripartizione degli
-utili); y el *confronto di prezzo* —el CUP— se prefiere sobre todos.
+utili); y el *confronto di prezzo* (el CUP) se prefiere sobre todos.
 
 La condición «a igual fiabilidad» hace que no sea una jerarquía formal al viejo estilo, pero es más
 de lo que dice la norma española, que no ordena nada. Un mismo caso puede exigir justificar la
@@ -123,7 +120,7 @@ manera relevante en el indicador financiero, o cuando, habiéndolas, pueden prac
 comparabilidad precisos que las eliminen o reduzcan significativamente.
 
 Los factores a identificar son cinco: términos contractuales; funciones desempeñadas, con activos
-utilizados y riesgos asumidos —incluido cómo se conectan con la generación de valor del grupo—;
+utilizados y riesgos asumidos (incluido cómo se conectan con la generación de valor del grupo);
 características de los bienes y servicios; circunstancias económicas y condiciones de mercado; y
 estrategias empresariales.
 
@@ -136,14 +133,13 @@ intangibles únicos y valiosos.
 
 ## Aplicación en TPIP
 
-**Esta ficha no se puede trasladar al motor con el vocabulario que hoy existe.** `RangeRule` tiene
-tres valores —`NO_STATUTORY_RULE`, `INTERQUARTILE_MEDIAN_ADJUSTMENT` y `NOT_MODELLED`— y la regla
+**Esta ficha no se puede trasladar al motor con el vocabulario que hoy existe.** `RangeRule` tiene tres valores (`NO_STATUTORY_RULE`, `INTERQUARTILE_MEDIAN_ADJUSTMENT` y `NOT_MODELLED`) y la regla
 italiana no es ninguno de ellos. Añadir Italia exige:
 
 1. Un valor nuevo en `RangeRule`, del tipo «ajuste al interior del intervalo», con su lógica de
    evaluación: el punto de destino es el borde del rango, no la mediana.
 2. La entrada `it-dm-2018-art6` en el registro cerrado de `tp_domain/sources.py`, con localizador
-   `url` —el permalink de la Gazzetta resuelve por sí solo— y esta fecha de verificación.
+   `url` (el permalink de la Gazzetta resuelve por sí solo) y esta fecha de verificación.
 3. `IT` en `JURISDICTION_RANGE_RULES`.
 
 En ese orden y no en otro: la ficha primero, el registro después, la regla al final.
