@@ -35,8 +35,9 @@ Dentro de ella, la doctrina que aplica procede de dos resoluciones anteriores qu
 transcribe: **SAN 1072/2019, de 6 de marzo de 2019**, fundamento tercero, y **Resolución del TEAC
 4881/2019, de 23 de noviembre de 2021**.
 
-**Aviso de alcance.** Las dos resoluciones citadas se conocen **a través de esta sentencia**, que las
-transcribe. No se han leído en su fuente. Lo verificado directamente es el texto del TSJ.
+**Aviso de alcance.** La **SAN 1072/2019 se ha leído después en su fuente**, descargada de CENDOJ:
+recurso 353/2015, ECLI `ES:AN:2019:1072`, ponente Sr. Fernández-Lomana García, y el recurrente es
+**IKEA IBERICA SA**. La **Resolución del TEAC 4881/2019** sigue conociéndose solo por transcripción.
 
 ## Por qué esta ficha estaba pendiente
 
@@ -116,6 +117,27 @@ tribunal consideró motivados los defectos y confirmó el ajuste:
 La diferencia entre los dos casos es de **prueba funcional**, no de estadística. Lo que decidió no fue
 el tamaño de la muestra: fue que la empresa hacía más cosas de las que decía hacer.
 
+## Dos matices que solo aparecen en el texto íntegro
+
+**El enfoque plurianual sirve para el estudio, no para la comparación.** IKEA sostuvo que su margen
+debía medirse por la media interanual de 2006 a 2008, que era el 2,2 %, y así quedaba dentro del
+rango. La Sala lo rechaza con un criterio que conviene retener:
+
+> la consideración plurianual es la relativa al **estudio de la comparabilidad**, pero una vez
+> realizado el estudio procede (…) la comparación **de forma individual y en relación con los
+> resultados de cada ejercicio** objeto de regularización.
+
+Y añade el argumento de la Inspección, que es demoledor por simple: *«de proceder, como dice la
+entidad, tal media, ¿por qué los años que ha cogido la entidad? ¿por qué no 5, o 10…?»*.
+
+**Mediana de la muestra y mediana del rango no son lo mismo.** El recurrente planteó como tercer
+motivo que, en todo caso, debía aplicarse *«la mediana del rango intercuantílico y no la mediana de la
+muestra»*. La Sala **no llegó a resolverlo**, porque estimó antes el motivo del 2,1 %.
+
+Queda, por tanto, **una cuestión abierta y sin doctrina**: cuando proceda la mediana, ¿la de todas las
+observaciones o la de las que quedan dentro del intercuartílico? Son números distintos. En el caso,
+la mediana de la muestra era el 4,1 % y la media el 6,1 %.
+
 ## La coherencia que exige el TEAC
 
 Hay un argumento en la resolución del TEAC transcrita que merece retenerse por su valor táctico:
@@ -152,6 +174,12 @@ revisión.
 3. **La distancia entre España e Italia se estrecha**, y la que se ensancha es la de Alemania. La
    tabla comparada del corpus necesita reescribirse.
 4. El argumento de coherencia del TEAC es material para la sección de riesgos del informe.
+5. **El motor calcula `percentile_50` sobre los comparables aceptados, es decir, la mediana de la
+   muestra.** La sentencia deja constancia de que existe otra lectura posible, la mediana del rango
+   intercuartílico, sin doctrina que la resuelva. Si algún día el informe dice «mediana», debería
+   declarar cuál de las dos, igual que declara la convención de percentiles.
+6. **El análisis ejercicio a ejercicio queda respaldado.** El motor evalúa un tipo contra un rango,
+   sin promediar años. La Sala confirma que esa es la unidad correcta de comparación.
 
 ## Límites de esta ficha
 
