@@ -148,6 +148,19 @@ La letra a) es competencia y proporción, no precio. La letra c) es domicilio. L
 puerta posible, y exige que el conflicto se plantee como interpretación del Concierto, no como
 discrepancia de valoración.
 
+**Corrección posterior (2026-08-27).** Al fichar el Convenio navarro apareció lo que aquí no se había
+buscado: **sí hay un órgano con competencia expresa sobre valoración**, aunque no sea la Junta
+Arbitral. El art. 64.e) del propio Concierto atribuye a la Comisión de Coordinación y Evaluación
+Normativa
+
+> Analizar los supuestos o cuestiones que se hayan planteado en materia de inspección entre la
+> Administración del Estado y las respectivas Diputaciones Forales, **así como los problemas de
+> valoración a efectos tributarios**.
+
+Navarra tiene el equivalente en el art. 67.2.e) de su Convenio. La hipótesis de abajo se mantiene,
+pero matizada: hay cauce para **examinar** el problema de valoración, y no hay cauce expreso para
+**resolverlo** con efecto sobre el caso individual. Ver la ficha de Navarra.
+
 ### ⚠️ Conflicto Doctrinal / Evolución de Criterio
 
 **Hipótesis detectada por contraste de fuentes, no resuelta.** Si la Diputación Foral corrige al alza
