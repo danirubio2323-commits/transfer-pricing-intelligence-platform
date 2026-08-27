@@ -90,6 +90,26 @@ en el borde del intervalo; España no legisla. Es la mejor ilustración de por q
 sin ficha se queda en `NOT_MODELLED`: de la base común no se deduce qué hizo con ella un tercer
 Estado.
 
+### Corrección posterior (2026-08-27): no son tres regímenes, son dos
+
+La tabla de arriba se escribió leyendo solo la **ley** española, y por eso decía que España «no
+legisla». Al fichar después la doctrina de la Audiencia Nacional resultó que sí hay criterio, y que
+**coincide con el italiano**.
+
+La SAN 1072/2019, caso IKEA Ibérica, corrigió a la Inspección que había ajustado a la mediana del
+4,1 % un margen que caía por debajo de un rango de 2,1 % a 7,6 %: *«el ajuste debió haberse efectuado
+sobre el 2,1 %, no sobre el 4,1 %»*. Al borde del rango, salvo que la Administración **motive**
+defectos de comparabilidad.
+
+| Fuera del rango, sin defectos motivados | |
+|---|---|
+| **Italia**, art. 6.3 DM 2018, por vía normativa | Al interior del intervalo |
+| **España**, doctrina SAN 2019, por vía judicial | Al límite del rango |
+| **Alemania**, §1.3a AStG | A la mediana, por defecto |
+
+Dos Estados llegan al mismo sitio por caminos distintos, y el que se aparta es Alemania. Ver
+`processes/doctrina-mediana-exige-defectos-motivados`.
+
 ## El otro contraste: Italia sí ordena los métodos
 
 El art. 4, comma 1, del decreto adopta la regla del método más apropiado, con cuatro criterios: fortalezas y debilidades de cada método, adecuación a las características económicamente relevantes, disponibilidad de información fiable y grado de comparabilidad.
