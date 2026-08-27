@@ -154,15 +154,30 @@ otra cosa: la consecuencia que sigue al ajuste.
 No hay conflicto con las Directrices OCDE: la Directiva es más exigente que el art. 25 del Modelo,
 porque el arbitraje del art. 15.2 no depende de que los Estados quieran someterse a él.
 
-Sí queda **pendiente de delimitar la relación con el Convenio de Arbitraje 90/436/CEE**, anterior y
-específico de precios de transferencia, que sigue existiendo. El art. 16.5 de la Directiva regula la
-interacción con otros procedimientos, y **ese apartado no se ha leído**. Hasta hacerlo, esta ficha no
-puede decir cuál prevalece.
+La relación con el **Convenio de Arbitraje 90/436/CEE**, anterior y específico de precios de
+transferencia, la resuelve el propio art. 16.5, y de forma tajante:
+
+> La presentación de una reclamación tal como dispone el artículo 3 **pondrá término a cualquier otro
+> procedimiento amistoso o procedimiento de resolución de litigios en curso** con arreglo a un acuerdo
+> o convenio que se esté interpretando o aplicando en relación con la cuestión en litigio pertinente.
+> Ese otro procedimiento (…) concluirá con efecto a partir de la fecha de la primera recepción de la
+> reclamación por cualquiera de las autoridades competentes.
+
+**No hay concurrencia: hay desplazamiento.** Reclamar por la Directiva mata el procedimiento del
+Convenio que estuviera en marcha. La elección de vía es, por tanto, irreversible en la práctica, y
+conviene hacerla sabiendo que la Directiva ofrece un recurso judicial de ejecución (art. 15.4) que el
+Convenio no prevé.
 
 ## Límites de esta ficha
 
-- Arts. 1, 2 y 17 a 22 **no leídos** carácter a carácter.
-- **Art. 16.5 sin leer**, y es el que decide la relación con el Convenio de Arbitraje.
-- **Convenio de Arbitraje 90/436/CEE: no fichado.** Es la pieza gemela de esta y le falta al corpus.
+- Arts. 1 y 2 **no leídos** carácter a carácter. Leídos después: 16.5, 16.6, 16.7, 17 y 18.
+- **Art. 16.6:** un Estado puede denegar el acceso si impuso sanciones por fraude fiscal, impago
+  deliberado o negligencia grave. Es una redacción distinta de la «sanción grave» del art. 8 del
+  Convenio, y la diferencia no se ha analizado.
+- **Art. 17:** particulares y empresas que no sean grandes ni parte de un grupo grande presentan
+  **solo ante su Estado de residencia**, que notifica a los demás en dos meses.
+- **Art. 18:** las decisiones definitivas se publican íntegras con consentimiento, y **si no lo hay se
+  publica un resumen** con el problema, la fecha, la base jurídica y el sector. Hay, por tanto, un
+  cuerpo de doctrina publicada que este corpus no ha explorado.
 - No se ha comprobado la **transposición española** de la Directiva, que es donde estarían los plazos
   y el órgano competente en España.

@@ -157,9 +157,10 @@ cláusula de no perjuicio: el Convenio no rebaja lo que otra norma dé.
 | Efecto | Vinculante entre Estados | Vinculante y **no sienta precedente** |
 | Vía judicial si el Estado no cumple | No prevista expresamente | Sí (art. 15.4) |
 
-**Lo que no se ha verificado:** el art. 16.5 de la Directiva, que regula la interacción con otros
-procedimientos, sigue sin leer. Hasta leerlo no se puede afirmar cuál prevalece cuando ambos caben,
-que es el caso normal de una corrección de precios de transferencia entre dos Estados miembros.
+**Resuelto:** el art. 16.5 de la Directiva, leído después de escribir esta ficha, dice que presentar
+una reclamación al amparo de su art. 3 **pone término a cualquier otro procedimiento en curso** bajo
+otro convenio, con efecto desde la primera recepción. No es concurrencia, es desplazamiento: la
+Directiva mata el procedimiento del Convenio. La elección de vía es irreversible en la práctica.
 
 ### ⚠️ Conflicto Doctrinal / Evolución de Criterio
 
