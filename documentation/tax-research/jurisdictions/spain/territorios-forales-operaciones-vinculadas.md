@@ -6,21 +6,20 @@ enlaces:
 - jurisdictions/spain/ris-documentacion-masterfile-localfile
 - frameworks/ocde-directrices-2022-cap3-rango-plena-competencia
 fecha_creacion: 2026-08-27
-fuente_primaria: Norma Foral 37/2013, de 13 de diciembre, del Impuesto sobre Sociedades
-  del Territorio Histórico de Álava, art. 42; Ley 12/2002, del Concierto Económico,
-  arts. 3, 14 a 16 y 66
+fuente_primaria: Ley 12/2002, de 23 de mayo, por la que se aprueba el Concierto Económico
+  con la Comunidad Autónoma del País Vasco, arts. 3, 14 a 16 y 66
 id_fuente: es-foral-vinculadas
-localizador: https://web.araba.eus/documents/d/araba/norma-foral-del-impuesto-sobre-sociedades_cas
+localizador: BOE-A-2002-9969
 origen: Lectura directa del PDF oficial de araba.eus y del texto consolidado del BOE,
   2026-08-27
-pinpoint: Art. 42 NF 37/2013 (reglas generales de operaciones vinculadas); arts. 3,
-  14 y 66 de la Ley 12/2002 (armonización, competencia sobre el IS, Junta Arbitral)
+pinpoint: Arts. 3 (armonización), 14 a 16 (competencia y puntos de conexión del IS)
+  y 66 (Junta Arbitral) de la Ley 12/2002
 rango_normativo: Norma Foral y Ley estatal
-tipo: Régimen foral, reparto competencial subestatal
-tipo_localizador: url
-titulo: 'España — territorios forales: operaciones vinculadas y reparto competencial'
+tipo: Reparto competencial subestatal
+tipo_localizador: boe_id
+titulo: España — el Concierto Económico y el reparto competencial sobre vinculadas
 usar_en: tp_domain/rules/statistical_rules.py, validación de perímetro previa al análisis
-verificada_el: 2026-08-27
+verificada_el: 2026-08-28
 ---
 
 # España — territorios forales: operaciones vinculadas y reparto competencial
@@ -30,10 +29,23 @@ Norma Foral 37/2013, de 13 de diciembre, del Impuesto sobre Sociedades de Álava
 Ley 12/2002, de 23 de mayo, del Concierto Económico con la Comunidad Autónoma del País Vasco,
 arts. 3, 14 a 16 y 66 (`BOE-A-2002-9969`, texto consolidado).
 
-**Alcance de esta ficha.** Cubre Álava con texto primario y el marco competencial del Concierto.
-**No cubre** Bizkaia, Gipuzkoa ni Navarra, cuyas normas no se han leído. Ver el apartado de límites
-al final, que no es una coletilla: es lo que separa esta ficha de una afirmación de Derecho comparado
-por analogía.
+**Alcance de esta ficha, revisado el 2026-08-28.** Cuando se escribió, era la única ficha foral y
+cubría dos cosas a la vez: el art. 42 alavés y el marco competencial del Concierto. Ya no hace falta
+que cargue con lo primero. **Cada territorio tiene ahora ficha propia**, con su norma, su localizador
+y su código de jurisdicción:
+
+| Territorio | Ficha | Código |
+|---|---|---|
+| Álava | `alava-nf-37-2013-vinculadas` | `ES-VI` |
+| Bizkaia | `bizkaia-nf-11-2013-vinculadas` | `ES-BI` |
+| Gipuzkoa | `gipuzkoa-nf-2-2014-vinculadas` | `ES-SS` |
+| Navarra | `navarra-lf-26-2016-vinculadas` | `ES-NA` |
+| Comparación de las cinco | `forales-habilitacion-medidas-estadisticas` | — |
+
+**Lo que esta ficha conserva es el marco competencial**: tributo concertado de normativa autónoma,
+puntos de conexión, armonización y Junta Arbitral. Eso no es de ningún territorio en particular y aquí
+se queda. La reserva que esta ficha traía —«no cubre Bizkaia, Gipuzkoa ni Navarra»— queda **levantada
+por lectura de sus textos primarios**, no por analogía.
 
 ## Por qué el problema existe
 

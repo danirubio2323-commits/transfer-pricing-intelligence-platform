@@ -11,30 +11,34 @@ en ningún PDF.
 trabajó sobre un resumen, una transcripción o una lectura parcial, y **la diferencia no es cosmética**:
 una fecha de verificación a secas sugeriría más certeza de la que hubo.
 
-
 ## España
 
 | Ficha | Clase | Citable | Verificación |
 |---|---|---|---|
 | [Doctrina TEAC aplicable a operaciones vinculadas](processes/doctrina-teac-bilateralidad-y-servicios.md) | case_law | no | dirigida |
-| [España — la mediana exige defectos de comparabilidad motivados, no basta estar fuera del rango](processes/doctrina-mediana-exige-defectos-motivados.md) | case_law | no | primaria |
 | [España — STS 390/2021: no todo convenio tiene el artículo 9.2, y sin él no hay ajuste bilateral](processes/sts-390-2021-ajuste-bilateral-y-cdi-sin-articulo-9-2.md) | case_law | no | primaria |
-| [España — territorios forales: operaciones vinculadas y reparto competencial](jurisdictions/spain/territorios-forales-operaciones-vinculadas.md) | legislation | no | primaria |
+| [España — la mediana exige defectos de comparabilidad motivados, no basta estar fuera del rango](processes/doctrina-mediana-exige-defectos-motivados.md) | case_law | no | primaria |
 | [España — Art. 18 LIS: operaciones vinculadas](jurisdictions/spain/art18-lis-operaciones-vinculadas.md) | legislation | **sí** | primaria |
 | [España — Navarra: el Convenio Económico y quién mira la valoración](jurisdictions/spain/navarra-convenio-economico-valoracion.md) | legislation | no | primaria |
 | [España — RD 1794/2008: el cauce procedimental del ajuste correlativo](jurisdictions/spain/rd-1794-2008-procedimientos-amistosos.md) | legislation | no | dirigida |
-| [España — art. 17 RIS: comparabilidad y medidas estadísticas](jurisdictions/spain/ris-art17-comparabilidad-medidas-estadisticas.md) | legislation | no | primaria |
 | [España — RIS: documentación Masterfile / Local file](jurisdictions/spain/ris-documentacion-masterfile-localfile.md) | legislation | no | dirigida |
+| [España — art. 17 RIS: comparabilidad y medidas estadísticas](jurisdictions/spain/ris-art17-comparabilidad-medidas-estadisticas.md) | legislation | no | primaria |
+| [España — el Concierto Económico y el reparto competencial sobre vinculadas](jurisdictions/spain/territorios-forales-operaciones-vinculadas.md) | legislation | no | primaria |
+| [España — el mapa estadístico de las cinco jurisdicciones españolas](jurisdictions/spain/forales-habilitacion-medidas-estadisticas.md) | legislation | no | primaria |
+| [Bizkaia — NF 11/2013, art. 42: valor normal de mercado sin regla estadística](jurisdictions/spain/bizkaia-nf-11-2013-vinculadas.md) | legislation | no | primaria |
+| [Navarra — LF 26/2016 y art. 18.7 del Reglamento: la habilitación estadística que el País Vasco no tiene](jurisdictions/spain/navarra-lf-26-2016-vinculadas.md) | legislation | no | primaria |
+| [Gipuzkoa — NF 2/2014, art. 42: valor normal de mercado sin regla estadística](jurisdictions/spain/gipuzkoa-nf-2-2014-vinculadas.md) | legislation | no | primaria |
+| [Álava — NF 37/2013, art. 42: valor normal de mercado sin regla estadística](jurisdictions/spain/alava-nf-37-2013-vinculadas.md) | legislation | no | primaria |
 
 ## Unión Europea
 
 | Ficha | Clase | Citable | Verificación |
 |---|---|---|---|
-| [UE — Directiva Intereses-Cánones 2003/49/CE](jurisdictions/eu/directiva-intereses-canones-2003-49.md) | legislation | no | dirigida |
 | [UE — Convenio de Arbitraje 90/436: el ajuste correlativo entre empresas asociadas](jurisdictions/eu/convenio-arbitraje-90-436-ajuste-correlativo.md) | legislation | no | primaria |
 | [UE — DAC4: el informe país por país, y para qué NO puede usarse](jurisdictions/eu/dac4-informe-pais-por-pais.md) | legislation | no | primaria |
 | [UE — DAC6: la seña distintiva E, precios de transferencia](jurisdictions/eu/dac6-sena-distintiva-e-precios-de-transferencia.md) | legislation | no | primaria |
 | [UE — Directiva 2017/1852: el arbitraje que cierra la doble imposición](jurisdictions/eu/directiva-2017-1852-resolucion-de-litigios.md) | legislation | no | primaria |
+| [UE — Directiva Intereses-Cánones 2003/49/CE](jurisdictions/eu/directiva-intereses-canones-2003-49.md) | legislation | no | dirigida |
 | [UE — Propuesta de Directiva sobre Precios de Transferencia COM(2023) 529 (RETIRADA)](jurisdictions/eu/propuesta-directiva-tp-2023-retirada.md) | legislation | no | dirigida |
 
 ## Alemania
@@ -66,5 +70,4 @@ la ficha con sus ocho claves de frontmatter. Una ficha **no** modela una jurisdi
 
 Una jurisdicción sin ficha se queda en `NOT_MODELLED`. Nunca hereda la regla del vecino.
 
-Total actual: **21 fichas**, 14 con fuente primaria leída.
-
+Total actual: **26 fichas**, 19 con fuente primaria leída.
