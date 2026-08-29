@@ -169,8 +169,13 @@ revisión.
    doctrina permite decir algo mucho más útil: procede regularización, y el punto de ajuste es el
    límite del rango **salvo** que la Inspección motive defectos de comparabilidad, en cuyo caso cabe
    la mediana.
-2. **`adjusted_rate` para España deja de ser `None`.** Hoy el motor solo calcula un tipo ajustado para
-   Alemania. Con esta doctrina, España tiene un punto de ajuste identificable: el cuartil más próximo.
+2. **`adjusted_rate` para España sigue siendo `None`, y es una decisión, no una omisión.** Esta ficha
+   sostuvo lo contrario el 27 de agosto. La nota de la AEAT sobre el rango, incorporada al corpus al
+   día siguiente, obligó a repensarlo. El campo significa **el tipo que la norma impone**: en Alemania
+   el §1.3a lo impone, en España nada lo impone. Emitir el mismo número en las dos casillas borraría
+   justo la asimetría que el producto existe para enseñar. El punto de ajuste español —la mediana de
+   ordinario, el borde del rango si los comparables son muy fiables— va **en la prosa del veredicto**,
+   donde se puede decir con sus condiciones. Un número solo no admite condiciones.
 3. **La distancia entre España e Italia se estrecha**, y la que se ensancha es la de Alemania. La
    tabla comparada del corpus necesita reescribirse.
 4. El argumento de coherencia del TEAC es material para la sección de riesgos del informe.

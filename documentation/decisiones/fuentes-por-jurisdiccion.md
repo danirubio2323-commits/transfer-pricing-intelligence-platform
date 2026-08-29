@@ -63,6 +63,12 @@ carácter con el `localizador` del frontmatter, que es lo que comprueba el gate.
 | `ES_BI_NF11_2013_ART42` | `es-bi-nf11-2013-art42` | `ES-BI` | `URL` | `https://www.bizkaia.eus/Ogasuna/Zerga_Arautegia/Indarreko_arautegia/pdf/ca_11_2013.pdf` |
 | `ES_SS_NF2_2014_ART42` | `es-ss-nf2-2014-art42` | `ES-SS` | `URL` | `https://www.gipuzkoa.eus/documents/2456431/2840971/NF+2-2014+(2017-4).pdf/62611287-c093-a23e-10fe-57254d23e2cc` |
 | `ES_NA_LF26_2016_ART28` | `es-na-lf26-2016-art28` | `ES-NA` | `BOE_ID` | `BOE-A-2017-2356` |
+| `ES_AEAT_NOTA_RANGO` | `es-aeat-nota-rango` | `ES` | `URL` | `https://sede.agenciatributaria.gob.es/static_files/Sede/Tema/Normativa/Doctrina_Criterios/Criterios/IS/nota_rango_valores.pdf` |
+
+La quinta es la nota de la AEAT, y entra en el registro por una razón distinta de las otras cuatro:
+sin ella el veredicto español no puede citar de dónde sale la mediana. Su `kind` es `GUIDELINES` y su
+`disclaimer` debe decir lo que la ficha dice — **una nota interna no es una norma**: no vincula a los
+tribunales, pero compromete a la Inspección con lo que afirma.
 
 Las cuatro con `verified_at = dt.date(2026, 8, 28)` y
 `verification_confidence = PRIMARY_SOURCE_VERIFIED`: los cuatro textos se descargaron y se leyeron,
@@ -155,18 +161,58 @@ Códigos **ISO 3166-2:ES**, que es un estándar publicado y no una invención de
 `xfail(strict=True)`. Al aplicar el parche **pasará, y por pasar se pondrá roja**. Hay que ir a
 retirar el marcador. Es el mecanismo, no un fallo.
 
-## Lo que este parche deliberadamente NO hace
+## Parche B: el veredicto español
 
-Queda fuera, y no por olvido: **corregir el veredicto español**, que hoy afirma que la Ley no impone
-regla estadística y calla que el art. 17.7 RIS habilita usarlas, y **calcular `adjusted_rate` para
-España** conforme a la doctrina de la SAN 1072/2019 (caso IKEA Ibérica), que sitúa el ajuste en el
-cuartil más próximo cuando no hay defectos de comparabilidad motivados.
+Va aparte porque toca la prosa, no la estructura. Anotado como deuda en
+`tests/web/test_coherencia_corpus_motor.py`, con dos marcadores `xfail(strict=True)`.
 
-Están anotados como deuda en `tests/web/test_coherencia_corpus_motor.py` y se dejan aparte por una
-razón concreta: **esa corrección sí rompe cosas**. Dos de los cinco casos dorados congelan la frase
-palabra por palabra, de modo que el arnés de evaluación **se pondrá rojo por acertar**; y los `payload`
-guardados congelan el texto de los casos ya emitidos, que seguirán reimprimiéndose con la frase vieja.
-Eso exige una decisión sobre qué se hace con lo ya emitido, y esa decisión no es técnica.
+**Qué hay que corregir.** Dentro del rango, el veredicto dice que el art. 18.4 LIS «no impone regla
+estadística» y calla que el art. 17.7 RIS habilita usarlas. Fuera del rango dice que la corrección
+«depende de la valoración caso por caso de la Inspección», que es vago hasta la inutilidad.
+
+**Con qué.** Con la **nota del Departamento de Inspección Financiera y Tributaria de la AEAT sobre el
+rango de plena competencia**, incorporada al corpus el 2026-08-28 y localizada a través del perfil de
+país de la OCDE. Dice, de la propia Inspección:
+
+| Situación | Lo que el veredicto puede afirmar ahora |
+|---|---|
+| Dentro del rango | La Administración **no podrá regularizar**. Más fuerte que «es defendible» |
+| Fuera, comparables muy fiables | Ajuste al punto del rango **más próximo**. La AEAT admite que es el caso raro |
+| Fuera, con defectos persistentes | **De ordinario, la mediana** — y la Inspección **debe motivar** esos defectos |
+
+### Una decisión de diseño que cambió por el camino
+
+Este documento sostuvo el 27 de agosto que `adjusted_rate` debía dejar de ser `None` para España.
+**Ya no.** Ese campo significa *el tipo que la norma impone*: en Alemania el §1.3a lo impone, en
+España no lo impone nada. Rellenarlo con la mediana igualaría las dos casillas y borraría la asimetría
+que el producto existe para enseñar —y que `tests/domain/test_rules.py` protege en
+`test_same_rate_same_range_different_consequence`—.
+
+La mediana va **en la prosa**, con sus dos condiciones. Un número no admite condiciones; una frase sí.
+
+Efecto colateral valioso: así el parche B **no toca la suite rescatada**. Sus tres aserciones
+españolas —`adjusted_rate is None`, `"no impone ajuste automático" in consequence`, y la cita de
+`es-lis-art18-4`— siguen siendo ciertas con el texto nuevo. Las 180 se quedan quietas.
+
+### Sobre el conjunto dorado, rectificando un aviso mío
+
+Avisé de que corregir el motor pondría el arnés en rojo «por acertar». **Comprobado, y es más
+benigno:** los casos dorados congelan la *entrada* —el `AnalysisResult` completo— y el arnés la
+reproduce, de modo que puntúa la explicación del modelo contra un resultado guardado. No vuelve a
+llamar al motor. Corregir el veredicto deja esos ficheros **desfasados, no rojos**. Conviene
+regenerarlos para que sigan siendo representativos, pero no es un bloqueo.
+
+Lo que sí es cierto y sigue en pie: los `payload` guardados congelan el texto de los casos ya
+emitidos, que se reimprimirán con la frase vieja. Es deliberado —un informe debe poder reproducirse
+tal como se emitió— y está fijado en
+`test_los_casos_guardados_congelan_el_veredicto_en_su_payload`.
+
+### Y el matiz foral, que no se puede saltar
+
+En Álava, Bizkaia y Gipuzkoa **no existe equivalente del art. 17.7 RIS**, comprobado texto a texto, y
+**la nota de la AEAT no rige allí**: la AEAT no inspecciona en Bizkaia. La corrección del veredicto
+español **no debe propagarse** a los tres territorios vascos. Navarra sí, con su art. 18.7 propio. Ver
+`documentation/tax-research/jurisdictions/spain/forales-habilitacion-medidas-estadisticas.md`.
 
 Hay además un matiz jurídico que solo puede escribirse después: en Álava, Bizkaia y Gipuzkoa **no
 existe equivalente del art. 17.7 RIS**, comprobado texto a texto. La corrección del veredicto español

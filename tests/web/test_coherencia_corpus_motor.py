@@ -136,21 +136,40 @@ def test_el_veredicto_espanol_no_contradice_al_corpus(corpus_indexado):
     assert "no impone regla estadística" not in veredicto.consequence
 
 
-@pytest.mark.django_db
 @pytest.mark.xfail(
     strict=True,
     reason=(
-        "DEUDA CONOCIDA, 2026-08-27. La doctrina de la Audiencia Nacional 1072/2019, "
-        "caso IKEA Ibérica, fija el punto de ajuste español en el borde del rango "
-        "cuando no hay defectos de comparabilidad motivados. El motor solo calcula "
-        "`adjusted_rate` para Alemania."
+        "DEUDA CONOCIDA, 2026-08-28. Fuera del rango, el veredicto español dice que "
+        "la corrección «depende de la valoración caso por caso de la Inspección». Es "
+        "vago hasta la inutilidad, y la nota del Departamento de Inspección de la "
+        "AEAT sobre el rango de plena competencia permite decir algo mucho más útil: "
+        "de ordinario se ajusta a la mediana, y para hacerlo la Inspección debe "
+        "motivar los defectos de comparabilidad. Vive en tp_domain/, hoy protegido "
+        "por la lista deny de .claude/settings.json."
     ),
 )
-def test_espana_fuera_del_rango_tiene_punto_de_ajuste():
-    """Fuera del rango, la doctrina española da un número: el cuartil más próximo."""
+def test_espana_fuera_del_rango_nombra_el_punto_de_ajuste_de_la_practica():
+    """Fuera del rango, el veredicto tiene que nombrar la mediana. No calcularla.
+
+    **Esta prueba cambió de forma el 28 de agosto de 2026, y conviene decir por
+    qué.** Antes exigía que `adjusted_rate` dejara de ser `None` para España.
+    La nota de la AEAT hizo ver que eso era el error contrario: ese campo
+    significa *el tipo que la norma impone*, y en España no lo impone ninguna.
+    Rellenarlo igualaría la casilla española con la alemana —donde el §1.3a sí
+    lo impone— y borraría la asimetría que justifica el producto entero.
+
+    Lo que sí falta es que la **prosa** nombre la mediana con sus condiciones.
+    Un número no admite condiciones; una frase sí.
+
+    Ver `documentation/tax-research/processes/aeat-nota-rango-plena-competencia.md`.
+    """
     veredicto = assess("ES", PartyRole.PAYER, rate=4.0, benchmark=RANGO)
 
-    assert veredicto.adjusted_rate is not None
+    # El campo se queda como está: es la decisión, no la deuda.
+    assert veredicto.adjusted_rate is None
+
+    assert "mediana" in veredicto.consequence
+    assert "defectos de comparabilidad" in veredicto.consequence
 
 
 # ---------------------------------------------------------------------------

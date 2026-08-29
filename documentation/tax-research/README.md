@@ -16,6 +16,9 @@ una fecha de verificación a secas sugeriría más certeza de la que hubo.
 | Ficha | Clase | Citable | Verificación |
 |---|---|---|---|
 | [Doctrina TEAC aplicable a operaciones vinculadas](processes/doctrina-teac-bilateralidad-y-servicios.md) | case_law | no | dirigida |
+| [España — la nota de la AEAT sobre el rango de plena competencia](processes/aeat-nota-rango-plena-competencia.md) | guidelines | no | primaria |
+| [España — el perfil de país de la OCDE, julio de 2025](jurisdictions/spain/oecd-perfil-pais-espana-2025.md) | guidelines | no | primaria |
+| [España — conclusiones del grupo de precios de transferencia del Foro de Grandes Empresas](jurisdictions/spain/aeat-foro-grandes-empresas-criterios.md) | guidelines | no | dirigida |
 | [España — STS 390/2021: no todo convenio tiene el artículo 9.2, y sin él no hay ajuste bilateral](processes/sts-390-2021-ajuste-bilateral-y-cdi-sin-articulo-9-2.md) | case_law | no | primaria |
 | [España — la mediana exige defectos de comparabilidad motivados, no basta estar fuera del rango](processes/doctrina-mediana-exige-defectos-motivados.md) | case_law | no | primaria |
 | [España — Art. 18 LIS: operaciones vinculadas](jurisdictions/spain/art18-lis-operaciones-vinculadas.md) | legislation | **sí** | primaria |
@@ -34,6 +37,7 @@ una fecha de verificación a secas sugeriría más certeza de la que hubo.
 
 | Ficha | Clase | Citable | Verificación |
 |---|---|---|---|
+| [UE — el informe del Foro Conjunto sobre el uso de comparables](jurisdictions/eu/jtpf-2017-uso-de-comparables.md) | guidelines | no | primaria |
 | [UE — Convenio de Arbitraje 90/436: el ajuste correlativo entre empresas asociadas](jurisdictions/eu/convenio-arbitraje-90-436-ajuste-correlativo.md) | legislation | no | primaria |
 | [UE — DAC4: el informe país por país, y para qué NO puede usarse](jurisdictions/eu/dac4-informe-pais-por-pais.md) | legislation | no | primaria |
 | [UE — DAC6: la seña distintiva E, precios de transferencia](jurisdictions/eu/dac6-sena-distintiva-e-precios-de-transferencia.md) | legislation | no | primaria |
@@ -62,6 +66,12 @@ una fecha de verificación a secas sugeriría más certeza de la que hubo.
 | [OCDE — Directrices de Precios de Transferencia 2022: los tres marcos](frameworks/ocde-directrices-2022-marcos-riesgo-dempe-servicios.md) | guidelines | **sí** | primaria |
 | [Safe harbours y HTVI — las reglas numéricas de la OCDE](frameworks/safe-harbours-y-htvi.md) | guidelines | no | dirigida |
 
+## Naciones Unidas
+
+| Ficha | Clase | Citable | Verificación |
+|---|---|---|---|
+| [ONU — Manual Práctico de Precios de Transferencia, 2021](frameworks/onu-manual-precios-transferencia-2021.md) | guidelines | no | dirigida |
+
 ## Cómo crece
 
 Con la skill `investigar-norma`, que impone el orden: explorar, triar, capturar el texto y estructurar
@@ -70,4 +80,4 @@ la ficha con sus ocho claves de frontmatter. Una ficha **no** modela una jurisdi
 
 Una jurisdicción sin ficha se queda en `NOT_MODELLED`. Nunca hereda la regla del vecino.
 
-Total actual: **26 fichas**, 19 con fuente primaria leída.
+Total actual: **31 fichas**, 22 con fuente primaria leída.
